@@ -1,0 +1,11 @@
+[instruction]
+	call
+
+[internal run]
+	if(RF.exe_code.type IS "Bind")
+		RF.symbol_table.insert("this",r1)
+
+	code_box.stack_frame.push(CFRC)
+	CFRC=RF
+	call()
+

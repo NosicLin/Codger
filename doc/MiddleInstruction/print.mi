@@ -1,0 +1,14 @@
+[instruction]
+	print 
+
+[internal run]
+	RF=new FuncFrame
+	Object ob=r0.get_attr("@print")
+	RF.symbol_table.insert("this",r0)
+	RF.exe_code=ob 
+	code_box.stack_frame.push(CFRC)
+	CFRC=RF
+	call()
+
+	
+

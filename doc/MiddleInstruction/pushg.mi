@@ -1,0 +1,7 @@
+[instruction]
+	pushg
+
+[internal run]
+	String arg_name=RF.exe_code.get_arg_name(RF.c_args.size())
+	RF.symbol_table.insert(arg_name,r0)
+	RF.c_args.push(r0)

@@ -1,0 +1,133 @@
+Redy Grammar
+1)[x] denotes zero or one occurrences of x
+2){x} denotes zero or more occurrences of x
+3)<x> denotes one or more occurrences of x 
+4)x|y means one of either x or y 
+
+/*stmt*/
+stmt:
+	expr_stmt
+	jump_stmt
+	select_stmt
+	iter_stmt
+	import_stmt
+	try_stmt
+	emit_stmt
+
+select_stmt:
+	'if' expr_stmt stmt_delimiter stmts ['elif' expr_stmt stmt_delimiter stmts] ['else' stmt_delimiter stmts] 'end'
+
+jump_stmt:
+	'break'
+	'return' [expr]
+	'continue' 
+
+iter_stmt:
+	'for' identifier 'in' expr stmt_delimiter stmts 'end'
+	'while' [expr] stmt_delimiter stmts 'end'
+
+try_stmt:
+	'try' stmt_delimiter stmts <'catch' [type_exception[:identifier]] stmt_delimiter stmts> {'finally' stmt_delimiter stmts} 'end'
+
+import_stmt:
+
+emit_stmt:
+	'emit' expr
+
+stmts:
+	<stmt stmt_delimiter>
+
+stmt_delimiter:
+	'\n'
+	';'
+
+/*declare*/
+
+declare:
+	class_declare
+	func_declare
+
+class_declare:
+	'class' identifier stmt_delimiter {class_members stmt_delimiter} 'end'
+
+class_members:
+	func_declare 
+	attr identifier_list
+	inherit identifier_list 
+	
+identifier_list:
+	{identifier,} identifier
+
+func_declare:
+	'func' identifier['('[args_list]')'] stmt_delimiter stmts 'end'
+
+args_list:
+	{identifier,}identifier
+
+/*expression*/
+
+primary_expr:
+	identifier
+	integer_literal
+	float_literal
+	bool_literal
+	character_literal
+	null_literal
+
+postfix_expr:
+	primary_expr{('[' expr ']' | '(' args_list ')' | '.' identifier | '++' | '--')}
+
+args_list:
+	expr {,expr}
+	
+unary_expr:
+	{unary_operator} postfix_expr
+
+unary_operator:
+	'+'|'++'|'-'|'--'|'not'|
+	'
+multi_expr:
+	unary_expr {('*'|'/'|'%') unary_expr}
+
+add_expr:
+	multi_expr {('+'|'-') multi_expr}
+
+shift_expr:
+	add_expr {('<<'|'>>') add_expr}
+
+comp_expr:
+	shift_expr {('>'|'<'|'<='|'>=') shift_expr}
+
+equality_expr:
+	comp_expr {('=='|'!=') comp_expr}
+
+bits_and_expr:
+	equality_expr {'&' equality_expr}
+
+bits_xor_expr:
+	bits_and_expr {'^' bits_and_expr }
+
+bits_or_expr:
+	bits_xor_expr {'|' bits_xor_expr }
+
+log_and_expr:
+	bits_or_expr { 'and' bits_or_expr}
+
+log_or_expr:
+	log_and_expr { 'or' log_and_expr}
+	
+cond_expr:
+	log_or_expr '?' expr ':' cond_expr
+
+assign_expr:
+	{assign_left assign_operator} cond_expr
+
+assign_operator:
+	'+='|'-='|'*='|'/='|'%='|'&='|'^='|'|='|'>>='|'<<='
+
+
+
+
+
+
+	

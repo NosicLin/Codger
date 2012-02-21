@@ -1,0 +1,93 @@
+primary_expr:
+	symbol | integer_literal | float_literal
+	bool_literal | char_literal | string_literal
+	|'(' expr ')'
+
+postfix_expr:
+	primary_expr
+	|postfix_expr '[' expr ']'
+	|postfix_expr '(' args_list ')'
+	|postfix_expr '(' ')'
+	|postfix_expr '.' identifier 
+	|postfix_expr '++'
+	|postfix_expr '--'
+
+args_list:
+	expr 
+	|args_list ',' expr 
+
+unary_expr:
+	postfix_expr
+	| unary_operator unary_expr 
+
+unary_operator:
+	'+'|'++'|'-'|'--'|'!'|'not'|'~'
+
+multi_expr:
+	unary_expr
+	|multi_expr multi_operator unary_expr
+
+multi_operator:
+	'*'|'/'|'%' 
+
+add_expr:
+	multi_expr
+	| add_expr add_operator multi_expr
+
+add_operator:
+	'+'|'-'
+
+shift_expr:
+	add_expr
+	|shift_expr shift_operator add_expr
+
+shift_operator:
+	'<<'|'>>'
+
+comp_expr:
+	shift_expr
+	|comp_expr comp_operator shift_expr
+
+comp_operator:
+	'>'|'<'|'<='|'>='
+
+equality_expr:
+	comp_expr
+	|equality_expr equality_operator comp_expr
+
+equality_operator:
+	'=='|'!='
+
+bits_and_expr:
+	equality_expr
+	| bits_and_expr '&' equality_expr 
+
+bits_xor_expr:
+	bits_and_expr
+	| bits_xor_expr '^' bits_and_expr
+
+bits_or_expr:
+	bits_xor_expr
+	| bits_or_expr '|' bits_xor_expr
+
+logic_and_expr:
+	bits_or_expr
+	|logic_and_expr 'and' bits_or_expr 
+
+logic_or_expr:
+	logic_and_expr
+	|logic_or_expr  'or' logic_and_expr
+
+cond_expr:
+	logic_or_expr '?' expr ':' cond_expr
+
+assign_expr:
+	cond_expr
+	| symbol assign_operator assign_expr 
+
+assign_operator:
+	'+='|'-='|'*='|'/='|'%='
+	|'&='|'^='|'|='|'>>='|'<<='
+		
+
+
