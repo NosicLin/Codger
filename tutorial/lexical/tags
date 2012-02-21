@@ -1,0 +1,43 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ASSIC_NUM	identifier.c	11;"	d	language:C	file:
+ASSIC_NUM	lexical.c	1;"	d	language:C	file:
+ID_DIGIT	identifier.c	6;"	d	language:C	file:
+ID_DIGIT	lexical.c	4;"	d	language:C	file:
+ID_ERR	identifier.c	5;"	d	language:C	file:
+ID_ERR	lexical.c	3;"	d	language:C	file:
+ID_INPUT_TYPES	lexical.c	21;"	d	language:C	file:
+ID_LETTER	identifier.c	7;"	d	language:C	file:
+ID_LETTER	lexical.c	5;"	d	language:C	file:
+ID_STATE_BEGIN	lexical.c	23;"	d	language:C	file:
+ID_STATE_ERROR	lexical.c	25;"	d	language:C	file:
+ID_STATE_IDENTIFIER	lexical.c	24;"	d	language:C	file:
+ID_STATE_TYPES	lexical.c	20;"	d	language:C	file:
+ID_S_AT	identifier.c	9;"	d	language:C	file:
+ID_S_AT	lexical.c	7;"	d	language:C	file:
+ID_UNDERLINE	identifier.c	8;"	d	language:C	file:
+ID_UNDERLINE	lexical.c	6;"	d	language:C	file:
+REDY_LEXICAL_H_	lexical.h	2;"	d	language:C++
+automaton	lexical.h	/^struct automaton$/;"	s	language:C++
+automaton::begin_state	lexical.h	/^	int begin_state;$/;"	m	language:C++	struct:automaton	access:public
+automaton::inputs_num	lexical.h	/^	int inputs_num;  \/* type of inputs char*\/$/;"	m	language:C++	struct:automaton	access:public
+automaton::states_info	lexical.h	/^	char* states_info;$/;"	m	language:C++	struct:automaton	access:public
+automaton::states_matrix	lexical.h	/^	int** states_matrix;$/;"	m	language:C++	struct:automaton	access:public
+automaton::states_num	lexical.h	/^	int states_num;  \/*number of state*\/$/;"	m	language:C++	struct:automaton	access:public
+automaton::type_map	lexical.h	/^	char* type_map;  $/;"	m	language:C++	struct:automaton	access:public
+begin_state	lexical.h	/^	int begin_state;$/;"	m	language:C++	struct:automaton	access:public
+id_array	identifier.c	/^char id_array[ASSIC_NUM];$/;"	v	language:C
+id_array_create	identifier.c	/^void id_array_create()$/;"	f	language:C
+identifier_automaton	lexical.c	/^int identifier_automaton[ID_STATE_TYPES][ID_INPUT_TYPES]=$/;"	v	language:C
+identifier_type_map	lexical.c	/^char identifier_type_map[ASSIC_NUM]=$/;"	v	language:C
+inputs_num	lexical.h	/^	int inputs_num;  \/* type of inputs char*\/$/;"	m	language:C++	struct:automaton	access:public
+main	identifier.c	/^int main()$/;"	f	language:C
+print_array	identifier.c	/^void print_array(char* array)$/;"	f	language:C	signature:(char* array)
+states_info	lexical.h	/^	char* states_info;$/;"	m	language:C++	struct:automaton	access:public
+states_matrix	lexical.h	/^	int** states_matrix;$/;"	m	language:C++	struct:automaton	access:public
+states_num	lexical.h	/^	int states_num;  \/*number of state*\/$/;"	m	language:C++	struct:automaton	access:public
+type_map	lexical.h	/^	char* type_map;  $/;"	m	language:C++	struct:automaton	access:public

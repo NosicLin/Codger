@@ -14,4 +14,11 @@ model_stmt:
 	func_declare
 	|class_declare
 	|normal_stmt
+	|import_stmt
+
+import_stmt:
+	'import' identifier_list 
+	|'from' identifier_list 'import' '*'
+	|'from' identifier_list 'import' identifier 
+	|'import' identifier_list 'as' identifier 
 

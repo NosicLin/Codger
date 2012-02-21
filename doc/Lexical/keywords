@@ -1,0 +1,34 @@
+[filename]
+	keywords
+
+[class]
+	'class' 'attr' 'end' 'inhrit'
+
+[function]
+	'func' 'end'
+	
+[model]
+	'import' 'as' 'to'  'from' 
+
+[iterator]
+	'break' 'continue' 'for' 'while' 'do' 'in' 'end'
+
+[select]
+	'if' 'elif' 'else' 'then' 'end'
+
+[expression]
+	'(' ')' '[' ']' '.' '++' '--' ','
+	'+' '++' '-' '--' '!' 'not' '~'
+	'%' '/' '%'
+	'<<' '>>'
+	'<' '>' '<=' '>='
+	'==' '!='
+	'&' '^' '|'
+	'and' 'or'
+	'?' ':'
+	'+=' '-=' '*=' '/=' '%='
+	'&=' '^=' '|=' '>>=' '<<='
+
+
+
+

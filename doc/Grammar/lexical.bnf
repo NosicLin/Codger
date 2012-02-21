@@ -1,0 +1,33 @@
+[filename]
+	lexical.bnf
+[reference]
+	http://docs.python.org/reference/lexical_analysis.html
+[Grammar]
+
+identifier ::=(letter|'_'|'@')(letter|digit|"_")*
+digit ::='0'..'9'
+letter ::=lowercase|uppercase
+lowercase ::='a'..'z'
+uppercase ::='A'..'Z'
+
+string ::='"'stringitem*'"'
+stringitem ::= <any source character except "\ " or newline or the quote>
+
+longinteger    ::=  integer ("l" | "L")
+integer        ::=  decimalinteger | octinteger | hexinteger | bininteger
+decimalinteger ::=  nonzerodigit digit* | "0"
+octinteger     ::=  "0" ("o" | "O") octdigit+ | "0" octdigit+
+hexinteger     ::=  "0" ("x" | "X") hexdigit+
+bininteger     ::=  "0" ("b" | "B") bindigit+
+nonzerodigit   ::=  "1"..."9"
+octdigit       ::=  "0"..."7"
+bindigit       ::=  "0" | "1"
+hexdigit       ::=  digit | "a"..."f" | "A"..."F"
+
+floatnumber   ::=  pointfloat | exponentfloat
+pointfloat    ::=  [intpart] fraction | intpart "."
+exponentfloat ::=  (intpart | pointfloat) exponent
+intpart       ::=  digit+
+fraction      ::=  "." digit+
+exponent      ::=  ("e" | "E") ["+" | "-"] digit+
+	
