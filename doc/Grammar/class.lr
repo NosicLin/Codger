@@ -1,0 +1,28 @@
+[filename]
+	class.lr
+[Grammar]
+
+class_declare:
+	'class' identifier stmt_delimiter class_members 'end' 
+
+class_stmts:
+	class_stmt stmt_delimiter
+	|class_stmts class_stmt stmt_delimiter
+
+class_member:
+	func_declare
+	|vfunc_declare
+	|'attr' identifier_list 
+
+identifier_list:
+	identifier
+	|identifier_list,identifier
+
+
+vfunc_declare:
+	vfunc identifier '(' args_list ')' 
+	vfunc identifier '(' ')' 
+
+ 
+
+

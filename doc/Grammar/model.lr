@@ -1,0 +1,17 @@
+[filename]
+	model.lr
+
+[Grammar]
+
+model:
+	model_stmts
+
+model_stmts:
+	model_stmt stmt_delimiter
+	|model_stmts model_stmt  stmt_delimiter
+
+model_stmt:
+	func_declare
+	|class_declare
+	|normal_stmt
+

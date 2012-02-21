@@ -1,0 +1,82 @@
+[filename]
+	stmts.lr
+
+[Grammar]
+
+stmts:
+	normal_stmt stmt_delimiter
+	|stmts normal_stmt stmt_delimiter 
+
+normal_stmt:
+	|expr_stmt
+	|inhrit_stmt
+	|for_stmt
+	|while_stmt
+	|do_until_stmt
+	|if_else_stmt
+	|return_stmt
+	|pass_stmt
+
+iterator_stmts:
+	iterator_stmt stmt_delimiter 
+	|iterator_stmts iterator_stmt stmt_delimiter
+
+iterator_stmt:
+	break_stmt
+	|continue_stmt
+	|normal_stmt
+
+expr_stmt:
+	expr_assign 
+
+inhrit_stmt:
+	'inherit' expr 
+
+for_stmt:
+	'for' identifier 'in' expr do_delimiter iterator_stmts 'end' 
+
+while_stmt:
+	'while' expr do_delimiter iterator_stmts 'end' 
+
+do_until_stmt:
+	'do' stmt_delimiter iterator_stmts until expr 
+
+do_delimiter:
+	'do"
+	|'do' newlines
+	|newlines
+
+if_else_stmt:
+	'if' expr then_delimiter stmts 'end' 
+	|'if' expr then_delimiter elif_stmts 'end' 
+	|'if' expr then_delimiter elif_stmts 'else' stmts 'end' 
+
+elif_stmts:
+	elif_stmt
+	|elif_stmts elif_stmt
+
+elif_stmt:
+	elif expr then_delimiter stmts 
+
+then_delimiter:
+	'then'
+	|'then' newlines
+	|newlines
+
+break_stmt:
+	'break' 
+
+return_stmt:
+	'return'
+	'return '(' expr ')'
+	'return expr 
+
+continue_stmt:
+	'continue 
+
+pass_stmt:
+	'pass'
+
+
+
+	

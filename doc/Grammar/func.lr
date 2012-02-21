@@ -1,0 +1,8 @@
+[filename]
+	func.lr 
+
+[Grammar]
+
+func_declare:
+	func identifier '(' args_list ')' stmt_delimiter stmts 'end' 
+	func identifier '(' ')' stmt_delimiter stmts 'end' 
