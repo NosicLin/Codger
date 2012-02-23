@@ -1,4 +1,4 @@
-#include<lexical.h>
+#include "lexical.h"
 #include<stdio.h>
 #include<string.h>
 /*返回值－1则表示识别错误，其它值表示能识别的最大位置*/

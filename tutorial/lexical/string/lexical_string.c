@@ -1,4 +1,4 @@
-#include<lexical.h>
+#include "lexical.h"
 
 #define STRING_OTHER 0
 #define STRING_NEWLINE 1

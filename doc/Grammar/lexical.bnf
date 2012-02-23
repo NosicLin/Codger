@@ -25,9 +25,8 @@ bindigit       ::=  "0" | "1"
 hexdigit       ::=  digit | "a"..."f" | "A"..."F"
 
 floatnumber   ::=  pointfloat | exponentfloat
-pointfloat    ::=  [intpart] fraction | intpart "."
+pointfloat    ::=  [intpart] "." digit+
 exponentfloat ::=  (intpart | pointfloat) exponent
 intpart       ::=  digit+
-fraction      ::=  "." digit+
 exponent      ::=  ("e" | "E") ["+" | "-"] digit+
 	
