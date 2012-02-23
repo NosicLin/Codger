@@ -10,8 +10,11 @@ letter ::=lowercase|uppercase
 lowercase ::='a'..'z'
 uppercase ::='A'..'Z'
 
+
+
 string ::='"'stringitem*'"'
-stringitem ::= <any source character except "\ " or newline or the quote>
+stringitem ::= <any source character except "\ " or newline or the quote> ｜'\'esc_item
+esc_item ::=<any source character >
 
 longinteger    ::=  integer ("l" | "L")
 integer        ::=  decimalinteger | octinteger | hexinteger | bininteger
