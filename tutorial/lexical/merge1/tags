@@ -1,0 +1,116 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ASCII_NUM	lexical.h	4;"	d	language:C++
+ASSIC_NUM	type_map.c	6;"	d	language:C	file:
+INIT_FINAL_STATE	lexical.h	48;"	d	language:C++
+INIT_OPERATOR_ASSIGN_TRANSLATE	lexical_operator.c	41;"	d	language:C	file:
+INIT_OPERATOR_EQUAL	lexical_operator.c	38;"	d	language:C	file:
+OPERATOR_FINAL_STATE	lexical_operator.c	17;"	d	language:C	file:
+OPER_AMPERSAND	lexical_operator.c	/^	OPER_AMPERSAND,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_AMPERSAND	type_map.c	/^	OPER_AMPERSAND,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_BAR	lexical_operator.c	/^	OPER_BAR,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_BAR	type_map.c	/^	OPER_BAR,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_CARET	lexical_operator.c	/^	OPER_CARET,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_CARET	type_map.c	/^	OPER_CARET,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_COMMA	lexical_operator.c	/^	OPER_COMMA,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_COMMA	type_map.c	/^	OPER_COMMA,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_DIVIDE	lexical_operator.c	/^	OPER_DIVIDE,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_DIVIDE	type_map.c	/^	OPER_DIVIDE,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_EQUAL	lexical_operator.c	/^	OPER_EQUAL,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_EQUAL	type_map.c	/^	OPER_EQUAL,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_EXCLAMATION	lexical_operator.c	/^	OPER_EXCLAMATION,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_EXCLAMATION	type_map.c	/^	OPER_EXCLAMATION,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_GREATER	lexical_operator.c	/^	OPER_GREATER,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_GREATER	type_map.c	/^	OPER_GREATER,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_INPUT_NUM	lexical_operator.c	/^	OPER_INPUT_NUM$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_INPUT_NUM	type_map.c	/^	OPER_INPUT_NUM$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_INPUT_TYPE	lexical_operator.c	/^enum OPER_INPUT_TYPE$/;"	g	language:C	file:
+OPER_INPUT_TYPE	type_map.c	/^enum OPER_INPUT_TYPE$/;"	g	language:C	file:
+OPER_LESS	lexical_operator.c	/^	OPER_LESS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_LESS	type_map.c	/^	OPER_LESS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_L_RB	lexical_operator.c	/^	OPER_L_RB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_L_RB	type_map.c	/^	OPER_L_RB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_L_SB	lexical_operator.c	/^	OPER_L_SB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_L_SB	type_map.c	/^	OPER_L_SB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_MINUS	lexical_operator.c	/^	OPER_MINUS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_MINUS	type_map.c	/^	OPER_MINUS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_OTHER	lexical_operator.c	/^	OPER_OTHER=0,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_OTHER	type_map.c	/^	OPER_OTHER=0,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PERCENT	lexical_operator.c	/^	OPER_PERCENT,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PERCENT	type_map.c	/^	OPER_PERCENT,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PERIOD	lexical_operator.c	/^	OPER_PERIOD,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PERIOD	type_map.c	/^	OPER_PERIOD,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PLUS	lexical_operator.c	/^	OPER_PLUS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_PLUS	type_map.c	/^	OPER_PLUS,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_REVERSE	lexical_operator.c	/^	OPER_REVERSE,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_REVERSE	type_map.c	/^	OPER_REVERSE,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_R_RB	lexical_operator.c	/^	OPER_R_RB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_R_RB	type_map.c	/^	OPER_R_RB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_R_SB	lexical_operator.c	/^	OPER_R_SB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_R_SB	type_map.c	/^	OPER_R_SB,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_STAR	lexical_operator.c	/^	OPER_STAR,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+OPER_STAR	type_map.c	/^	OPER_STAR,$/;"	e	language:C	enum:OPER_INPUT_TYPE	file:
+_REDY_LEXICAL_H_	lexical.h	2;"	d	language:C++
+__INIT_OPERATOR_ASSIGN_TRANSLATE	lexical_operator.c	29;"	d	language:C	file:
+bits_and	lexical_operator.c	/^INIT_OPERATOR_EQUAL(bits_and);$/;"	v	language:C
+bits_or	lexical_operator.c	/^INIT_OPERATOR_EQUAL(bits_or);$/;"	v	language:C
+bits_xor	lexical_operator.c	/^INIT_OPERATOR_EQUAL(bits_xor);$/;"	v	language:C
+comma	lexical_operator.c	/^OPERATOR_FINAL_STATE(comma);$/;"	v	language:C
+divide	lexical_operator.c	/^INIT_OPERATOR_EQUAL(divide);$/;"	v	language:C
+driver	lexical_driver.c	/^int driver(struct state* s,char* str)$/;"	f	language:C	signature:(struct state* s,char* str)
+greater_equal	lexical_operator.c	/^OPERATOR_FINAL_STATE(greater_equal);$/;"	v	language:C
+id_array	type_map.c	/^char id_array[ASSIC_NUM];$/;"	v	language:C
+id_array_create	type_map.c	/^void id_array_create()$/;"	f	language:C
+input_map	lexical.h	/^typedef int (*input_map)(char);$/;"	t	language:C++
+input_map_other	lexical.c	/^int input_map_other(char c)$/;"	f	language:C	signature:(char c)
+input_map_other	lexical.h	/^int input_map_other(char);$/;"	p	language:C++	signature:(char)
+input_type_other	lexical_operator.c	3;"	d	language:C	file:
+l_rb	lexical_operator.c	/^OPERATOR_FINAL_STATE(l_rb);$/;"	v	language:C
+l_sb	lexical_operator.c	/^OPERATOR_FINAL_STATE(l_sb);$/;"	v	language:C
+left_shift	lexical_operator.c	/^INIT_OPERATOR_EQUAL(left_shift);$/;"	v	language:C
+less_equal	lexical_operator.c	/^OPERATOR_FINAL_STATE(less_equal);$/;"	v	language:C
+lex_err	lexical.c	/^struct state lex_err=$/;"	v	language:C	typeref:struct:state
+main	type_map.c	/^int main()$/;"	f	language:C
+minus	lexical_operator.c	/^INIT_OPERATOR_EQUAL(minus);$/;"	v	language:C
+mod	lexical_operator.c	/^INIT_OPERATOR_EQUAL(mod);$/;"	v	language:C
+multiply	lexical_operator.c	/^INIT_OPERATOR_EQUAL(multiply);$/;"	v	language:C
+oper_begin_state	lexical_operator.c	/^struct state oper_begin_state=$/;"	v	language:C	typeref:struct:state
+oper_begin_state_targets_array	lexical_operator.c	/^struct state* oper_begin_state_targets_array[]=$/;"	v	language:C	typeref:struct:state
+oper_greater_than	lexical_operator.c	/^struct state oper_greater_than=$/;"	v	language:C	typeref:struct:state
+oper_greater_than_input_type	lexical_operator.c	/^int oper_greater_than_input_type(char c)$/;"	f	language:C	signature:(char c)
+oper_greater_than_targets_array	lexical_operator.c	/^static struct state* oper_greater_than_targets_array[]=$/;"	v	language:C	typeref:struct:state	file:
+oper_input_type_map	lexical_operator.c	/^char oper_input_type_map[ASCII_NUM]=$/;"	v	language:C
+oper_less_than	lexical_operator.c	/^struct state oper_less_than=$/;"	v	language:C	typeref:struct:state
+oper_less_than_input_targets_array	lexical_operator.c	/^static struct state* oper_less_than_input_targets_array[]=$/;"	v	language:C	typeref:struct:state	file:
+oper_less_than_input_type	lexical_operator.c	/^int oper_less_than_input_type(char c)$/;"	f	language:C	signature:(char c)
+operator_input_map_equal	lexical_operator.c	/^int operator_input_map_equal(char c)$/;"	f	language:C	signature:(char c)
+operator_input_map_other	lexical_operator.c	/^int operator_input_map_other(char c)$/;"	f	language:C	signature:(char c)
+period	lexical_operator.c	/^OPERATOR_FINAL_STATE(period);$/;"	v	language:C
+plus	lexical_operator.c	/^INIT_OPERATOR_EQUAL(plus);$/;"	v	language:C
+print_array	type_map.c	/^void print_array(char* array)$/;"	f	language:C	signature:(char* array)
+r_rb	lexical_operator.c	/^OPERATOR_FINAL_STATE(r_rb);$/;"	v	language:C
+r_sb	lexical_operator.c	/^OPERATOR_FINAL_STATE(r_sb);$/;"	v	language:C
+reverse	lexical_operator.c	/^OPERATOR_FINAL_STATE(reverse);$/;"	v	language:C
+right_shift	lexical_operator.c	/^INIT_OPERATOR_EQUAL(right_shift);$/;"	v	language:C
+s_final	lexical.h	/^	int s_final;$/;"	m	language:C++	struct:state	access:public
+s_input_func	lexical.h	/^	input_map s_input_func;$/;"	m	language:C++	struct:state	access:public
+s_input_map	lexical.h	/^	char* s_input_map;$/;"	m	language:C++	struct:state	access:public
+s_inputs_num	lexical.h	/^	int s_inputs_num;$/;"	m	language:C++	struct:state	access:public
+s_name	lexical.h	/^	char* s_name;$/;"	m	language:C++	struct:state	access:public
+s_targets	lexical.h	/^	struct state** s_targets;$/;"	m	language:C++	struct:state	typeref:struct:state::state	access:public
+s_targets_num	lexical.h	/^	int s_targets_num;$/;"	m	language:C++	struct:state	access:public
+state	lexical.h	/^struct state$/;"	s	language:C++
+state::s_final	lexical.h	/^	int s_final;$/;"	m	language:C++	struct:state	access:public
+state::s_input_func	lexical.h	/^	input_map s_input_func;$/;"	m	language:C++	struct:state	access:public
+state::s_input_map	lexical.h	/^	char* s_input_map;$/;"	m	language:C++	struct:state	access:public
+state::s_inputs_num	lexical.h	/^	int s_inputs_num;$/;"	m	language:C++	struct:state	access:public
+state::s_name	lexical.h	/^	char* s_name;$/;"	m	language:C++	struct:state	access:public
+state::s_targets	lexical.h	/^	struct state** s_targets;$/;"	m	language:C++	struct:state	typeref:struct:state::state	access:public
+state::s_targets_num	lexical.h	/^	int s_targets_num;$/;"	m	language:C++	struct:state	access:public
+state_final	lexical.h	/^static inline state_final(struct state* s)$/;"	f	language:C++	signature:(struct state* s)
+state_name	lexical.h	/^static inline char* state_name(struct state* s)$/;"	f	language:C++	signature:(struct state* s)
+state_next	lexical.h	/^static inline struct state* state_next(struct state* s,char c)$/;"	f	language:C++	signature:(struct state* s,char c)

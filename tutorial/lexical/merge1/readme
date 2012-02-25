@@ -1,0 +1,9 @@
+compile
+	make
+run state machine 1
+	./a1
+run state machine 2
+	./b1
+run state machine merge
+	./merge
+
