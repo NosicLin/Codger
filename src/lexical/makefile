@@ -1,7 +1,7 @@
 PROJECT=lexical
-SRC=lexical.c sl_integer.c 
+SRC=lexical.c sl_integer.c  sl_float.c sl_number.c
 DEBUG=driver.c
-BIN=main_t1.c main_t2.c
+BIN=unit_float.c unit_integer.c in_integer.c in_float.c in_number.c
 
 OBJ_NAME=$(SRC:%.c=%.o) $(DEBUG:%.c=%.o)
 OBJ_NAME_WITH_PATH=$(addprefix obj/,$(OBJ_NAME))
