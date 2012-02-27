@@ -7,9 +7,8 @@ typedef int (*input_map)(char); /*输入类型映射函数*/
 struct state
 {
 	char* s_name;				/*状态名称*/
-
+	int s_token;				/*词文类型，用于后面的语法识别*/
 	int s_inputs_num;			/*输入类型的数量*/
-	int s_targets_num;          /*后继状态的数量*/
 
 	char* s_input_map;          /*输入类型的映射数组，如果该值为0,则用s_input_func函数指针来判断输入类型*/
 	input_map s_input_func;     /*输入类型的函数指针*/
@@ -45,12 +44,9 @@ static inline char* state_name(struct state* s)
 	return s->s_name;
 }
 
-int input_map_other(char);
-
-
 extern struct state lex_state_err; 
 extern struct state* lex_state_err_array[];
-#define INIT_FINAL_STATE(name) {name,1,0,0,input_map_other,lex_state_err_array,1}
+extern char input_map_other[];
 
 
 #endif /*_REDY_LEXICAL_H_*/

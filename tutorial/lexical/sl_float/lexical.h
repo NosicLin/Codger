@@ -42,12 +42,11 @@ static inline char* state_name(struct state* s)
 	return s->s_name;
 }
 
-int input_map_other(char);
 
 
 extern struct state lex_state_err; 
 extern struct state* lex_state_err_array[];
-#define INIT_FINAL_STATE(name) {name,1,0,0,input_map_other,lex_state_err_array,1}
+extern char input_map_other[];
 
 
 #endif /*_REDY_LEXICAL_H_*/

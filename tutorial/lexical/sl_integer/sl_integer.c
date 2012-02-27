@@ -35,7 +35,7 @@ struct state ist_long=
 	"long",
 	TOKEN_LONG,
 	1,
-	int_input_map,
+	input_map_other,
 	0,
 	lex_state_err_array,
 	1,
@@ -248,8 +248,8 @@ struct state* ist_int_prefix_targets[]=
 	&ist_oct,               /*INT_D1*/
 	&ist_oct,               /*INT_D2_7*/
 	&lex_state_err,         /*INT_D8_9*/
-                            /*INT_S_A*/
-	&lex_state_err,                     
+                            
+	&lex_state_err,         /*INT_S_A*/            
 	&ist_bin_begin,         /*INT_S_B*/
 	&lex_state_err,         /*INT_S_C_F*/
 	&ist_oct_begin,         /*INT_S_O)*/
@@ -277,8 +277,8 @@ struct state* ist_begin_targets[]=
 	&ist_dec,           /*INT_D1*/
 	&ist_dec,           /*INT_D2_7*/
 	&ist_dec,           /*INT_D8_9*/
-                        /*INT_S_A*/
-	&lex_state_err,                 
+                        
+	&lex_state_err,  	/*INT_S_A*/               
 	&lex_state_err,     /*INT_S_B*/
 	&lex_state_err,     /*INT_S_C_F*/
 	&lex_state_err,     /*INT_S_O)*/

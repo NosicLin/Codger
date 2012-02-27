@@ -1,0 +1,134 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ASCII_NUM	lexical.h	5;"	d	language:C++
+BIN	makefile	/^BIN=unit_float.c unit_integer.c in_integer.c in_float.c$/;"	m	language:Make
+BIN_NAME	makefile	/^BIN_NAME=$(BIN:%.c=%.exe)$/;"	m	language:Make
+BIN_NAME_WITH_PATH	makefile	/^BIN_NAME_WITH_PATH=$(addprefix bin\/,$(BIN_NAME))$/;"	m	language:Make
+BIN_OBJ_NAME	makefile	/^BIN_OBJ_NAME=$(BIN:%.c=%.o)$/;"	m	language:Make
+BIN_OBJ_NAME_WITH_PATH	makefile	/^BIN_OBJ_NAME_WITH_PATH=$(addprefix obj\/,$(BIN_OBJ_NAME))$/;"	m	language:Make
+CC	makefile	/^CC=gcc$/;"	m	language:Make
+DEBUG	makefile	/^DEBUG=driver.c$/;"	m	language:Make
+FLAGS	makefile	/^FLAGS=-g -Wall$/;"	m	language:Make
+FLOAT_INPUT_TYPES	sl_float.c	/^enum FLOAT_INPUT_TYPES$/;"	g	language:C	file:
+F_DIGIT	sl_float.c	/^	F_DIGIT,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+F_INPUT_NUM	sl_float.c	/^	F_INPUT_NUM,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+F_OTHER	sl_float.c	/^	F_OTHER=0,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+F_POINT	sl_float.c	/^	F_POINT,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+F_SIGN	sl_float.c	/^	F_SIGN,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+F_S_E	sl_float.c	/^	F_S_E,$/;"	e	language:C	enum:FLOAT_INPUT_TYPES	file:
+INCLUDE	makefile	/^INCLUDE=-I. -I.\/debug  $/;"	m	language:Make
+INIT_FINAL_STATE	lexical.h	50;"	d	language:C++
+INT_D0	sl_integer.c	/^	INT_D0,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_D1	sl_integer.c	/^	INT_D1,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_D2_7	sl_integer.c	/^	INT_D2_7,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_INPUT_NUM	sl_integer.c	/^	INT_INPUT_NUM$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_INPUT_TYPES	sl_integer.c	/^enum INT_INPUT_TYPES$/;"	g	language:C	file:
+INT_OTHER	sl_integer.c	/^	INT_OTHER=0,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_A	sl_integer.c	/^	INT_S_A,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_B	sl_integer.c	/^	INT_S_B,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_C_F	sl_integer.c	/^	INT_S_C_F,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_L	sl_integer.c	/^	INT_S_L,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_O	sl_integer.c	/^	INT_S_O,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+INT_S_X	sl_integer.c	/^	INT_S_X,$/;"	e	language:C	enum:INT_INPUT_TYPES	file:
+LIB	makefile	/^LIB=-Llib -l$(PROJECT)$/;"	m	language:Make
+NUMBER_INPUT_TYPES	sl_number.c	/^enum NUMBER_INPUT_TYPES$/;"	g	language:C	file:
+NU_D0	sl_number.c	/^	NU_D0,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_D1_7	sl_number.c	/^	NU_D1_7,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_D8_9	sl_number.c	/^	NU_D8_9,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_OTHER	sl_number.c	/^	NU_OTHER=0,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_POINT	sl_number.c	/^	NU_POINT,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_S_B	sl_number.c	/^	NU_S_B,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_S_E	sl_number.c	/^	NU_S_E,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_S_L	sl_number.c	/^	NU_S_L,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_S_O	sl_number.c	/^	NU_S_O,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+NU_S_X	sl_number.c	/^	NU_S_X,$/;"	e	language:C	enum:NUMBER_INPUT_TYPES	file:
+OBJ_NAME	makefile	/^OBJ_NAME=$(SRC:%.c=%.o) $(DEBUG:%.c=%.o)$/;"	m	language:Make
+OBJ_NAME_WITH_PATH	makefile	/^OBJ_NAME_WITH_PATH=$(addprefix obj\/,$(OBJ_NAME))$/;"	m	language:Make
+PROJECT	makefile	/^PROJECT=lexical$/;"	m	language:Make
+REDY_TOKEN	token.h	/^enum REDY_TOKEN$/;"	g	language:C++
+SRC	makefile	/^SRC=lexical.c sl_integer.c  sl_float.c$/;"	m	language:Make
+TOKEN_BIN	token.h	/^	TOKEN_BIN,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_DEC	token.h	/^	TOKEN_DEC,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_EXP_FLOAT	token.h	/^	TOKEN_EXP_FLOAT,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_FLOAT	token.h	/^	TOKEN_FLOAT,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_HEX	token.h	/^	TOKEN_HEX,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_ID	token.h	/^	TOKEN_ID,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_LONG	token.h	/^	TOKEN_LONG,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_OCT	token.h	/^	TOKEN_OCT,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_STRING	token.h	/^	TOKEN_STRING,$/;"	e	language:C++	enum:REDY_TOKEN
+TOKEN_UNKOWN	token.h	/^	TOKEN_UNKOWN=0,$/;"	e	language:C++	enum:REDY_TOKEN
+_REDY_LEXICAL_H_	lexical.h	2;"	d	language:C++
+_REDY_LEXICAL_SL_STATE_H_	sl_states.h	2;"	d	language:C++
+_REDY_LEXICAL_TOKEN_H_	token.h	2;"	d	language:C++
+driver	debug/driver.c	/^int driver(struct state* s,char* str,struct state* info)$/;"	f	language:C	signature:(struct state* s,char* str,struct state* info)
+driver	debug/in_float.c	/^int driver(struct state* s,char* str,struct state* info);$/;"	p	language:C	file:	signature:(struct state* s,char* str,struct state* info)
+driver	debug/in_integer.c	/^int driver(struct state* s,char* str,struct state* info);$/;"	p	language:C	file:	signature:(struct state* s,char* str,struct state* info)
+driver	debug/unit_float.c	/^int driver(struct state* s,char* str,struct state* info);$/;"	p	language:C	file:	signature:(struct state* s,char* str,struct state* info)
+driver	debug/unit_integer.c	/^int driver(struct state* s,char* str,struct state* info);$/;"	p	language:C	file:	signature:(struct state* s,char* str,struct state* info)
+float_type_map	sl_float.c	/^char float_type_map[ASCII_NUM]=$/;"	v	language:C
+ft_begin	sl_float.c	/^struct state ft_begin=$/;"	v	language:C	typeref:struct:state
+ft_begin_targets	sl_float.c	/^struct state* ft_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_exp_begin	sl_float.c	/^struct state ft_exp_begin=$/;"	v	language:C	typeref:struct:state
+ft_exp_begin_targets	sl_float.c	/^struct state* ft_exp_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_exp_sign	sl_float.c	/^struct state ft_exp_sign=$/;"	v	language:C	typeref:struct:state
+ft_exp_sign_targets	sl_float.c	/^struct state* ft_exp_sign_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_exponent	sl_float.c	/^struct state ft_exponent=$/;"	v	language:C	typeref:struct:state
+ft_exponent_targets	sl_float.c	/^struct state* ft_exponent_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_frac_begin	sl_float.c	/^struct state ft_frac_begin=$/;"	v	language:C	typeref:struct:state
+ft_frac_begin_targets	sl_float.c	/^struct state* ft_frac_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_fraction	sl_float.c	/^struct state ft_fraction=$/;"	v	language:C	typeref:struct:state
+ft_fraction_targets	sl_float.c	/^struct state* ft_fraction_targets[]=$/;"	v	language:C	typeref:struct:state
+ft_int_part	sl_float.c	/^struct state ft_int_part=$/;"	v	language:C	typeref:struct:state
+ft_int_part_targets	sl_float.c	/^struct state* ft_int_part_targets[]=$/;"	v	language:C	typeref:struct:state
+input_map	lexical.h	/^typedef int (*input_map)(char c);$/;"	t	language:C++
+input_map_other	lexical.c	/^int input_map_other(char c)$/;"	f	language:C	signature:(char c)
+input_map_other	lexical.h	/^int input_map_other(char);$/;"	p	language:C++	signature:(char)
+int_input_map	sl_integer.c	/^char int_input_map[ASCII_NUM]=$/;"	v	language:C
+ist_begin	sl_integer.c	/^struct state ist_begin=$/;"	v	language:C	typeref:struct:state
+ist_begin_targets	sl_integer.c	/^struct state* ist_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_bin	sl_integer.c	/^struct state ist_bin=$/;"	v	language:C	typeref:struct:state
+ist_bin_begin	sl_integer.c	/^struct state ist_bin_begin=$/;"	v	language:C	typeref:struct:state
+ist_bin_begin_targets	sl_integer.c	/^struct state* ist_bin_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_bin_targets	sl_integer.c	/^struct state* ist_bin_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_dec	sl_integer.c	/^struct state ist_dec=$/;"	v	language:C	typeref:struct:state
+ist_dec_targets	sl_integer.c	/^struct state* ist_dec_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_hex	sl_integer.c	/^struct state ist_hex=$/;"	v	language:C	typeref:struct:state
+ist_hex_begin	sl_integer.c	/^struct state ist_hex_begin=$/;"	v	language:C	typeref:struct:state
+ist_hex_begin_targets	sl_integer.c	/^struct state* ist_hex_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_hex_targets	sl_integer.c	/^struct state* ist_hex_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_int_prefix	sl_integer.c	/^struct state ist_int_prefix=$/;"	v	language:C	typeref:struct:state
+ist_int_prefix_targets	sl_integer.c	/^struct state* ist_int_prefix_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_long	sl_integer.c	/^struct state ist_long=$/;"	v	language:C	typeref:struct:state
+ist_oct	sl_integer.c	/^struct state ist_oct=$/;"	v	language:C	typeref:struct:state
+ist_oct_begin	sl_integer.c	/^struct state ist_oct_begin=$/;"	v	language:C	typeref:struct:state
+ist_oct_begin_targets	sl_integer.c	/^struct state* ist_oct_begin_targets[]=$/;"	v	language:C	typeref:struct:state
+ist_oct_targets	sl_integer.c	/^struct state* ist_oct_targets[]=$/;"	v	language:C	typeref:struct:state
+lex_state_err	lexical.c	/^struct state lex_state_err=$/;"	v	language:C	typeref:struct:state
+lex_state_err_array	lexical.c	/^struct state* lex_state_err_array[]={&lex_state_err};$/;"	v	language:C	typeref:struct:state
+main	debug/in_float.c	/^int main()$/;"	f	language:C
+main	debug/in_integer.c	/^int main()$/;"	f	language:C
+main	debug/unit_float.c	/^int main()$/;"	f	language:C
+main	debug/unit_integer.c	/^int main()$/;"	f	language:C
+number_input_map	sl_number.c	/^char number_input_map=$/;"	v	language:C
+s_final	lexical.h	/^	int s_final;$/;"	m	language:C++	struct:state	access:public
+s_input_func	lexical.h	/^	input_map s_input_func;  $/;"	m	language:C++	struct:state	access:public
+s_input_map	lexical.h	/^	char* s_input_map; $/;"	m	language:C++	struct:state	access:public
+s_inputs_num	lexical.h	/^	int s_inputs_num;	$/;"	m	language:C++	struct:state	access:public
+s_name	lexical.h	/^	char* s_name;			$/;"	m	language:C++	struct:state	access:public
+s_targets	lexical.h	/^	struct state** s_targets;$/;"	m	language:C++	struct:state	typeref:struct:state::state	access:public
+s_token	lexical.h	/^	int s_token;$/;"	m	language:C++	struct:state	access:public
+state	lexical.h	/^struct state$/;"	s	language:C++
+state::s_final	lexical.h	/^	int s_final;$/;"	m	language:C++	struct:state	access:public
+state::s_input_func	lexical.h	/^	input_map s_input_func;  $/;"	m	language:C++	struct:state	access:public
+state::s_input_map	lexical.h	/^	char* s_input_map; $/;"	m	language:C++	struct:state	access:public
+state::s_inputs_num	lexical.h	/^	int s_inputs_num;	$/;"	m	language:C++	struct:state	access:public
+state::s_name	lexical.h	/^	char* s_name;			$/;"	m	language:C++	struct:state	access:public
+state::s_targets	lexical.h	/^	struct state** s_targets;$/;"	m	language:C++	struct:state	typeref:struct:state::state	access:public
+state::s_token	lexical.h	/^	int s_token;$/;"	m	language:C++	struct:state	access:public
+state_final	lexical.h	/^static inline int state_final(struct state* s)$/;"	f	language:C++	signature:(struct state* s)
+state_name	lexical.h	/^static inline char* state_name(struct state* s)$/;"	f	language:C++	signature:(struct state* s)
+state_next	lexical.h	/^static inline struct state* state_next(struct state* s,int c)$/;"	f	language:C++	signature:(struct state* s,int c)

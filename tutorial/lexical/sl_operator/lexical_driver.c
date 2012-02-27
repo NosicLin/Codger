@@ -40,7 +40,7 @@ int main()
 	struct state s;
 	while(strcmp(buf,"__quit__")!=0)
 	{
-		int ret=driver(&oper_begin_state,buf,&s);
+		int ret=driver(&op_begin,buf,&s);
 		if(ret==-1)   
 		{
 			printf("Sorry,Not Operator\n");

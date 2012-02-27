@@ -8,6 +8,7 @@ struct state lex_state_err=
 	0,
 };
 struct state* lex_state_err_array[]={&lex_state_err};
+
 char input_map_other[ASCII_NUM]=
 {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
