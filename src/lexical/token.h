@@ -58,7 +58,17 @@ enum REDY_TOKEN
 	TOKEN_A_LS,
 	TOKEN_LE,
 	TOKEN_LT,
+	
+	/*annotate*/
+	TOKEN_ANNO,
 		
+	/*white space (ws)*/
+	TOKEN_WS,
+	
+	/*sentence break (sb)*/
+	TOKEN_SEMI,
+	TOKEN_NEWLINE,
+
 };
 
 #endif /*_REDY_LEXICAL_TOKEN_H_*/

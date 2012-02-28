@@ -1,6 +1,11 @@
 #ifndef _REDY_LEXICAL_SL_STATE_H_
 #define _REDY_LEXICAL_SL_STATE_H_
 #include "lexical.h"
+/*string parts*/
+extern struct state st_begin;
+extern struct state st_string;
+extern struct state st_esc;
+extern struct state st_end;
 /*identifier parts*/
 extern struct state id_begin;
 extern struct state id_identifier;
@@ -76,4 +81,21 @@ extern struct state op_less_equal;
 extern struct state op_left_shift;
 extern struct state op_assign_left_shift;
 
+/*annotate parts*/
+extern struct state an_begin;
+extern struct state an_annotate;
+extern struct state an_end;
+
+/*white space (ws) parts*/
+extern struct state ws_begin;
+extern struct state ws_ws;
+
+/*sentence break (sb)*/
+extern struct state sb_begin;
+extern struct state sb_semicolon;
+extern struct state sb_newline;
+
+/*merge parts*/
+extern struct state me_begin;
+extern struct state me_period; 
 #endif /*_REDY_LEXICAL_SL_STATE_H_*/

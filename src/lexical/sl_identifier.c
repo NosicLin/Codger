@@ -61,6 +61,7 @@ struct state id_identifier=
 	TOKEN_ID,
 	ID_INPUT_NUM,
 	id_input_map,
-	0,id_identifier_targets,
 	0,
+	id_identifier_targets,
+	1,
 };

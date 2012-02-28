@@ -101,10 +101,33 @@ void input_map_other()
 {
 	memset(id_array,0,sizeof(id_array));
 }
+void input_map_ws()
+{
+	memset(id_array,0,sizeof(id_array));
+	id_array[' ']=1;
+	id_array['\t']=1;
+}
+
+void input_map_sb()
+{
+	memset(id_array,0,sizeof(id_array));
+	id_array[';']=1;
+	id_array['\n']=2;
+}
+
+void input_map_me_divide()
+{
 	
+	memset(id_array,0,sizeof(id_array));
+	int i;
+	for(i='0';i<='9';i++)
+	{
+		id_array[i]=1;
+	};
+}
 int main()
 {
-	id_array_op_input_less_than();
+	input_map_me_divide();
 	print_array(id_array);
 	return 0;
 }

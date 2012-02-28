@@ -53,10 +53,50 @@ obj/in_number.o: debug/in_number.c /usr/include/stdio.h \
  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
  /usr/include/string.h /usr/include/xlocale.h lexical.h sl_states.h \
  lexical.h
+obj/in_operator.o: debug/in_operator.c /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/bits/predefs.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/string.h /usr/include/xlocale.h lexical.h sl_states.h \
+ lexical.h
+obj/unit_number.o: debug/unit_number.c /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/bits/predefs.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/string.h /usr/include/xlocale.h lexical.h sl_states.h \
+ lexical.h token.h
+obj/in_merge.o: debug/in_merge.c /usr/include/stdio.h \
+ /usr/include/features.h /usr/include/bits/predefs.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-32.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/i386-linux-gnu/gcc/i686-linux-gnu/4.5.2/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/string.h /usr/include/xlocale.h lexical.h sl_states.h \
+ lexical.h
 obj/lex.oal.c: lexical.c lexical.h
 obj/sl_integer.o: sl_integer.c lexical.h token.h sl_states.h
 obj/sl_float.o: sl_float.c lexical.h token.h sl_states.h
 obj/sl_number.o: sl_number.c lexical.h token.h sl_states.h
+obj/sl_operator.o: sl_operator.c token.h lexical.h sl_states.h
+obj/sl_identifier.o: sl_identifier.c lexical.h token.h sl_states.h
+obj/sl_annotate.o: sl_annotate.c lexical.h token.h sl_states.h
+obj/sl_ws.o: sl_ws.c lexical.h token.h sl_states.h
+obj/sl_sb.o: sl_sb.c lexical.h token.h sl_states.h
+obj/sl_merge.o: sl_merge.c lexical.h token.h sl_states.h
+obj/sl_string.o: sl_string.c lexical.h token.h sl_states.h
 obj/driver.o: debug/driver.c /usr/include/stdio.h /usr/include/features.h \
  /usr/include/bits/predefs.h /usr/include/sys/cdefs.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
