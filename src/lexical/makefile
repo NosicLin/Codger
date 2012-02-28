@@ -1,10 +1,11 @@
 PROJECT=lexical
 SRC=lexical.c sl_integer.c  sl_float.c sl_number.c sl_operator.c \
 	sl_identifier.c sl_annotate.c sl_ws.c sl_sb.c sl_merge.c \
-	sl_string.c
+	sl_string.c scanner.c
 DEBUG=driver.c
 BIN=unit_float.c unit_integer.c in_integer.c in_float.c \
-   	in_number.c in_operator.c unit_number.c in_merge.c
+   	in_number.c in_operator.c unit_number.c in_merge.c \
+	test_lex_file.c test_scanner.c test_key_words.c
 
 OBJ_NAME=$(SRC:%.c=%.o) $(DEBUG:%.c=%.o)
 OBJ_NAME_WITH_PATH=$(addprefix obj/,$(OBJ_NAME))
@@ -16,9 +17,9 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall
-INCLUDE=-I. -I./debug  
-LIB=-Llib -l$(PROJECT)
+FLAGS=-g -Wall -Werror
+INCLUDE=-I. -I./debug  -I../../
+LIB=-Llib -l$(PROJECT) -L../../lib -lutility_c
 
 
 

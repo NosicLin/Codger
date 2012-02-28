@@ -79,6 +79,7 @@ struct state st_esc=
 	TOKEN_UNKOWN,
 	ST_INPUT_NUM,
 	st_input_map,
+	0,
 	st_esc_targets,
 	0,
 };

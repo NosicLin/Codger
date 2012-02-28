@@ -18,6 +18,19 @@ struct state
 	int s_final;
 };
 
+struct keyword
+{
+	char* k_name;
+	int k_token;
+};
+#define KEYWORD_NUM 28
+extern struct keyword key_words[];
+
+/*lexical.c*/
+int symbol_type(char*);
+
+
+
 static inline struct state* state_next(struct state* s,int c)
 {
 	int input_type;
@@ -37,6 +50,10 @@ static inline int state_final(struct state* s)
 	return s->s_final;
 }
 
+static inline int state_token(struct state* s)
+{
+	return s->s_token;
+}
 static inline char* state_name(struct state* s)
 {
 	return s->s_name;

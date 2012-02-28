@@ -2,7 +2,7 @@
 	keywords
 
 [class]
-	'class' 'attr' 'end' 'inhrit'
+	'class' 'attr' 'end' 'inhrit' 'vfunc'
 
 [function]
 	'func' 'end'
@@ -15,6 +15,21 @@
 
 [select]
 	'if' 'elif' 'else' 'then' 'end'
+
+[sentence]
+	'return' 'print' 'pass'
+
+[exception]
+	'try' 'catch' 'finally'
+
+[keywords overview]
+	'class' 'attr' 'end' 'inhrit' 'vfunc' 'func'
+	'import' 'as' 'to'  'from' 
+	'break' 'continue' 'for' 'while' 'do' 'in' 
+	'if' 'elif' 'else' 'then' 
+	'return' 'and' 'or' 'not'
+	'print' 'try' 'catch' 'finally'
+
 
 [expression]
 	'(' ')' '[' ']' '.' ','

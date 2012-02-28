@@ -5,6 +5,8 @@ enum REDY_TOKEN
 {
 
 	TOKEN_UNKOWN=0,
+	TOKEN_ERR,
+	TOKEN_EOF,
 
 	/*integer parts*/
 	TOKEN_BIN,
@@ -69,7 +71,43 @@ enum REDY_TOKEN
 	TOKEN_SEMI,
 	TOKEN_NEWLINE,
 
+	/*keyword*/
+	TOKEN_AND,
+	TOKEN_AS,
+	TOKEN_ATTR,
+	TOKEN_BREAK,
+	TOKEN_CATCH,
+	TOKEN_CLASS,
+	TOKEN_CONTIUNE,
+	TOKEN_DO,
+	TOKEN_ELIF,
+	TOKEN_ELSE,
+	TOKEN_END,
+	TOKEN_FINALLY,
+	TOKEN_FOR,
+	TOKEN_FROM,
+	TOKEN_FUNC,
+	TOKEN_IF,
+	TOKEN_IMPORT,
+	TOKEN_IN,
+	TOKEN_INHRIT,
+	TOKEN_NOT,
+	TOKEN_OR,
+	TOKEN_PRINT,
+	TOKEN_RETURN,
+	TOKEN_THEN,
+	TOKEN_TO,
+	TOKEN_TRY,
+	TOKEN_VFUNC,
+	TOKEN_WHILE,
 };
+
+
+extern char* token_info[];
+static inline char* token_name(int token)
+{
+	return  token_info[token];
+}
 
 #endif /*_REDY_LEXICAL_TOKEN_H_*/
 
