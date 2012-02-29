@@ -1,0 +1,7 @@
+*.dep
+tags
+*.swp
+*.exe
+*.o
+*.a
+
