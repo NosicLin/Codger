@@ -1,0 +1,32 @@
+func add(left,right)
+	return left++right
+end
+
+func minus(left,right)
+	return left-right
+end
+
+i=9
+j=8
+print add(i,j)
+z=minus(i,j)
+print z
+
+
+
+a=random()
+b=random()
+if a+b/2==5
+	a.inc()
+	if a/2
+		a.dec()
+	else
+		a.inc()
+	end
+elif a+b/3==6
+	a.dec()
+else 
+	b=a/2
+end
+print a
+print b

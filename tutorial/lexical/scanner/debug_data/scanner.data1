@@ -1,0 +1,16 @@
+a=random()
+b=random()
+if a+b/2==557
+	a.inc()
+	if a/2
+		a.dec()
+	else
+		a.inc()
+	end
+elif a+b/3==6
+	a.dec()
+else 
+	b=a/2
+end
+print a
+print b

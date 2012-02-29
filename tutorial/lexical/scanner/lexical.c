@@ -1,6 +1,5 @@
 #include "lexical.h"
 #include "lex_file.h"
-#include "utility_c/marocs.h"
 #include <string.h>
 #include "token.h"
 
@@ -159,7 +158,6 @@ struct lex_file* lf_stream_create(FILE* file)
 {
 	if(file==NULL)
 	{
-		BUG("NULL Pointer");
 		return NULL;
 	}
 	struct lex_file* lf=(struct lex_file*)malloc(sizeof(*lf));

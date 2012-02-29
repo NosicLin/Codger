@@ -1,0 +1,114 @@
+#ifndef _REDY_LEXICAL_TOKEN_H_
+#define _REDY_LEXICAL_TOKEN_H_
+
+enum REDY_TOKEN
+{
+
+	TOKEN_UNKOWN=0,
+	TOKEN_ERR,
+	TOKEN_EOF,
+
+	/*integer parts*/
+	TOKEN_BIN,
+	TOKEN_OCT,
+	TOKEN_DEC,
+	TOKEN_HEX,
+	TOKEN_LONG,
+
+	/*float parts*/
+	TOKEN_FLOAT,
+	TOKEN_EXP_FLOAT,
+
+	/*string parts*/
+	TOKEN_STRING,
+
+	/*identifier parts*/
+	TOKEN_ID,
+
+	/*operator parts*/
+	TOKEN_COMMA,
+	TOKEN_PERIOD,
+	TOKEN_L_RB,
+	TOKEN_R_RB,
+	TOKEN_L_SB,
+	TOKEN_R_SB,
+	TOKEN_REVERSE,
+	TOKEN_NOT_EQUAL,
+	TOKEN_BITS_AND,
+	TOKEN_A_BITS_AND,
+	TOKEN_BITS_OR,
+	TOKEN_A_BITS_OR,
+	TOKEN_BITS_XOR,
+	TOKEN_A_BITS_XOR,
+	TOKEN_MUL,
+	TOKEN_A_MUL,
+	TOKEN_MOD,
+	TOKEN_A_MOD,
+	TOKEN_MINUS,
+	TOKEN_A_MINUS,
+	TOKEN_PLUS,
+	TOKEN_A_PLUS,
+	TOKEN_DIVIDE,
+	TOKEN_A_DIVIDE,
+	TOKEN_ASSIGN,
+	TOKEN_EQUAL,
+	TOKEN_RS,
+	TOKEN_A_RS,
+	TOKEN_GE,
+	TOKEN_GT,
+	TOKEN_LS,
+	TOKEN_A_LS,
+	TOKEN_LE,
+	TOKEN_LT,
+	
+	/*annotate*/
+	TOKEN_ANNO,
+		
+	/*white space (ws)*/
+	TOKEN_WS,
+	
+	/*sentence break (sb)*/
+	TOKEN_SEMI,
+	TOKEN_NEWLINE,
+
+	/*keyword*/
+	TOKEN_AND,
+	TOKEN_AS,
+	TOKEN_ATTR,
+	TOKEN_BREAK,
+	TOKEN_CATCH,
+	TOKEN_CLASS,
+	TOKEN_CONTIUNE,
+	TOKEN_DO,
+	TOKEN_ELIF,
+	TOKEN_ELSE,
+	TOKEN_END,
+	TOKEN_FINALLY,
+	TOKEN_FOR,
+	TOKEN_FROM,
+	TOKEN_FUNC,
+	TOKEN_IF,
+	TOKEN_IMPORT,
+	TOKEN_IN,
+	TOKEN_INHRIT,
+	TOKEN_NOT,
+	TOKEN_OR,
+	TOKEN_PRINT,
+	TOKEN_RETURN,
+	TOKEN_THEN,
+	TOKEN_TO,
+	TOKEN_TRY,
+	TOKEN_VFUNC,
+	TOKEN_WHILE,
+};
+
+
+extern char* token_info[];
+static inline char* token_name(int token)
+{
+	return  token_info[token];
+}
+
+#endif /*_REDY_LEXICAL_TOKEN_H_*/
+
+

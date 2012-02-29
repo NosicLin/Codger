@@ -1,7 +1,6 @@
 #include"scanner.h"
 #include"sl_states.h"
 #include"lexical.h"
-#include<utility_c/marocs.h>
 #include<string.h>
 
 static void sc_set_cur_literial(struct scanner* sc,char* buf,int length)
@@ -86,7 +85,6 @@ struct scanner* sc_create(char* filename)
 	struct lex_file* lf=lf_create(filename);
 	if(lf==NULL)
 	{
-		WARN("Open file[%s] Failed",filename);
 		return NULL;
 	}
 	struct scanner* sc=(struct scanner*)malloc(sizeof(*sc));
@@ -99,7 +97,6 @@ struct scanner* sc_stream_create(FILE* file)
 	struct lex_file* lf=lf_stream_create(file);
 	if(lf==NULL)
 	{
-		WARN("Create Scanner Failed");
 		return NULL;
 	}
 	struct scanner* sc=(struct scanner*)malloc(sizeof(*sc));
