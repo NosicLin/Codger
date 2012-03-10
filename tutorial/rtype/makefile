@@ -1,8 +1,10 @@
 PROJECT=rtype
 SRC=big_integer.c
 DEBUG=
-BIN=test_dec_to_bin.c test_big_integer_dec.c test_big_integer_hex.c \
-   	test_big_integer_oct.c test_big_integer_bin.c  test_bg_add.c
+BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c \
+	gen_expr.c   gen_bits.c \
+	gen_shift.c
+
 
 
 OBJ_NAME=$(SRC:%.c=%.o) $(DEBUG:%.c=%.o)
@@ -15,7 +17,7 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall -Werror
+FLAGS=-g -Wall 
 INCLUDE=-I. -I./debug  -I../../
 LIB=-Llib -l$(PROJECT) -L../../lib -lutility_c
 
@@ -45,7 +47,7 @@ init:
 rm:
 	rm -f obj/*
 	rm -f lib/*
-	rm -f bin/*
+	rm -f bin/*.exe
 clear:
 	rm -rf obj 
 	rm -rf bin 

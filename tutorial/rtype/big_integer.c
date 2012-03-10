@@ -2,6 +2,7 @@
 #include<utility_c/marocs.h>
 #include<string.h>
 #include<stdlib.h>
+#include<assert.h>
 #define DEFALUT_BIG_INTEGER_LENGTH 3 
 #define BGLONG_SHIFT 15
 #define BGLONG_BASE ((b_unit)1<<BGLONG_SHIFT)
@@ -10,6 +11,28 @@
 #define SHIFT BGLONG_SHIFT
 #define BASE BGLONG_BASE
 #define MASK BGLONG_MASK 
+
+static void units_print(b_unit* u,int size)
+{
+	assert(size>0);
+	int i,j;
+	for(i=size-1;i>=0;i--)
+	{
+		for(j=SHIFT-1;j>=0;j--)
+		{
+			if(u[i]&(1<<j))
+			{
+				printf("1");
+			}
+			else
+			{
+				printf("0");
+			}
+		}
+		printf(" ");
+	}
+}
+
 
 static inline int bg_size(BGInteger* bg)
 {
@@ -24,7 +47,21 @@ static inline void bg_set_size(BGInteger* bg,int len)
 	bg->b_len=len;
 }
 
-static void bg_negative(BGInteger* bg)
+static inline int bg_bit_in_unit(b_unit u)
+{
+	int i=SHIFT;
+	while(i--)
+	{
+		if(u&(1<<i))
+		{
+			break;
+		}
+	}
+	return i+1;
+}
+
+
+void bg_negative(BGInteger* bg)
 {
 	bg->b_len*=-1;
 }
@@ -52,14 +89,14 @@ static inline char int_to_char(int value)
 
 static inline int  bg_get_bit(BGInteger* bg,long pos)
 {
-	BUG_ON(pos>=bg->b_len*SHIFT,"Error Pos");
+	BUG_ON(pos>=abs(bg->b_len)*SHIFT,"Error Pos");
 	int pre=pos/BGLONG_SHIFT;
 	int sub=pos%BGLONG_SHIFT;
 	return (bg->b_val[pre]&(1<<sub))!=0;
 }
 static inline void bg_set_bit(BGInteger* bg,long pos,int value)
 {
-	BUG_ON(pos>=bg->b_len*SHIFT,"Error Pos");
+	BUG_ON(pos>=abs(bg->b_len)*SHIFT,"Error Pos");
 	int pre=pos/BGLONG_SHIFT;
 	int sub=pos%BGLONG_SHIFT;
 	if(value)
@@ -79,6 +116,14 @@ static inline BGInteger* bg_malloc(int len)
 	BGInteger* ret=(BGInteger*)malloc(t_len);
 	memset(ret,0,t_len);
 	ret->b_len=len;
+	return ret;
+}
+
+static BGInteger* bg_clone(BGInteger* bg)
+{
+	BGInteger* ret=bg_malloc(abs(bg->b_len));
+	ret->b_len=bg->b_len;
+	memcpy(ret->b_val,bg->b_val,abs(bg->b_len)*sizeof(b_unit));
 	return ret;
 }
 
@@ -423,7 +468,6 @@ static BGInteger* abs_mul(BGInteger* l,BGInteger* r)
 	
 	int l_len=abs(l->b_len);
 	int r_len=abs(r->b_len);
-	int sign=l->b_len*r->b_len<0?-1:1;
 	if(l_len==0||r_len==0)
 	{
 		return bg_create_zero();
@@ -447,10 +491,7 @@ static BGInteger* abs_mul(BGInteger* l,BGInteger* r)
 		}
 		t_val[i+l_len]=c;
 	}
-	if(sign==-1)
-	{
-		bg_negative(ret);
-	}
+
 	bg_format_len(ret);
 	return ret;
 }
@@ -468,6 +509,7 @@ BGInteger* bg_mul(BGInteger* l,BGInteger* r)
  * @r!=0;
  * 2<=r->len<=l->r->len;
  */
+/*
 static BGInteger* abs_divrem(BGInteger* l,BGInteger* r,BGInteger** prem)
 {
 	BUG_ON(l->b_len<r->b_len||r->b_len<2,"Error Length");
@@ -554,15 +596,406 @@ static BGInteger* abs_divrem(BGInteger* l,BGInteger* r,BGInteger** prem)
 	bg_format_len(ret);
 	return ret;
 }
-
+*/
 
 
 
 BGInteger* bg_div(BGInteger* l,BGInteger* r);
 BGInteger* bg_mod(BGInteger* l,BGInteger* r);
 
-BGInteger* bg_lshift(BGInteger* l,BGInteger* r);
-BGInteger* bg_rshift(BGInteger* l,BGInteger* r);
+/*@condition shift_value<SHIFT*/
+static b_unit units_rshift(b_unit* d, b_unit* s ,int size,int shift_value)
+{
+	assert(size>=0&&shift_value<SHIFT);
+
+	b_unit t=0;
+	while(size--)
+	{
+		d[size]=s[size]>>shift_value|t;
+		t=s[size]<<((SHIFT-shift_value)&MASK);
+	}
+	return t;
+}
+
+
+/*@condition shift_value<SHIFT*/
+static b_unit units_lshift(b_unit* d,b_unit* s,int size, int shift_value)
+{
+//	printf("size=%d\n",size);
+	assert(size>=0&&shift_value<SHIFT);
+	twob_unit t=0;
+	int i;
+	for(i=0;i<size;i++)
+	{
+		d[i]=(s[i]<<shift_value|t)&MASK;
+		t=s[i]>>((SHIFT-shift_value)&MASK);
+	}
+	return t;
+}
+
+/* if r is too large to convert to int  return -1*/
+static int bg_to_abs_int(BGInteger* r)
+{
+	int r_len=abs(r->b_len);
+	int ret=0;
+	b_unit* r_val=r->b_val;
+	if(r_len>=4)
+	{
+		return -1;
+	}
+	if(r_len==3)
+	{
+		if(bg_bit_in_unit(r_val[2])>=2)
+		{
+			return  -1;
+		}
+		else
+		{
+			ret|=r_val[2]<<(SHIFT*2);
+		}
+	}
+	if(r_len>=2)
+	{
+		ret|=r_val[1]<<SHIFT;
+	}
+	if(r_len>=1)
+	{
+		ret|=r_val[0];
+	}
+	return ret;
+}
+/* translate original code to complement */
+static void units_invert_complement(b_unit* d,b_unit* s,int size)
+{
+	b_unit carry=1;
+	int i;
+	for(i=0;i<size;i++)
+	{
+		carry=(~s[i]&MASK)+carry;
+		d[i]=carry&MASK;
+		carry>>=SHIFT;
+	}
+
+	assert(carry==0);
+}
+/* translate complement to original */
+static void units_invert_origin(b_unit* d,b_unit* s,int size)
+{
+	b_unit carry=1;
+	int i;
+	for(i=0;i<size;i++)
+	{
+		carry=s[i]-carry;
+		d[i]=(~carry)&MASK;
+		carry>>=SHIFT;
+	}
+	assert(carry==0);
+}
+
+
+
+
+/*@condition r>0
+ * r->b_len=1
+ */
+
+static inline BGInteger* abs_lshift(BGInteger* l,int shift_value)
+{
+
+	int l_len=abs(l->b_len);
+	b_unit* l_val=l->b_val;
+
+	int t_len=l_len+shift_value/SHIFT+1;
+	BGInteger*  ret=bg_malloc(t_len);
+	b_unit carry;
+	carry=units_lshift(ret->b_val+shift_value/SHIFT,l_val,l_len,shift_value%SHIFT);
+	ret->b_val[shift_value/SHIFT+l_len]=carry;
+
+	bg_format_len(ret);
+	return ret;
+}
+/*@condition r>0
+ * r->b_len=1 or 0
+ */
+BGInteger* bg_lshift(BGInteger* l,BGInteger* r)
+{
+	if(r->b_len<0)
+	{
+		WARN("Negative Shift Value");
+		return NULL;
+	}
+	if(r->b_len==0)
+	{
+		return bg_clone(l);
+	}
+	int shift_value=bg_to_abs_int(r);
+
+	//printf("sv=%d\n",shift_value);
+	if(shift_value<0)
+	{
+		WARN("Shift Value Is Too BIG");
+		return NULL;
+	}
+	BGInteger* ret=abs_lshift(l,shift_value);
+	if(l->b_len<0)
+	{
+		bg_negative(ret);
+	}
+	return ret;
+}
+
+
+/*@condition r>=0
+*/
+static BGInteger* i_rshift(BGInteger* l,int shift_value)
+{
+	int l_len=abs(l->b_len);
+	assert(shift_value>=0);
+	BGInteger* ret=0;
+
+	/* bits(l) < shift_value*/ 
+	if(l_len*SHIFT<=shift_value)
+	{
+		if(l->b_len<0)
+		{
+			return bg_create_from_int(-1);
+		}
+		else
+		{
+			return bg_create_zero();
+		}
+	}
+
+	int sign=l->b_len<0?1:0;
+
+	ret=bg_malloc(l_len-shift_value/SHIFT);
+
+	int shift_pre=shift_value/SHIFT;
+	int shift_pos=shift_value%SHIFT;
+
+	int size=l_len-shift_pre;
+	int d=shift_pos;
+
+
+	b_unit* ivt_l=malloc(sizeof(*ivt_l)*l_len);
+
+	/* if l is negative , translate to complement */
+	if(sign)
+	{
+		units_invert_complement(ivt_l,l->b_val,l_len);
+	}
+	else
+	{
+		memcpy(ivt_l,l->b_val,l_len*sizeof(*ivt_l));
+	}
+
+	b_unit* src=ivt_l+shift_pre;
+	b_unit c_src;
+	b_unit oflow=0;
+	if(sign)
+	{
+		/* if left is negative, fill high bits 1 */
+		oflow=(1<<d)-1;
+	}
+	oflow=(oflow<<(SHIFT-d))&MASK;
+	int i=size;
+
+	/* Right SHIFT */
+	while(i--)
+	{
+		c_src=src[i];
+		src[i]=oflow|((c_src&MASK)>>d);
+		oflow=(c_src<<(SHIFT-d))&MASK;
+	}
+
+	if(sign)
+	{
+		/* translate complement to original */
+		units_invert_origin(ret->b_val,src,size);
+		bg_negative(ret);
+	}
+	else
+	{
+		memcpy(ret->b_val,src,sizeof(*src)*size);
+	}
+
+	free(ivt_l);
+	bg_format_len(ret);
+
+	return ret;
+}
+
+/*@condition r>=0
+*/
+BGInteger* bg_rshift(BGInteger* l,BGInteger* r)
+{
+	int l_len=l->b_len;
+	int r_len=r->b_len;
+
+	if(l_len==0)
+	{
+		return bg_create_zero();
+	}
+	if(r_len==0)
+	{
+		return bg_clone(l);
+	}
+	if(r_len<0)
+	{
+		BUG("Shift With Negative Value");
+		return NULL;
+	}
+
+	int shift_value=bg_to_abs_int(r);
+
+	/* bits(r)>31, is to big, so return NULL*/
+	if(shift_value<0)
+	{
+		WARN("RSHIFT Right Is Too Big");
+		return NULL;
+	}
+	BGInteger* ret=i_rshift(l,shift_value);
+	return ret;
+}
+static b_unit i_bitwise(b_unit l,b_unit r,char op)
+{
+	if(op=='^')
+	{
+		return l^r;
+	}
+	else  if(op=='|')
+	{
+		return l|r;
+	}
+	else if(op=='&')
+	{
+		return l&r;
+	}
+	assert(0); /*never reached here*/
+	return 0;
+}
+
+
+static BGInteger* i_bits_op(BGInteger* l,BGInteger* r,char op)
+{
+	/*keep longer value left*/
+	if(abs(l->b_len)<abs(r->b_len))
+	{
+		BGInteger* temp=l;
+		l=r;
+		r=temp;
+	}
+	int l_len=abs(l->b_len);
+	int r_len=abs(r->b_len);
+
+	/*0^0=0; 0|0=0; 0&0=0*/
+	if(l_len==0&&r_len==0)
+	{
+		return bg_create_zero();
+	}
+	int l_sign=l->b_len<0?1:0;
+	int r_sign=r->b_len<0?1:0;
+
+	BGInteger* ret=bg_malloc(l_len);
+
+	b_unit* l_val=l->b_val;
+	b_unit* r_val=r->b_val;
+	b_unit* t_val=ret->b_val;
+
+	b_unit l_carry=1;
+	b_unit r_carry=1;
+	int i=0;
+
+	b_unit c_l,c_r;
+
+	for(i=0;i<r_len;i++)
+	{
+		c_l=l_val[i];
+		c_r=r_val[i];
+
+		if(l_sign==1)
+		{
+
+			l_carry=((~c_l)&MASK)+l_carry;
+			c_l=l_carry&MASK;
+			l_carry>>=SHIFT;
+		}
+		if(r_sign==1)
+		{
+			r_carry=((~c_r)&MASK)+r_carry;
+			c_r=r_carry&MASK;
+			r_carry>>=SHIFT;
+		}
+		t_val[i]=i_bitwise(c_l,c_r,op)&MASK;
+	}
+
+	for(;i<l_len;i++)
+	{
+		c_l=l_val[i];
+		c_r=0;
+		if(l_sign==1)
+		{
+
+			l_carry=((~c_l)&MASK)+l_carry;
+			c_l=l_carry&MASK;
+			l_carry>>=SHIFT;
+		}
+		if(r_sign==1)
+		{
+			r_carry=((~c_r)&MASK)+r_carry;
+			c_r=r_carry&MASK;
+			r_carry>>=SHIFT;
+		}
+		t_val[i]=i_bitwise(c_l,c_r,op)&MASK;
+	}
+
+	int need_invert=0;
+
+	if(op=='&')
+	{
+		if((l_sign&r_sign)&1) need_invert=1;
+	}
+	else if(op=='^')
+	{
+		if((r_sign^l_sign)&1) need_invert=1;
+	}
+	else if(op=='|')
+	{
+		if((r_sign|l_sign)&1) need_invert=1;
+	}
+	if(need_invert)
+	{
+		//printf("need_invert \n");
+		b_unit  r_carry=1;
+
+		for(i=0;i<l_len;i++)
+		{
+			r_carry=t_val[i]-r_carry;
+
+			t_val[i]=(~r_carry)&MASK;
+			r_carry>>=SHIFT;
+		}
+		bg_negative(ret);
+	}
+	bg_format_len(ret);
+	return ret;
+
+}
+
+BGInteger* bg_or(BGInteger* l,BGInteger* r)
+{
+	return i_bits_op(l,r,'|');
+}
+BGInteger* bg_xor(BGInteger* l,BGInteger* r)
+{
+	return i_bits_op(l,r,'^');
+}
+BGInteger* bg_and(BGInteger* l,BGInteger* r)
+{
+	return i_bits_op(l,r,'&');
+}
+
+
 
 
 void bg_print_dec(BGInteger* bg)
@@ -602,14 +1035,6 @@ void bg_print_dec(BGInteger* bg)
 	free(r_str);
 }
 
-
-
-
-
-
-
-
-
 void bg_print_bin(BGInteger* bg)
 {
 	int t_len=SHIFT*abs(bg->b_len);
@@ -625,12 +1050,16 @@ void bg_print_bin(BGInteger* bg)
 		return ;
 	}
 
-	while(!bg_get_bit(bg,--t_len));
-
-
+	while(t_len--&&!bg_get_bit(bg,t_len));
+	if(t_len<0)
+	{
+		printf("0");
+		return ;
+	}
 	do
 	{
 		printf("%d",bg_get_bit(bg,t_len));
+		if(t_len%15==0&&t_len!=0) printf(" ");
 	}while(t_len--);
 }
 

@@ -26,8 +26,12 @@ static inline void bg_free(BGInteger* bg)
 {
 	free(bg);
 }
+
 void bg_print_dec(BGInteger* bg);
 void bg_print_bin(BGInteger* bg);
+
+/*normal func*/
+void bg_negative(BGInteger* bg);
 
 /* type cast*/
 float bg_to_float(BGInteger* bg);
@@ -39,12 +43,16 @@ BGInteger* bg_minus(BGInteger* left,BGInteger* right);
 /*mul div mod */
 BGInteger* bg_mul(BGInteger* left,BGInteger* right);
 BGInteger* bg_div(BGInteger* left,BGInteger* right);
-
 BGInteger* bg_mod(BGInteger* left,BGInteger* right);
 
 /* left shift right shift*/
 BGInteger* bg_lshift(BGInteger* left,BGInteger* right);
 BGInteger* bg_rshift(BGInteger* left,BGInteger* right);
+
+/* logic or and xor */
+BGInteger* bg_and(BGInteger* left,BGInteger* right);
+BGInteger* bg_or(BGInteger* left,BGInteger* right);
+BGInteger* bg_xor(BGInteger* left,BGInteger* right);
 
 /* cmp used for gt  ge equal le lt*/
 int bg_cmp(BGInteger* left,BGInteger* right);
