@@ -3,7 +3,7 @@ SRC=big_integer.c
 DEBUG=
 BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c \
 	gen_expr.c   gen_bits.c \
-	gen_shift.c
+	gen_shift.c gen_div.c 
 
 
 

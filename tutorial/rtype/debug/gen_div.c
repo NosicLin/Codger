@@ -31,11 +31,6 @@ void gen_value(char* buf,int length)
 {
 	int real_len=rand()%length+1;
 	int i=0;
-	if(rand()%2)
-	{
-		buf[i]='-';
-		i++;
-	}
 	int value=rand()%10;
 	while(!value)
 	{
@@ -75,13 +70,7 @@ int main(int argc,char** argv)
 		gen_value(buf_l,length);
 		gen_value(buf_r,length);
 
-		bash_write(bash," add ");
-		bash_write(bash," sub ");
-		bash_write(bash," mul ");
 		bash_write(bash," div ");
-		python_write(python," + ");
-		python_write(python," - ");
-		python_write(python," * ");
 		python_write(python," / ");
 	}
 

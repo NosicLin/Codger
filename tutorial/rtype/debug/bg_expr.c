@@ -49,6 +49,11 @@ int main(int argc,char** argv)
 		r=bg_mul(bg1,bg2);
 
 	}
+	else if(strcmp(argv[2],"div")==0)
+	{
+		r=bg_div(bg1,bg2);
+
+	}
 	else if(strcmp(argv[2],"lshift")==0)
 	{
 		r=bg_lshift(bg1,bg2);
