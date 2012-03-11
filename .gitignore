@@ -4,4 +4,6 @@ tags
 *.exe
 *.o
 *.a
+*.dat
+
 

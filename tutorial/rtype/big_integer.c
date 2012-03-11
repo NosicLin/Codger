@@ -61,10 +61,6 @@ static inline int bg_bit_in_unit(b_unit u)
 }
 
 
-void bg_negative(BGInteger* bg)
-{
-	bg->b_len*=-1;
-}
 static void  bg_format_len(BGInteger* bg)
 {
 	int len=abs(bg->b_len);
@@ -134,13 +130,22 @@ static BGInteger* bg_create_zero()
 	return ret;
 }
 
+void bg_self_negative(BGInteger* bg)
+{
+	bg->b_len*=-1;
+}
+
+static inline void self_negative(BGInteger* bg)
+{
+	bg_self_negative(bg);
+}
 
 BGInteger* bg_create_from_int(int value)
 {
 	BGInteger* ret=bg_malloc(DEFALUT_BIG_INTEGER_LENGTH);
 	if(value<0)
 	{
-		bg_negative(ret);
+		self_negative(ret);
 		value=-value;
 	}
 	int i;
@@ -269,6 +274,12 @@ BGInteger* bg_create_from_decstr(char* decstr)
 	return ret;
 }
 	
+BGInteger* bg_negative(BGInteger* bg)
+{
+	BGInteger* ret=bg_clone(bg);
+	bg_self_negative(ret);
+	return ret;
+}
 
 static BGInteger* abs_plus(BGInteger* l,BGInteger* r)
 {
@@ -363,7 +374,7 @@ static BGInteger* abs_minus(BGInteger* l,BGInteger* r)
 	}
 	if(sign==-1)
 	{
-		bg_negative(ret);
+		self_negative(ret);
 	}
 
 	bg_format_len(ret);
@@ -380,7 +391,7 @@ BGInteger* bg_plus(BGInteger* l,BGInteger* r)
 			 * ret=-(abs(l)+abs(r))
 			 */
 			ret=abs_plus(l,r);
-			bg_negative(ret);
+			self_negative(ret);
 		}
 		else
 		{
@@ -388,7 +399,7 @@ BGInteger* bg_plus(BGInteger* l,BGInteger* r)
 			 * ret=-(abs(r)-abs(r))
 			 */
 			ret=abs_minus(l,r);
-			bg_negative(ret);
+			self_negative(ret);
 		}
 	}
 	else
@@ -423,7 +434,7 @@ BGInteger* bg_minus(BGInteger* l,BGInteger* r)
 			 * l-r=-abs(l)-(-abs(r))=-(abs(l)-abs(r));
 			 */
 			ret=abs_minus(l,r);
-			bg_negative(ret);
+			self_negative(ret);
 		}
 		else
 		{
@@ -431,7 +442,7 @@ BGInteger* bg_minus(BGInteger* l,BGInteger* r)
 			 * l-r=-abs(l)-abs(r)=-(abs(l)+abs(r));
 			 */
 			ret=abs_plus(l,r);
-			bg_negative(ret);
+			self_negative(ret);
 		}
 	}
 	else
@@ -496,7 +507,7 @@ BGInteger* bg_mul(BGInteger* l,BGInteger* r)
 	BGInteger* ret=abs_mul(l,r);
 	if(l->b_len*r->b_len<0)
 	{
-		bg_negative(ret);
+		self_negative(ret);
 	}
 	return ret;
 }
@@ -537,9 +548,10 @@ static b_unit units_rshift(b_unit* d, b_unit* s ,int size,int shift_value)
 
 static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteger** prem)
 {
-	BUG_ON(left->b_len<right->b_len||right->b_len<2,"Error Length");
 	int l_len=abs(left->b_len);
 	int r_len=abs(right->b_len);
+
+	BUG_ON(l_len<r_len||r_len<2,"Error Length");
 
 	BGInteger* x=bg_malloc(l_len+1);
 	BGInteger* y=bg_malloc(r_len);
@@ -551,17 +563,19 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 	b_unit* y_val=y->b_val;
 
 	/*
-	printf("left:dec=");
-	bg_print_dec(left);
-	printf("\nright:dec=");
-	bg_print_dec(right);
-	printf("\n");
-	*/
+	   printf("left:dec=");
+	   bg_print_dec(left);
+	   printf("\nright:dec=");
+	   bg_print_dec(right);
+	   printf("\n");
+	   */
 
 	int d=bg_bit_in_unit(right->b_val[r_len-1]);
 	int m=SHIFT-d;
-	
-	//printf("shift=%d\n",1<<m);
+
+	/*
+	   printf("shift=%d\n",1<<m);
+	   */
 
 	int carry;
 	carry=units_lshift(y_val,right->b_val,r_len,m);
@@ -575,17 +589,21 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 	}
 
 	/*
-	printf("left:dec=");
-	bg_print_dec(x);
-	printf("\nright:dec=");
-	bg_print_dec(y);
-	printf("\n");
-	*/
+	   printf("left:dec=");
+	   bg_print_dec(x);
+	   printf("\nleft:bin=");
+	   bg_print_bin(x);
+	   printf("\nright:dec=");
+	   bg_print_dec(y);
+	   printf("\nright:bin=");
+	   bg_print_bin(y);
+	   printf("\n");
+	   */
 
 	int k=x_len-y_len;
 	BGInteger* qa =bg_malloc(k);
 	b_unit* c_qa=qa->b_val+k-1;
-	
+
 
 	int i;
 	b_unit y_t=y_val[y_len-1];
@@ -618,7 +636,7 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 				break;
 		}
 
-	//	printf("q=%d,r=%d\n",q,r);
+//		printf("q=%d,r=%d\n",q,r);
 
 		twob_unit y_mul=0;
 		b_unit borrow=0;
@@ -636,13 +654,14 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 		b_unit carry=0;
 
 		/*
-		printf("x_i=%d,y_mul=%d\n",x_i,y_mul);
-		printf("x_i-y_mul=%d(%d)\n",x_i-y_mul,(sb_unit)(x_i-y_mul)<0);
-		*/
+		   printf("x_i=%d,y_mul=%d\n",x_i,y_mul);
+		   printf("x_i-y_mul=%d(%d)\n",x_i-y_mul,(sb_unit)(x_i-y_mul)<0);
+		   */
 
 		assert(x_i-y_mul==-1||x_i-y_mul==0);
 		if((sb_unit)(x_i-y_mul)<0)
 		{
+			q--;
 			for(j=0;j<y_len;j++)
 			{
 				carry=x_val[i-y_len+j]+y_val[j]+carry;
@@ -651,15 +670,25 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 			}
 			assert(carry==1);
 		}
+		/*
+		   printf("x:dec=");
+		   bg_print_dec(x);
+		   printf("\nx:bin=");
+		   bg_print_bin(x);
+		   printf("\n");
+		   */
+
 		x_val[i]=0;
 		*c_qa--=q;
-			
+
 	}
 	/*
-	bg_print_dec(x);
-	printf("\n");
-	printf("d=%d\n",d);
-	*/
+	   printf("\n");
+	   printf("\n");
+	   bg_print_dec(x);
+	   printf("\n");
+	   printf("d=%d\n",d);
+	   */
 
 	units_rshift(y_val,x_val,y_len,m);
 
@@ -668,6 +697,15 @@ static int  abs_divrem(BGInteger* left,BGInteger* right,BGInteger** pdiv,BGInteg
 
 	*prem=y;
 	*pdiv=qa;
+
+	/*
+	   printf("qa:dec=");
+	   bg_print_dec(qa);
+	   printf("\nqa:bin=");
+	   bg_print_bin(qa);
+	   printf("\n");
+	   */
+
 
 
 	bg_free(x);
@@ -760,29 +798,108 @@ static int abs_cmp(BGInteger* l,BGInteger* r)
 
 
 
-BGInteger* bg_div(BGInteger* l,BGInteger* r)
+int  i_divrem(BGInteger* l,BGInteger* r,BGInteger** pdiv,BGInteger** prem)
 {
 
-	if(abs_cmp(l,r)<0)
-	{
-		return bg_create_zero();
-	}
-	BGInteger* ret;
+	BGInteger* div;
 	BGInteger* rem;
+	int l_len=abs(l->b_len);
+	int r_len=abs(r->b_len);
+
+	if(r_len==0)
+	{
+		WARN("BG divide By Zero");
+		return -1;
+	}
+	if(l_len<r_len||abs_cmp(l,r)<0)
+	{
+		div=bg_create_zero();
+		rem=bg_clone(l);
+		*pdiv=div;
+		*prem=rem;
+		return 1;
+	}
+
 	if(abs(r->b_len)==1)
 	{
-		abs_divrem1(l,r,&ret,&rem);
+		abs_divrem1(l,r,&div,&rem);
 	}
 	else
 	{
-		abs_divrem(l,r,&ret,&rem);
+		abs_divrem(l,r,&div,&rem);
 	}
 
-	bg_free(rem);
-	return ret;
-}
-BGInteger* bg_mod(BGInteger* l,BGInteger* r);
+	if((l->b_len<0) != (r->b_len<0))
+	{
+		self_negative(div);
+	}
+	if(l->b_len<0&&rem->b_len!=0)
+	{
+		self_negative(rem);
 
+	}
+	*pdiv=div;
+	*prem=rem;
+	return 1;
+}
+int  i_divmod(BGInteger* l,BGInteger* r,BGInteger** pdiv,BGInteger** pmod)
+{
+	BGInteger* div;
+	BGInteger* rem;
+
+	if(i_divrem(l,r,&div,&rem)<0)
+	{
+		return -1;
+	}
+
+	if((rem->b_len<0&&r->b_len>0)||(rem->b_len>0&&r->b_len<0))
+	{
+		BGInteger* real_rem=bg_plus(rem,r);
+
+		BGInteger* b1=bg_create_from_int(1);
+		BGInteger* real_div=bg_minus(div,b1);
+
+		bg_free(rem);
+		bg_free(div);
+		bg_free(b1);
+
+		*pdiv=real_div;
+		*pmod=real_rem;
+	}
+	else
+	{
+		*pdiv=div;
+		*pmod=rem;
+	}
+	return 1;
+}
+
+BGInteger* bg_div(BGInteger* l,BGInteger* r)
+{
+	BGInteger* div;
+	BGInteger* mod;
+	if(i_divmod(l,r,&div,&mod)<0)
+	{
+		return NULL;
+	}
+	bg_free(mod);
+	return div;
+}
+
+
+
+
+BGInteger* bg_mod(BGInteger* l,BGInteger* r)
+{
+	BGInteger* div;
+	BGInteger* mod;
+	if(i_divmod(l,r,&div,&mod)<0)
+	{
+		return NULL;
+	}
+	bg_free(div);
+	return mod;
+}
 
 
 
@@ -894,7 +1011,7 @@ BGInteger* bg_lshift(BGInteger* l,BGInteger* r)
 	BGInteger* ret=abs_lshift(l,shift_value);
 	if(l->b_len<0)
 	{
-		bg_negative(ret);
+		self_negative(ret);
 	}
 	return ret;
 }
@@ -967,7 +1084,7 @@ static BGInteger* i_rshift(BGInteger* l,int shift_value)
 	{
 		/* translate complement to original */
 		units_invert_origin(ret->b_val,src,size);
-		bg_negative(ret);
+		self_negative(ret);
 	}
 	else
 	{
@@ -1130,7 +1247,7 @@ static BGInteger* i_bits_op(BGInteger* l,BGInteger* r,char op)
 			t_val[i]=(~r_carry)&MASK;
 			r_carry>>=SHIFT;
 		}
-		bg_negative(ret);
+		self_negative(ret);
 	}
 	bg_format_len(ret);
 	return ret;

@@ -11,13 +11,13 @@ int main(int argc,char** argv)
 		exit(-1);
 	}
 
-	FILE* bash=fopen("bg.sh","w+");
+	FILE* bash=fopen("bg.dat","w+");
 	FILE* python=fopen("bg.py","w+");
 
 	int num=atoi(argv[2]);
 	int length=atoi(argv[1]);
 
-	set_exe_name(" bg_expr ");
+	set_exe_name("");
 
 	srand(time(NULL));
 
@@ -29,8 +29,11 @@ int main(int argc,char** argv)
 		gen_value(buf_r,length);
 
 		bash_write(bash," div ");
+		bash_write(bash," mod ");
 		python_write(python," / ");
+		python_write(python," % ");
 	}
+	fwrite("\nquit\n",1,strlen("\nquit"),bash);
 
 
 	fclose(bash);

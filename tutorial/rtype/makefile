@@ -1,9 +1,9 @@
 PROJECT=rtype
 SRC=big_integer.c
-DEBUG=
-BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c \
-	gen_expr.c   gen_bits.c \
-	gen_shift.c gen_div.c 
+DEBUG=gen_lib.c
+BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
+	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
+	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c
 
 
 

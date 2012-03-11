@@ -11,26 +11,17 @@ int main(int argc,char** argv)
 		exit(-1);
 	}
 
-	FILE* bash=fopen("bg.sh","w+");
+	FILE* bash=fopen("bg.dat","w+");
 	FILE* python=fopen("bg.py","w+");
 
-	int num=atoi(argv[2]);
 	int length=atoi(argv[1]);
-
-	set_exe_name(" bg_expr ");
+	int num=atoi(argv[2]);
 
 	srand(time(NULL));
 
-	int i=0;
-	for(;i<num;i++)
-	{
-
-		gen_value(buf_l,length);
-		gen_value(buf_r,length);
-
-		bash_write(bash," div ");
-		python_write(python," / ");
-	}
+	set_exe_name("");
+	gen_bitwise(bash,python,length,num);
+	fwrite("\nquit\n",1,strlen("\nquit"),bash);
 
 
 	fclose(bash);

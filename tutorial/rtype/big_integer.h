@@ -31,7 +31,10 @@ void bg_print_dec(BGInteger* bg);
 void bg_print_bin(BGInteger* bg);
 
 /*normal func*/
-void bg_negative(BGInteger* bg);
+
+/*negative*/
+BGInteger* bg_negative(BGInteger* bg);
+void bg_self_negative(BGInteger* bg);
 
 /* type cast*/
 float bg_to_float(BGInteger* bg);
@@ -53,8 +56,9 @@ BGInteger* bg_rshift(BGInteger* left,BGInteger* right);
 BGInteger* bg_and(BGInteger* left,BGInteger* right);
 BGInteger* bg_or(BGInteger* left,BGInteger* right);
 BGInteger* bg_xor(BGInteger* left,BGInteger* right);
+BGInteger* bg_invert(BGInteger* bg);
 
-/* cmp used for gt  ge equal le lt*/
+/* cmp used for gt , ge, eq,le ,lt*/
 int bg_cmp(BGInteger* left,BGInteger* right);
 
 /*used for and or not*/
