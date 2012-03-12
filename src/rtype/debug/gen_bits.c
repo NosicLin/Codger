@@ -12,8 +12,8 @@ int main(int argc,char** argv)
 		exit(-1);
 	}
 
-	FILE* bash=fopen("bg.sh","w+");
-	FILE* python=fopen("bg.py","w+");
+	FILE* bash=fopen("bash.dat","w+");
+	FILE* python=fopen("py.dat","w+");
 
 	int length=atoi(argv[1]);
 	int num=atoi(argv[2]);

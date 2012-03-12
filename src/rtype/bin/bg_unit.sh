@@ -2,13 +2,14 @@ export PATH=$PATH:.
 echo begin unit test
 
 echo now is bg.sh
-bg.sh >t1
+chmod a+x bash.dat
+bash.dat >t1.dat
 echo bg.sh complete 
 echo 
 echo now is bg.py
-python bg.py >t2
+python py.dat >t2.dat
 echo bg.py complete 
-diff t1 t2
+diff t1.dat t2.dat
 
 
 
