@@ -1,0 +1,3 @@
+[submodule "utility"]
+	path = utility
+	url = ssh://nosiclin@git.code.sf.net/p/cutility/code
