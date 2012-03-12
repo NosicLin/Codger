@@ -1,0 +1,12 @@
+because utility is a submodule of redy
+so when you clone redy project,
+you will find there is nothing in the directory utility.
+to get the utility code 
+you should execute another two command 
+
+git submodule init 
+git submodule update 
+
+now all thing is ok
+
+
