@@ -46,6 +46,9 @@ enum RTYPE
 #define L_TO_R(bt) (assert(((Robject*)bt)->r_type==RT_LONG),(Robject*)bt)
 
 #else 
+#define R_TO_I(rt) ((BtInt*)rt)
+#define	I_TO_R(rti) ((Robject*) rti)
+
 #define R_TO_F(rt) ((BtFloat*)rt)
 #define	F_TO_R(rtf) ((Robject*) rtf)
 

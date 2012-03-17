@@ -6,7 +6,8 @@ BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
 	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
 	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c \
 	gen_cmp2.c  gen_bl_str.c \
-	bi_str_to_int.c  bg_to_float.c bl_from_str.c rtype_unit_test.c
+	bi_str_to_int.c  bg_to_float.c bl_from_str.c \
+	rtype_unit_test.c rtype_unit_test2.c
 
 
 

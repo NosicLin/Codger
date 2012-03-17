@@ -19,16 +19,16 @@ Robject* r_##name(Robject* l,Robject* r) \
 	} \
 } 
 
-f_func(mul)
-f_func(div)
-f_func(mod)
-f_func(plus)
-f_func(minus)
-f_func(lshift)
-f_func(rshift)
-f_func(bit_and)
-f_func(bit_or)
-f_func(bit_xor)
+f_func(mul);
+f_func(div);
+f_func(mod);
+f_func(plus);
+f_func(minus);
+f_func(lshift);
+f_func(rshift);
+f_func(bit_and);
+f_func(bit_or);
+f_func(bit_xor);
 
 /* unary operator */
 
@@ -46,9 +46,9 @@ Robject* r_##name(Robject* u)\
 	} \
 }
 
-unary_func(positive)
-unary_func(negative)
-unary_func(bit_negated)
+unary_func(positive);
+unary_func(negative);
+unary_func(bit_negated);
 
 
 
