@@ -1,56 +1,65 @@
 #include"rtype.h"
+#include<utility_c/marocs.h>
 
-#define R_TO_F(rt) ((BTFloat*)rt)
-#define	F_TO_R(rtf) ((Robject*) rtf)
-
-static Robject* bt_float_negative(Robject* rt)
+/* unary oparator + - */
+static Robject* bf_negative(Robject* rt)
 {
 	float value=-R_TO_F(rt)->f_value;
-	BTFloat* ret=bt_float_create(value);
+	BtFloat* ret=bt_float_create(value);
 	return F_TO_R(ret);
 }
 
-static Robject* bt_float_positive(Robject* rt)
+static Robject* bf_positive(Robject* rt)
 {
-	robject_ref(rt);
+	robject_addref(rt);
 	return rt;
 }
 
-static Robject* bt_float_mul(Robject* left,Robject* right)
+/* arithmetic operator * /  */
+/* float * float =float 
+ * float * int =float 
+ * float * long =float
+ */
+static Robject* bf_mul(Robject* left,Robject* right)
 {
-	if(bt_type(right)==RT_FLOAT)
+	if(rt_type(right)==RT_FLOAT)
 	{
 		float value=R_TO_F(left)->f_value*R_TO_F(right)->f_value;
-		BTFloat* ret=bt_float_create(value);
+		BtFloat* ret=bt_float_create(value);
 		return F_TO_R(ret);
 	}
-	else if(bt_type(right)==RT_INT)
+	else if(rt_type(right)==RT_INT)
 	{
 		return r_mul_float_int(left,right);
 	}
-	else if(bt_type(right)==RT_LONG)
+	else if(rt_type(right)==RT_LONG)
 	{
 		return r_mul_float_long(left,right);
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand for /");
-		robject_ref(robject_null)
+		rt_raise_oper_type_error(left,right,OPER_MUL);
+		robject_addref(robject_null);
 		return robject_null;
 	}
 }
-static Robject* bt_float_div(Robject* left,Robject* right)
+
+/* float / float =Float
+ * float / int =float 
+ * float / long =float 
+ */
+static Robject* bf_div(Robject* left,Robject* right)
 {
 	if(rt_type(right)==RT_FLOAT)
 	{
 		if(R_TO_F(right)->f_value==0)
 		{
-			raise_divzero_error("Float Div Zero");
-			robject_null->ref();
+			rt_raise_div_zero(left);
+			robject_addref(robject_null);
 			return robject_null;
 		}
 		float value=R_TO_F(left)->f_value/R_TO_F(right)->f_value;
-		BTFloat* ret=bt_float_create(value);
+		BtFloat* ret=bt_float_create(value);
 		return F_TO_R(ret);
 	}
 	else if(rt_type(right)==RT_INT)
@@ -59,55 +68,28 @@ static Robject* bt_float_div(Robject* left,Robject* right)
 	}
 	else if(rt_type(right)==RT_LONG)
 	{
-		retuern r_div_float_long(left,right);
+		return r_div_float_long(left,right);
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand For /");
-		robject_ref(robject_null)
+		rt_raise_oper_type_error(left,right,OPER_DIV);
+		robject_addref(robject_null);
 		return robject_null;
 	}
 }
 
+/*arithmetic  + - */
 
-
-static Robject* bt_float_mod(Robject* left,Robject* right)
+/* float + float =Float
+ * float + int =float 
+ * float + long =float 
+ */
+static Robject* bf_plus(Robject* left,Robject* right)
 {
 	if(rt_type(right)==RT_FLOAT)
 	{
-		if(R_TO_F(right)->f_value==0)
-		{
-			raise_divzero_error("Float Div Zero");
-			robject_null->ref();
-			return robject_null;
-		}
-		float value=R_TO_F(left)->f_value%R_TO_F(right)->f_value;
-		BTFloat* ret=bt_float_create(value);
-		return F_TO_R(ret);
-	}
-	else if(rt_type(right)==RT_INT)
-	{
-		return r_mod_float_int(left,right);
-	}
-	else if(rt_type(right)==RT_LONG)
-	{
-		retuern r_mod_float_long(left,right);
-	}
-	else
-	{
-		raise_type_error("Unsupport Operand For /");
-		robject_ref(robject_null)
-		return robject_null;
-	}
-
-}
-
-static Robject* bt_float_plus(Robject* left,Robject* right)
-{
-	if(rt_type(right)==RT_FLOAT)
-	{
-		float value=R_TO_INT(left)->f_value+R_TO_INT(right)->f_value;
-		BTFloat* ret=bt_float_create(value);
+		float value=R_TO_F(left)->f_value+R_TO_F(right)->f_value;
+		BtFloat* ret=bt_float_create(value);
 		return F_TO_R(ret);
 	}
 	else if(rt_type(right)==RT_INT)
@@ -116,24 +98,28 @@ static Robject* bt_float_plus(Robject* left,Robject* right)
 	}
 	else if(rt_type(right)==RT_LONG)
 	{
-		retuern r_plus_float_long(left,right);
+		return r_plus_float_long(left,right);
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand For +");
-		robject_ref(robject_null)
+		rt_raise_oper_type_error(left,right,OPER_PLUS);
+		robject_addref(robject_null);
 		return robject_null;
 	}
 }
 
 
-static Robject* bt_float_minus(Robject* left,Robject* right)
+/* float - float =Float
+ * float - int =float 
+ * float - long =float 
+ */
+static Robject* bf_minus(Robject* left,Robject* right)
 {
 
 	if(rt_type(right)==RT_FLOAT)
 	{
-		float value=R_TO_INT(left)->f_value-R_TO_INT(right)->f_value;
-		BTFloat* ret=bt_float_create(value);
+		float value=R_TO_F(left)->f_value-R_TO_F(right)->f_value;
+		BtFloat* ret=bt_float_create(value);
 		return F_TO_R(ret);
 	}
 	else if(rt_type(right)==RT_INT)
@@ -142,32 +128,36 @@ static Robject* bt_float_minus(Robject* left,Robject* right)
 	}
 	else if(rt_type(right)==RT_LONG)
 	{
-		retuern r_minus_float_long(left,right);
+		return r_minus_float_long(left,right);
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand For -");
-		robject_ref(robject_null)
+		rt_raise_oper_type_error(left,right,OPER_MINUS);
+		robject_addref(robject_null);
 		return robject_null;
 	}
 }
 
-static int bt_float_cmp(Robject* left,Robject* right)
+
+/* cmp operator used for lt le eq ne ge gt */
+
+static Robject* bf_cmp(Robject* left,Robject* right)
 {
-	if(rt_type(right)==RT_FLOAT))
+	int ret=0;
+	if(rt_type(right)==RT_FLOAT)
 	{
-		float value==R_TO_F(left)->f_value-R_TO_F(right)->f_value;
+		float value=R_TO_F(left)->f_value-R_TO_F(right)->f_value;
 		if(value<0)
 		{
-			return -1;
+			ret=-1;
 		}
 		else if(value==0)
 		{
-			return 0;
+			ret=0;
 		}
 		else 
 		{
-			return 1;
+			ret=1;
 		}
 	}
 	else if(rt_type(right)==RT_INT)
@@ -180,21 +170,38 @@ static int bt_float_cmp(Robject* left,Robject* right)
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand for >");
-		robject_ref(robject_null)
+		rt_raise_oper_type_error(left,right,OPER_CMP);
+		robject_addref(robject_null);
 		return robject_null;
 	}
-
+	BtInt* r=bt_int_create(ret);
+	return I_TO_R(r);
 }
 
 
 
 
-
-static int bt_float_booleaned(Robject* btf)
+/* logic operator used for and or not */
+static Robject*  bf_bool(Robject* btf)
 {
-	return  R_TO_F(btf)->f_value==0;
+	BtBoolean* ret=NULL;
+	float value=R_TO_F(btf)->f_value;
+	if(value==0)
+	{
+		ret=bt_boolean_create(0);
+	}
+	else
+	{
+		ret=bt_boolean_create(1);
+	}
+	return B_TO_R(ret);
 }
+
+static void  bf_print(Robject* btf)
+{
+	printf("%g\n",R_TO_F(btf)->f_value);
+}
+
 
 
 
@@ -203,42 +210,67 @@ static int bt_float_booleaned(Robject* btf)
 
 static struct rexpr_ops bt_float_expr_ops=
 {
-	.ro_negative=bt_float_negative,
-	.ro_positive=bt_float_positive,
+	/*unary oparator + - */
+	.ro_negative=bf_negative,
+	.ro_positive=bf_positive,
 
-	ro_mul=bt_float_muls,
-	ro_div=bt_float_div,
-	ro_mod=bt_float_mod,
+	/*arithmetic  * / % */
+	.ro_mul=bf_mul,
+	.ro_div=bf_div,
 
-	ro_plus=bt_float_plus,
-	ro_minus=bt_float_minus,
+	/* arithmetic + -  */
+	.ro_plus=bf_plus,
+	.ro_minus=bf_minus,
 
-	ro_cmp=bt_float_cmp,
+	/* compare operator */
+	.ro_cmp=bf_cmp,
 
-	ro_booleaned=bt_float_booleaned,
+	/* logic operator */
+	.ro_bool=bf_bool,
+
+	/* print */
+	.ro_print=bf_print,
+
 };
 
 
-static void bt_float_free(Robject* bt)
+static void bf_free(Robject* bt)
 {
 	free(R_TO_F(bt));
 }
 
-static Robject_ops bt_float_ops=
+static struct robject_ops bt_float_ops=
 {
-	.ro_free=bt_float_free,
+	.ro_free=bf_free,
 };
 
 
-static bt_float* bt_float_create(float value)
+BtFloat* bt_float_malloc()
 {
-	BTFloat* ret=(BTFloat*)malloc(sizeof(*ret));
-	ret->f_value=value;
-	Robject* base=ret->f_base;
-
+	BtFloat* ret=(BtFloat*)malloc(sizeof(*ret));
+	ret->f_value=0.0;
+	Robject* base=&ret->f_base;
 	base->r_name="Float";
 	base->r_expr_ops=&bt_float_expr_ops;
 	base->r_type=RT_FLOAT;
 	base->r_ops=&bt_float_ops;
+	base->r_ref=1;
+	return ret;
+
+}
+
+BtFloat* bt_float_create(float value)
+{
+	BtFloat* ret=bt_float_malloc();
+	ret->f_value=value;
+	return ret;
+
+}
+BtFloat* bt_float_from_str(char* str)
+{
+	BtFloat* ret=bt_float_malloc();
+	float value=atof(str);
+	ret->f_value=value;
 	return ret;
 }
+

@@ -83,6 +83,18 @@ int main(int argc,char** argv)
 		{
 			r=bg_xor(bg1,bg2);
 		}
+		else if(strcmp(op,"negated")==0)
+		{
+			r=bg_negated(bg1);
+		}
+		else if (strcmp(op,"cmp")==0)
+		{
+			int value=bg_cmp(bg1,bg2);
+			printf("%d\n",value);
+			bg_free(bg1);
+			bg_free(bg2);
+			continue;
+		}
 		else
 		{
 			printf(" %s is invalid,please use right operator\n",op);

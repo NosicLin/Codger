@@ -1,9 +1,7 @@
 #include"rtype.h"
 #include<string.h>
 
-#define S_TO_R(bts) ((Robject*)bts)
-#define R_TO_S(rt) ((BTString*)rt) 
-static Robject* bt_string_postfix_get(Robject* left,Robject* right)
+static Robject* bs_get_item(Robject* left,Robject* right)
 {
 	if(bt_type(right)==RT_INT)
 	{
@@ -14,7 +12,7 @@ static Robject* bt_string_postfix_get(Robject* left,Robject* right)
 
 		if(pos>=l_length)
 		{
-			raise_outof_range_error("String Acess Out of Range");
+			rt_raise_outof_range_error("String Acess Out of Range");
 			robject_ref(robject_null)
 			return robject_null;
 		}

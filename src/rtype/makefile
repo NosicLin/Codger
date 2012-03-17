@@ -1,9 +1,12 @@
 PROJECT=rtype
-SRC=big_integer.c
-DEBUG=gen_lib.c
+SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
+	rtype.c robject.c
+DEBUG=gen_lib.c 
 BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
 	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
-	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c
+	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c \
+	gen_cmp2.c  gen_bl_str.c \
+	bi_str_to_int.c  bg_to_float.c bl_from_str.c rtype_unit_test.c
 
 
 
@@ -17,7 +20,7 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall 
+FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug  -I../../
 LIB=-Llib -l$(PROJECT) -L../../lib -lutility_c
 

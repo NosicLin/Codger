@@ -1,22 +1,24 @@
 #ifndef _REDY_RTYPE_STRING_H_
 #define _REDY_RTYPE_STRING_H_
-
-
+#include"robject.h"
 struct bt_string
 {
 	struct robject s_base;
-	char* s_value;
 	int s_length;
+	char s_value[0];
 };
-typedef struct bt_string BTString;
+typedef struct bt_string BtString;
+
+#define S_TO_R(bts) ((Robject*)bts)
+#define R_TO_S(rt) ((BTString*)rt) 
 
 /* implement in bt_string.c */ 
-BTString* bt_string_create(char* str);
-BTString* bt_string_create_with_length(char* s,int length)
-BTString* bt_string_create_empty();
-BTString* bt_string_create_from_char(char c);
+void bg_string_malloc(int length);
+BtString* bt_string_create(char* str);
+BtString* bt_string_create_empty();
+BtString* bt_string_from_char(char c);
 
-static inline char* bt_string_str(BTString* bts)
+static inline char* bt_string_str(BtString* bts)
 {
 	return  bts->s_value;
 }

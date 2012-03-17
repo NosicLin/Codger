@@ -12,6 +12,9 @@
 #define BASE BGLONG_BASE
 #define MASK BGLONG_MASK 
 
+#define BIG_INTEGER_DEBUG 0
+
+#if BIG_INTEGER_DEBUG  
 static void units_print(b_unit* u,int size)
 {
 	assert(size>0);
@@ -32,20 +35,63 @@ static void units_print(b_unit* u,int size)
 		printf(" ");
 	}
 }
+#endif 
 
+int bg_booleaned(BGInteger* bg)
+{
+	if(bg->b_len==0)
+	{
+		return 0;
+	}
+	else 
+	{
+		return 1;
 
-static inline int bg_size(BGInteger* bg)
-{
-	return bg->b_len;
+	}
 }
-static  inline int bg_abs_size(BGInteger* bg)
+int bg_cmp(BGInteger* left,BGInteger* right)
 {
-	return abs(bg->b_len);
+	int l_len=left->b_len;
+	int r_len=right->b_len;
+	if(l_len<r_len)
+	{
+		return -1;
+	}
+	else if (l_len>r_len)
+	{
+		return 1;
+	}
+	else 
+	{
+		int sign=0;
+		int cmp_ret=0;
+		int len=l_len;
+		if (l_len<0)
+		{
+			sign=1;
+			len=l_len*-1;
+		}
+		while(len--)
+		{
+			if(left->b_val[len]>right->b_val[len])
+			{
+				cmp_ret=1;
+				break;
+			}
+			else if(left->b_val[len]<right->b_val[len])
+			{
+				cmp_ret=-1;
+				break;
+			}
+		}
+		if(sign)
+		{
+			cmp_ret*=-1;
+		}
+		return cmp_ret;
+	}
 }
-static inline void bg_set_size(BGInteger* bg,int len)
-{
-	bg->b_len=len;
-}
+
 
 static inline int bg_bit_in_unit(b_unit u)
 {
@@ -60,6 +106,75 @@ static inline int bg_bit_in_unit(b_unit u)
 	return i+1;
 }
 
+/* if r is too large to convert to int  return -1*/
+static int bg_to_abs_int(BGInteger* r)
+{
+	int r_len=abs(r->b_len);
+	int ret=0;
+	b_unit* r_val=r->b_val;
+	if(r_len>=4)
+	{
+		return -1;
+	}
+	if(r_len==3)
+	{
+		if(bg_bit_in_unit(r_val[2])>=2)
+		{
+			return  -1;
+		}
+		else
+		{
+			ret|=r_val[2]<<(SHIFT*2);
+		}
+	}
+	if(r_len>=2)
+	{
+		ret|=r_val[1]<<SHIFT;
+	}
+	if(r_len>=1)
+	{
+		ret|=r_val[0];
+	}
+	return ret;
+}
+
+int bg_overflow_int(BGInteger* bg)
+{
+	int value=bg_to_abs_int(bg);
+	if(value==-1)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*FIXME 
+ * bg_to_float need to rewrite,it will lose precision 
+ * this is only used for temp
+ */
+float bg_to_float(BGInteger* bg)
+{
+	int sign=0;
+	if(bg->b_len<0)
+	{
+		sign=1;
+	}
+
+	int len=abs(bg->b_len);
+	float value=0;
+	while(len--)
+	{
+		value=value*BASE+bg->b_val[len]; /*will lose precision*/
+	}
+	if(sign)
+	{
+		value*=-1;
+	}
+	return value;
+}
 
 static void  bg_format_len(BGInteger* bg)
 {
@@ -212,6 +327,29 @@ BGInteger* bg_create_from_binstr(char* str)
  * for example hex a=0x103afl
  * @str=103af
  */
+static int char_to_int(char c)
+{
+	int ret=0;
+	if('0'<=c && c<='9')
+	{
+		ret=c-'0';
+	}
+	else if('a'<=c && c<='f')
+	{
+		ret= c-'a'+10;
+	}
+	else if('A'<=c && c<='F')
+	{
+		ret=c-'A'+10;
+	}
+	else 
+	{
+		/* invalid char */
+		BUG("Error Char(%c)",c);
+		ret=0;
+	}
+	return ret; 
+}
 BGInteger* bg_create_from_hexstr(char* str)
 {
 
@@ -221,7 +359,7 @@ BGInteger* bg_create_from_hexstr(char* str)
 	int c_i;
 	while(len--)
 	{
-		int c_val=str[len]<='9'?str[len]-'0':str[len]-'a'+10;
+		int c_val=char_to_int(str[len]);
 		c_i=0;
 		while(c_val)
 		{
@@ -905,37 +1043,6 @@ BGInteger* bg_mod(BGInteger* l,BGInteger* r)
 
 
 
-/* if r is too large to convert to int  return -1*/
-static int bg_to_abs_int(BGInteger* r)
-{
-	int r_len=abs(r->b_len);
-	int ret=0;
-	b_unit* r_val=r->b_val;
-	if(r_len>=4)
-	{
-		return -1;
-	}
-	if(r_len==3)
-	{
-		if(bg_bit_in_unit(r_val[2])>=2)
-		{
-			return  -1;
-		}
-		else
-		{
-			ret|=r_val[2]<<(SHIFT*2);
-		}
-	}
-	if(r_len>=2)
-	{
-		ret|=r_val[1]<<SHIFT;
-	}
-	if(r_len>=1)
-	{
-		ret|=r_val[0];
-	}
-	return ret;
-}
 /* translate original code to complement */
 static void units_invert_complement(b_unit* d,b_unit* s,int size)
 {
@@ -1266,6 +1373,23 @@ BGInteger* bg_and(BGInteger* l,BGInteger* r)
 {
 	return i_bits_op(l,r,'&');
 }
+
+/* negated x=-(x+1) */
+BGInteger* bg_negated(BGInteger* bg)
+{
+	BGInteger* one=bg_create_from_int(1);
+	BGInteger* ret= bg_plus(bg,one);
+	bg_self_negative(ret);
+	bg_free(one);
+	return ret;
+}
+
+/* old interface shouldn't use */
+BGInteger* bg_invert(BGInteger* bg)
+{
+	return bg_negated(bg);
+}
+
 
 
 

@@ -2,23 +2,25 @@
 #define _REDY_RTYPE_ROBJECT_H_
 
 /*Robject short for Redy Object*/
-typedef struct  robject 
+struct robject_ops;
+struct rexpr_ops;
+
+struct  robject 
 {
-	struct robject_ops* r_ops;
-	struct rexpr_ops* r_expr_ops;
 	int r_ref;
 	int r_type;
 	char* r_name;
+	struct robject_ops* r_ops;
+	struct rexpr_ops* r_expr_ops;
 };
 
 typedef struct robject Robject;
 
 struct rexpr_ops
 {
-	/*posifix operator '()'and '[]' */
-	Robject* (*ro_call)(Robject*);
-	Robject* (*ro_postfix_get)(Robject*,Robject* );
-	Robject* (*ro_postfix_set)(Robject*,Robject*);
+	/*posifix operator '[]' */
+	Robject* (*ro_get_item)(Robject*,Robject* );
+	Robject* (*ro_set_item)(Robject*,Robject*);
 
 	/* unary operator + and - */
 	Robject* (*ro_negative)(Robject* );
@@ -38,32 +40,41 @@ struct rexpr_ops
 	Robject* (*ro_rshift)(Robject* , Robject*);
 
 	/* less than(lt <), less equal(le <=) */
-	/* equal (==) */
-	/* greater than( gt,>), greater equal (ge, <=)*/
 	Robject* (*ro_lt)(Robject* ,Robject*);
 	Robject* (*ro_le)(Robject* ,Robject*);
-	Robject* (*ro_equal)(Robject* ,Robject*);
+
+	/* equal (==), not equal(ne !=)*/
+	Robject* (*ro_eq)(Robject* ,Robject*);
+	Robject* (*ro_ne)(Robject* ,Robject*);
+
+	/* greater than( gt,>), greater equal (ge, <=)*/
 	Robject* (*ro_gt)(Robject* ,Robject*);
 	Robject* (*ro_ge)(Robject* ,Robject*);
 
-	/*bit_and(&), bit_or(|) bit_xor(^) */
+	/* cmp a short method for lt,le,eq,gt,ge */
+	Robject* (*ro_cmp)(Robject* ,Robject*);
+
+	/*bit_and(&), bit_or(|) bit_xor(^) bit_negated*/
 	Robject* (*ro_bit_and)(Robject*,Robject*);
 	Robject* (*ro_bit_or)(Robject* ,Robject*);
 	Robject* (*ro_bit_xor)(Robject*,Robject*);
+	Robject* (*ro_bit_negated)(Robject*);
 
 	/*logic and ,logic_or */
-	Robject* (*ro_booleaned)(Robject*);
+	Robject* (*ro_bool)(Robject*);
 
-	/*logic not */
-	Robject* (*ro_not)(Robject*);
+	/*used for print sentence */
+	void (*ro_print)(Robject*);
+
+	/*get iterator */
+	Robject* (*ro_iterator)(Robject*);
 };
 
 
-struct robjct_ops; 
+struct robject_ops 
 {
 	void (*ro_free)(Robject*);
 };
-
 
 
 /*create and free*/
@@ -71,7 +82,7 @@ Robject* robject_create();
 
 static inline void robject_free(Robject* rt)
 {
-	return rt->r_ops.ro_free(rt);
+	rt->r_ops->ro_free(rt);
 }
 
 /* init */
@@ -81,17 +92,24 @@ static inline void robject_init(Robject* rt,int type)
 }
 
 /*reference and release*/
-static inline void robject_ref(Robject* rt);
+static inline void robject_addref(Robject* rt)
 {
 	rt->r_ref++;
 }
-static inline void robject_release(Robject* rt);
+static inline void robject_release(Robject* rt)
 {
 	rt->r_ref--;
 	if(rt->r_ref==0)
 	{
-		rt->r_ops.ro_free(rt);
+		robject_free(rt);
 	}
 }
 
+static inline int rt_type(Robject* rt)
+{
+	return rt->r_type;
+}
+
+extern Robject* robject_null;
+extern Robject* robject_other;
 #endif 

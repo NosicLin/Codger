@@ -10,5 +10,7 @@ extern char buf_r[];
 void gen_shift(FILE* bash,FILE* python,int length,int num);
 void gen_expr(FILE* bash,FILE* python,int length,int num);
 void gen_bitwise(FILE* bash,FILE* python,int length,int num);
+void gen_cmp(FILE* bash,FILE* python,int length,int num);
+void gen_bl_from_str(FILE* bash,FILE* python ,int length,int num);
 
 #endif

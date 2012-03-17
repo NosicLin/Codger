@@ -1,5 +1,5 @@
-#ifndef _REDY_RTYPE_LONG_H_
-#define _REDY_RTYPE_LONG_H_
+#ifndef _REDY_RTYPE_BGINTEGER_H_
+#define _REDY_RTYPE_BGINTEGER_H_
 #include<stdlib.h>
 
 typedef unsigned short b_unit;
@@ -56,13 +56,39 @@ BGInteger* bg_rshift(BGInteger* left,BGInteger* right);
 BGInteger* bg_and(BGInteger* left,BGInteger* right);
 BGInteger* bg_or(BGInteger* left,BGInteger* right);
 BGInteger* bg_xor(BGInteger* left,BGInteger* right);
+BGInteger* bg_negated(BGInteger* bg);
+
+/* old interface shouldn't use */
 BGInteger* bg_invert(BGInteger* bg);
 
 /* cmp used for gt , ge, eq,le ,lt*/
 int bg_cmp(BGInteger* left,BGInteger* right);
 
 /*used for and or not*/
-int bg_boolean(BGInteger* bg);
+int bg_booleaned(BGInteger* bg);
 
+/* other func */
+int bg_overflow_int(BGInteger* bg);
+
+static inline int bg_is_zero(BGInteger* bg)
+{
+	return bg->b_len==0;
+}
+static inline int bg_is_negative(BGInteger* bg)
+{
+	return bg->b_len<0;
+}
+static inline int bg_size(BGInteger* bg)
+{
+	return bg->b_len;
+}
+static  inline int bg_abs_size(BGInteger* bg)
+{
+	return abs(bg->b_len);
+}
+static inline void bg_set_size(BGInteger* bg,int len)
+{
+	bg->b_len=len;
+}
 
 #endif 

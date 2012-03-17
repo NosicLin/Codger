@@ -33,6 +33,43 @@ void python_write(FILE* f,char* op)
 	fwrite("print a\n",1,strlen("print a\n"),f);
 
 }
+void python_unary_write(FILE* f,char* op)
+{
+	fwrite("a=~",1,strlen("a=~"),f);
+	fwrite(buf_l,1,strlen(buf_l),f);
+	fwrite("l",1,strlen("l"),f);
+	fwrite("\n",1,sizeof("\n")-1,f);
+	fwrite("print a\n",1,strlen("print a\n"),f);
+}
+void python_write_cmp_func(FILE* f)
+{
+	char str[]="def cmp(a):\n \
+	if a<0:\n \
+		return -1\n \
+	if a>0:\n \
+		return 1\n \
+	if a==0:\n \
+		return 0\n \
+	\n";
+	fwrite(str,1,strlen(str),f);
+}
+
+
+void python_write_cmp(FILE* f)
+{
+
+	fwrite("a=",1,strlen("a="),f);
+	fwrite(buf_l,1,strlen(buf_l),f);
+	fwrite("l",1,strlen("l"),f);
+	fwrite("-",1,strlen("-"),f);
+	fwrite(buf_r,1,strlen(buf_r),f);
+	fwrite("l",1,strlen("l"),f);
+	fwrite("\n",1,sizeof("\n")-1,f);
+	fwrite("print cmp(a)\n",1,strlen("print cmp(a)\n"),f);
+}
+
+
+
 void gen_value(char* buf,int length)
 {
 	int real_len=rand()%length+1;
@@ -103,10 +140,123 @@ void gen_bitwise(FILE* bash,FILE* python,int length,int num)
 		bash_write(bash," or ");
 		bash_write(bash," and ");
 		bash_write(bash," xor ");
+		bash_write(bash," negated ");
+
 		python_write(python," | ");
 		python_write(python," & ");
 		python_write(python," ^ ");
+		python_unary_write(python,"~");
 
 	}
 
+}
+void gen_cmp(FILE* bash,FILE* python,int length,int num)
+{
+	int i=0;
+
+	python_write_cmp_func( python);
+	for(;i<num;i++)
+	{
+
+		gen_value(buf_l,length);
+		gen_value(buf_r,length);
+
+		bash_write(bash," cmp ");
+		python_write_cmp(python);
+
+	}
+}
+
+void gen_bl_from_str(FILE* bash,FILE* python ,int length,int num)
+{
+	int i=0;
+	for(;i<num;i++)
+	{
+
+		int value=rand()%5;
+		char* str;
+		if(value==0) /*dec*/
+		{
+			str=buf_l;
+			int j=0;
+
+			*str=rand()%9+'1';
+			str++;
+			for(;j<length-1;j++)
+			{
+				*str=rand()%10+'0';
+				str++;
+			}
+			*str='l';
+			*(str+1)='\0';
+		}
+		if(value==1) /*oct 1*/
+		{
+			*buf_l='0';
+			str=buf_l+1;
+			int j=0;
+			for(;j<length;j++)
+			{
+				*str=rand()%8+'0';
+				str++;
+			}
+			*str='l';
+			*(str+1)='\0';
+		}
+		if(value==2) /*oct 2*/
+		{
+			*buf_l='0';
+			*(buf_l+1)='o';
+			str=buf_l+2;
+
+			int j=0;
+			for(;j<length;j++)
+			{
+				*str=rand()%8+'0';
+				str++;
+			}
+			*str='l';
+			*(str+1)='\0';
+		}
+		if(value==3) /*hex*/
+		{
+
+			*buf_l='0';
+			*(buf_l+1)='x';
+			str=buf_l+2;
+			int j=0;
+			for(;j<length;j++)
+			{
+				int  t=rand()%16;
+
+				*str=t>=10?t-10+'a':t+'0';
+				str++;
+			}
+			*str='l';
+			*(str+1)='\0';
+		}
+
+		if(value==4) /*bin*/
+		{
+
+			*buf_l='0';
+			*(buf_l+1)='b';
+			str=buf_l+2;
+			int j=0;
+			for(;j<length;j++)
+			{
+				*str=rand()%2+'0';
+				str++;
+			}
+			*str='l';
+			*(str+1)='\0';
+		}
+
+		fwrite(buf_l,1,strlen(buf_l),bash);
+		fwrite("\n",1,1,bash);
+		fwrite("print ",1,strlen("print "),python);
+		fwrite(buf_l,1,strlen(buf_l),python);
+		fwrite("\n",1,1,python);
+	}
+	fwrite("quit",1,strlen("quit"),bash);
 }
