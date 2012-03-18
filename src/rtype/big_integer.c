@@ -137,6 +137,20 @@ static int bg_to_abs_int(BGInteger* r)
 	}
 	return ret;
 }
+int bg_to_int(BGInteger* bg)
+{
+	int value=bg_to_abs_int(bg);
+	/*overflow  int */
+	if(value==-1)
+	{
+		return 0;
+	}
+	if(bg->b_len<0)
+	{
+		value*=-1;
+	}
+	return value;
+}
 
 int bg_overflow_int(BGInteger* bg)
 {

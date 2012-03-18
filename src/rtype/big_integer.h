@@ -69,6 +69,7 @@ int bg_booleaned(BGInteger* bg);
 
 /* other func */
 int bg_overflow_int(BGInteger* bg);
+int bg_to_int(BGInteger* bg);
 
 static inline int bg_is_zero(BGInteger* bg)
 {

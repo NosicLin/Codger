@@ -20,7 +20,7 @@ struct rexpr_ops
 {
 	/*posifix operator '[]' */
 	Robject* (*ro_get_item)(Robject*,Robject* );
-	Robject* (*ro_set_item)(Robject*,Robject*);
+	void (*ro_set_item)(Robject*,Robject* index,Robject* item);
 
 	/* unary operator + and - */
 	Robject* (*ro_negative)(Robject* );
@@ -105,11 +105,18 @@ static inline void robject_release(Robject* rt)
 	}
 }
 
+/* interface */
 static inline int rt_type(Robject* rt)
 {
 	return rt->r_type;
 }
 
+static inline char* robject_name(Robject* rt)
+{
+	return rt->r_name;
+}
+
+void robject_print(Robject* rt);
 extern Robject* robject_null;
 extern Robject* robject_other;
 #endif 

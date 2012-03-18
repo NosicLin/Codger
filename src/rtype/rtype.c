@@ -1,20 +1,21 @@
 #include"rtype.h"
 #include<utility_c/marocs.h>
 
-void rt_raise_oper_type_error(Robject* left,Robject* right,char* s)
+void rt_raise_type_error(char* msg)
 {
-	TODO("Exception Model");
+	TODO("TypeError");
 }
 
-void rt_raise_div_zero(Robject* bt)
+void rt_raise_div_zero(char* msg)
 {
-	TODO("Exception Model");
+	TODO("DivZeroError");
 }
-void rt_raise_overflow(Robject* bt)
+void rt_raise_overflow(char* msg)
 {
-	TODO("Exception Model");
+	TODO("OverflowError");
 }
-void rt_raise_value_error(char* s)
+void rt_raise_value_error(char* msg )
 {
-	TODO("Exception Model");
+	TODO("VauleError");
 }
+

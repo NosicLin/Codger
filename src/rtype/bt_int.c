@@ -133,7 +133,7 @@ static Robject* bi_mul(Robject* left,Robject* right)
 	/* error type */
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MUL);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MUL));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -152,7 +152,7 @@ static Robject* bi_div(Robject* left,Robject* right)
 	{
 		if(R_TO_I(right)->i_value==0)
 		{
-			rt_raise_div_zero(left);
+			rt_raise_div_zero(MSG_DIV(robject_name(left)));
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -170,7 +170,7 @@ static Robject* bi_div(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_DIV);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_DIV));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -188,7 +188,7 @@ static Robject* bi_mod(Robject* left,Robject* right)
 	{
 		if(R_TO_I(right)->i_value==0)
 		{
-			rt_raise_div_zero(left);
+			rt_raise_div_zero(MSG_DIV(robject_name(left)));
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -202,7 +202,7 @@ static Robject* bi_mod(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MOD);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MOD));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -234,7 +234,7 @@ static Robject* bi_plus(Robject* left,Robject* right)
 	}
 	else 
 	{
-		rt_raise_oper_type_error(left,right,OPER_PLUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_PLUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -262,7 +262,7 @@ static Robject* bi_minus(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MINUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MINUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -280,7 +280,7 @@ static Robject* bi_lshift(Robject* left,Robject* right)
 	{
 		if(R_TO_I(right)->i_value<0)
 		{
-			rt_raise_value_error("Negative Shift Count");
+			rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -295,7 +295,7 @@ static Robject* bi_lshift(Robject* left,Robject* right)
 	}
 	else 
 	{
-		rt_raise_oper_type_error(left,right,OPER_LSHIFT);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LSHIFT));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -310,7 +310,7 @@ static Robject* bi_rshift(Robject* left,Robject* right)
 	{
 		if(R_TO_I(right)->i_value<0)
 		{
-			rt_raise_value_error("Negative Shift Count");
+			rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -324,7 +324,7 @@ static Robject* bi_rshift(Robject* left,Robject* right)
 	}
 	else 
 	{
-		rt_raise_oper_type_error(left,right,OPER_RSHIFT);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_RSHIFT));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -363,7 +363,7 @@ static Robject* bi_cmp(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_CMP);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_CMP));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -387,7 +387,7 @@ static Robject* bi_and(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_AND);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_AND));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -411,7 +411,7 @@ static Robject* bi_or(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_OR);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_OR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -435,7 +435,7 @@ static Robject* bi_xor(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_XOR);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_XOR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -467,9 +467,9 @@ static Robject* bi_booleaned(Robject* bti)
 
 
 /* print operator */
-static void bi_print(Robject* bti)
+static void bi_print(Robject* bt)
 {
-	printf("%d\n",R_TO_I(bti)->i_value);
+	printf("%d",R_TO_I(bt)->i_value);
 }
 
 static struct  rexpr_ops bt_int_expr_ops=

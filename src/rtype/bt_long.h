@@ -2,7 +2,6 @@
 #define _REDY_RTYPE_BT_LONG_H_
 #include"robject.h"
 #include"big_integer.h"
-#include"rtype.h"
 #include"stdlib.h"
 struct bt_long
 {
@@ -32,6 +31,14 @@ static inline int bt_long_is_zero(BtLong* bl)
 	return bl->l_value->b_len==0;
 }
 
+static inline int bt_long_overflow_int(BtLong* bl)
+{
+	return bg_overflow_int(bl->l_value);
+}
+static inline int bt_long_to_int(BtLong* bl)
+{
+	return  bg_to_int(bl->l_value);
+}
 
 #endif
 

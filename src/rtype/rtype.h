@@ -6,8 +6,11 @@
 #include"bt_float.h"
 #include"bt_long.h"
 #include"bt_string.h"
+#include"bt_array.h"
 #include"bt_common.h"
 #include<assert.h>
+#include"except_msg.h"
+#include"robject.h"
 
 enum RTYPE
 {
@@ -21,31 +24,72 @@ enum RTYPE
 	RT_NULL,
 	RT_OTHER,
 };
-#define OPER_MUL "*"
-#define OPER_DIV "/"
-#define OPER_MOD "%"
-#define OPER_PLUS "+"
-#define OPER_MINUS "-"
-#define OPER_LSHIFT "<<"
-#define OPER_RSHIFT ">>"
-#define OPER_CMP "cmp"
-#define OPER_AND "and"
-#define OPER_OR "or"
-#define OPER_XOR "xor"
-
 #define RTYPE_DEBUG 1
 
 #if RTYPE_DEBUG 
-#define R_TO_I(rt) (assert(rt->r_type==RT_INT),(BtInt*)rt)
-#define I_TO_R(bt) (assert(((Robject*)bt)->r_type==RT_INT),(Robject*)bt)
 
-#define R_TO_F(rt) (assert(rt->r_type==RT_FLOAT),(BtFloat*)rt)
-#define F_TO_R(bt) (assert(((Robject*)bt)->r_type==RT_FLOAT),(Robject*)bt)
+/* int */
+static inline BtInt* R_TO_I(Robject* rt)
+{
+	assert(rt->r_type==RT_INT);
+	return (BtInt*) rt;
+}
 
-#define R_TO_L(rt) (assert(rt->r_type==RT_LONG),(BtLong*)rt)
-#define L_TO_R(bt) (assert(((Robject*)bt)->r_type==RT_LONG),(Robject*)bt)
+static inline Robject* I_TO_R(BtInt* bt)
+{
+	assert(((Robject*)bt)->r_type==RT_INT);
+	return (Robject*)bt;
+}
 
+/* float */
+static inline BtFloat* R_TO_F(Robject* rt)
+{
+	assert(rt_type(rt)==RT_FLOAT);
+	return (BtFloat*)rt;
+}
+static inline Robject* F_TO_R(BtFloat* bt)
+{
+	assert(rt_type((Robject*)bt)==RT_FLOAT);
+	return (Robject*)bt;
+}
+
+/*long */
+static inline BtLong* R_TO_L(Robject* rt)
+{	
+	assert(rt_type(rt)==RT_LONG);
+	return (BtLong*)rt;
+}
+static inline Robject* L_TO_R(BtLong* bt)
+{
+	assert(rt_type((Robject*)bt)==RT_LONG);
+	return (Robject*)bt;
+}
+
+/* string */
+static inline BtString* R_TO_S(Robject* rt)
+{
+	assert(rt_type(rt)==RT_STRING);
+	return (BtString*) rt;
+}
+static inline Robject* S_TO_R(BtString* bt)
+{
+	assert(rt_type((Robject*)bt)==RT_STRING);
+	return (Robject*)bt;
+}
+
+/*array*/
+static inline BtArray* R_TO_A(Robject* rt)
+{
+	assert(rt_type(rt)==RT_ARRAY);
+	return (BtArray*) rt;
+}
+static inline Robject* A_TO_R(BtArray* bt)
+{
+	assert(rt_type((Robject*)bt)==RT_ARRAY);
+	return (Robject*)bt;
+}
 #else 
+
 #define R_TO_I(rt) ((BtInt*)rt)
 #define	I_TO_R(rti) ((Robject*) rti)
 
@@ -55,12 +99,19 @@ enum RTYPE
 #define R_TO_L(bt) ((BtLong*)bt)
 #define L_TO_R(btl) ((Robject*)btl)
 
+#define R_TO_S(bt) ((BtString*)bt)
+#define S_TO_R(btl) ((Robject*)btl)
+
+#define R_TO_A(bt) ((BtArray*)bt)
+#define A_TO_R(btl) ((Robject*)btl)
+
 #endif 
 
-void rt_raise_oper_type_error(Robject* left,Robject* right,char* );
 
-void rt_raise_div_zero(Robject* bt);
-void rt_raise_overflow(Robject* bt);
-void rt_raise_value_error(char* );
+void rt_raise_type_error(char* msg);
+void rt_raise_div_zero(char* msg);
+void rt_raise_overflow(char* msg);
+void rt_raise_value_error(char* msg );
+void rt_raise_index_error(char* msg );
 
 #endif /*_REDY_RTYPE_RTYPE_H_*/

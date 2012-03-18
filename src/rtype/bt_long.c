@@ -1,4 +1,4 @@
-#include"bt_long.h"
+#include"rtype.h"
 #include<stdio.h>
 #include<string.h>
 #include<utility_c/marocs.h>
@@ -44,7 +44,7 @@ static Robject* bl_mul(Robject* left, Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MUL);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MUL));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -62,7 +62,7 @@ static Robject* bl_div(Robject* left, Robject* right)
 	{
 		if(bg_is_zero(R_TO_L(right)->l_value))
 		{
-			rt_raise_div_zero(left);
+			rt_raise_div_zero(MSG_DIV(robject_name(left)));
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -80,7 +80,7 @@ static Robject* bl_div(Robject* left, Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_DIV);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_DIV));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -96,7 +96,7 @@ static Robject* bl_mod(Robject* left, Robject* right)
 	{
 		if(bg_is_zero(R_TO_L(right)->l_value))
 		{
-			rt_raise_div_zero(left);
+			rt_raise_div_zero(MSG_DIV(robject_name(left)));
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -110,7 +110,7 @@ static Robject* bl_mod(Robject* left, Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MOD);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MOD));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -141,7 +141,7 @@ static Robject* bl_plus(Robject* left, Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_PLUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_PLUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -171,7 +171,7 @@ static Robject* bl_minus(Robject* left, Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MINUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MINUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -190,15 +190,13 @@ static Robject* bl_lshift(Robject* left,Robject* right)
 	{
 		if(bg_overflow_int(R_TO_L(right)->l_value))
 		{
-			rt_raise_overflow(right);
-			robject_addref(robject_null);
-			return robject_null;
+			rt_raise_overflow(MSG_LONG_OVERFLOW);
+			goto error;
 		}
 		if(bg_is_negative(R_TO_L(right)->l_value))
 		{
-			rt_raise_value_error("Negative Shift Count");
-			robject_addref(robject_null);
-			return robject_null;
+			rt_raise_value_error(MSG_SHIFT_NEGATIVE);
+			goto error;
 		}
 		BGInteger* bg=bg_lshift(R_TO_L(left)->l_value,R_TO_L(right)->l_value);
 		BtLong* ret=bt_long_create(bg);
@@ -210,10 +208,13 @@ static Robject* bl_lshift(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_LSHIFT);
-		robject_addref(robject_null);
-		return robject_null;
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LSHIFT));
+		goto error;
 	}
+
+error:
+	robject_addref(robject_null);
+	return robject_null;
 }
 
 
@@ -227,15 +228,13 @@ static Robject* bl_rshift(Robject* left,Robject* right)
 	{
 		if(bg_overflow_int(R_TO_L(right)->l_value))
 		{
-			rt_raise_overflow(right);
-			robject_addref(robject_null);
-			return robject_null;
+			rt_raise_overflow(MSG_LONG_OVERFLOW);
+			goto error;
 		}
 		if(bg_is_negative(R_TO_L(right)->l_value))
 		{
-			rt_raise_value_error("Negative Shift Count");
-			robject_addref(robject_null);
-			return robject_null;
+			rt_raise_value_error(MSG_SHIFT_NEGATIVE);
+			goto error;
 		}
 		BGInteger* bg=bg_rshift(R_TO_L(left)->l_value,R_TO_L(right)->l_value);
 		BtLong* ret=bt_long_create(bg);
@@ -247,10 +246,13 @@ static Robject* bl_rshift(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_RSHIFT);
-		robject_addref(robject_null);
-		return robject_null;
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_RSHIFT));
+		goto error;
 	}
+
+error:
+	robject_addref(robject_null);
+	return robject_null;
 }
 
 
@@ -288,7 +290,7 @@ static Robject* bl_cmp(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_CMP);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_CMP));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -316,7 +318,7 @@ static  Robject* bl_and(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_AND);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_AND));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -343,7 +345,7 @@ static  Robject* bl_or(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_OR);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_OR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -369,7 +371,7 @@ static  Robject* bl_xor(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_XOR);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_XOR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -408,7 +410,6 @@ static Robject* bl_booleaned(Robject* btl)
 static void bl_print(Robject* btl)
 {
 	bg_print_dec(R_TO_L(btl)->l_value);
-	printf("\n");
 }
 
 

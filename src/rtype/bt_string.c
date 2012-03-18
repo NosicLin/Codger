@@ -1,42 +1,60 @@
 #include"rtype.h"
 #include<string.h>
+#include<stdio.h>
+#include<utility_c/marocs.h>
 
 static Robject* bs_get_item(Robject* left,Robject* right)
 {
-	if(bt_type(right)==RT_INT)
+	int type=rt_type(right);
+	int pos=0;
+	if(type==RT_INT)
 	{
-		char* c_left=R_TO_S(left)->s_value;
-		int l_length=R_TO_S(left)->s_length;
-
-		int pos=R_TO_INT(right)->i_value;
-
-		if(pos>=l_length)
+		 pos=R_TO_I(right)->i_value;
+	}
+	if(type==RT_LONG)
+	{
+		BtLong* bl=R_TO_L(right);
+		if(bt_long_overflow_int(bl))
 		{
-			rt_raise_outof_range_error("String Acess Out of Range");
-			robject_ref(robject_null)
-			return robject_null;
+			rt_raise_index_error(MSG_LONG_OVERFLOW);
+			goto error;
 		}
 		else
 		{
-			return bt_string_create_from_char(c_left[pos]);
+			pos=bt_long_to_int(bl);
 		}
 	}
 	else
 	{
-		raise_type_error("Unsupport Operand for +");
-		robject_ref(robject_null)
-		return robject_null;
+		rt_raise_type_error(MSG_STRING_INDEX_TYPE(robject_name(right)));
+		goto error;
 	}
-
+	BtString* bs=R_TO_S(left);
+	if(pos<0)
+	{
+		rt_raise_value_error(MSG_STRING_INDEX_NEGATIVE);
+		goto error;
+	}
+	if(pos>=bs->s_length)
+	{
+		rt_raise_index_error(MSG_STRING_OUT_OF_RANGE);
+		goto error;
+	}
+	char* str=bs->s_value;
+	BtString* ret=bt_string_from_char(str[pos]);
+	return S_TO_R(ret);
+error:
+	robject_addref(robject_null);
+	return robject_null;
 }
 
-static Robject* bt_string_add(Robject* left,Robject* right)
+static Robject* bs_plus(Robject* left,Robject* right)
 {
-	if(bt_type(right)!=RT_STRING)
+	BtString* new_bs=0;
+	if(rt_type(right)!=RT_STRING)
 	{
-		raise_type_error("Unsupport Operand for +");
-		robject_ref(robject_null)
-		return robject_null;
+		rt_raise_type_error(MSG_STRING_PLUS(robject_name(right)));
+		goto error;
 	}
 	else
 	{
@@ -46,120 +64,145 @@ static Robject* bt_string_add(Robject* left,Robject* right)
 		int r_length=R_TO_S(right)->s_length;
 
 		int new_length=l_length+r_length;
-		char* new_c=(char*)malloc(new_length+1);
 
-		int i;
+		new_bs=bt_string_malloc(new_length);
+		char* new_str=new_bs->s_value;
+
+		int i=0;
 		for(;i<l_length;i++)
 		{
-			new_c[i]=c_left[i];
+			new_str[i]=c_left[i];
 		}
-		for(i=0;i<r_length;i++)
+		for(;i<r_length;i++)
 		{
-			new_c[i+l_length]=c_right[i];
+			new_str[i+l_length]=c_right[i];
 		}
-		new_c[new_length]='\0';
-		BTString* ret;
-		ret=bt_string_create_with_length(new_c,new_length);
-		return S_TO_R(ret);
 	}
+	return S_TO_R(new_bs);
+error:
+	robject_addref(robject_null);
+	return robject_null;
 
 
 }
-static int bt_string_cmp(Robject* left,Robject* right)
+static Robject* bs_cmp(Robject* left,Robject* right)
 {
-	if(bt_type(right)!=RT_STRING)
+	int cmp_value;
+	if(rt_type(right)!=RT_STRING)
 	{
 
-		raise_type_error("Unsupport Operand for +");
-		robject_ref(robject_null)
-		return robject_null;
+		rt_raise_type_error(MSG_CMP(robject_name(left),robject_name(right)));
+		goto error;
 	}
 	else 
 	{
 
 		char* c_left=R_TO_S(left)->s_value;
 		char* c_right=R_TO_S(right)->s_value;
-		return strcmp(c_left,c_right);
+		cmp_value=strcmp(c_left,c_right);
 	}
+	BtInt* ret=bt_int_create(cmp_value);
+	return I_TO_R(ret);
+
+error:
+	robject_addref(robject_null);
+	return robject_null;
 }
-static int bt_string_boolean(Robject* bts)
+static Robject* bs_bool(Robject* bt)
 {
-	return 1;
+	BtString* bs=R_TO_S(bt);
+	BtBoolean* ret=bt_boolean_create(bs->s_length);
+	return B_TO_R(ret);
+}
+static void bs_print(Robject* bt)
+{
+	BtString* bs=R_TO_S(bt);
+	printf("%s",bs->s_value);
 }
 
-
-
-static struct rexpr_ops bt_string_expr_ops=
+static struct rexpr_ops bs_expr_ops=
 {
-	.ro_postfix_get=bt_string_postfix_get,
-	.ro_add=bt_string_add,
-	.ro_cmp=bt_string_cmp,
-	.ro_booleaned=bt_string_boolean,
+	.ro_get_item=bs_get_item,
+	.ro_plus=bs_plus,
+	.ro_cmp=bs_cmp,
+	.ro_bool=bs_bool,
+	.ro_print=bs_print,
 };
 
-static void bt_string_free(Robject* bts)
+static void bs_free(Robject* bts)
 {
-	BTString* s=R_TO_S(bts);
-	free(s->s_value);
+	BtString* s=R_TO_S(bts);
 	free(s);
 }
 
-static Robject_ops bt_string_ops=
+static struct robject_ops bs_ops=
 {
-	.ro_free=bt_string_ops,
+	.ro_free=bs_free,
 };
 
 
 
-static void empty_bt_string_free(Robject* bts)
+static void bs_empty_free(Robject* bts)
 {
+	/* this func will never called*/
+	BUG("Free Empty String");
 }
-static Robject_ops empty_bt_string_ops=
+static struct robject_ops bs_empty_string_ops=
 {
-	.ro_free=empty_bt_string_free,
-}
+	.ro_free=bs_empty_free,
+};
 
-static BTString empty_bt_string=
+static BtString* bs_empty_string=0;
+
+
+BtString* bt_string_malloc(int length)
 {
-	{&bt_string_expr_ops,&empty_bt_string_ops,1,RT_STRING,"string"},
-	"",
-	0,
-}
-
-
-
-
-
-
-
-static BTString* bt_string_create_internal(char* s,int length);
-BTString* bt_string_create_with_length(char* s,int length)
-{
-	return bt_string_create_internal(s,length);
-}
-BTString* bt_string_create(char* str)
-{
-	return bt_string_create_internal(str,strlen(str));
-
-}
-
-BTString* bt_string_create_empty()
-{
-	 robject_ref(S_TO_R(&empty_bt_string));
-	 return &empty_bt_string;
-}
-BTString* bt_string_create_from_char(char c)
-{
-	char* str=(char*)malloc(2);
-	str[0]=c;
-	str[1]='\0';
-	return bt_string_create_internal(str,1);
+	BtString* bs=(BtString*) malloc(sizeof(*bs)+length+1);
+	bs->s_value[length]='\0';
+	bs->s_length=length;
+	Robject* base=&bs->s_base;
+	base->r_expr_ops=&bs_expr_ops;
+	base->r_name="String";
+	base->r_ops=&bs_ops;
+	base->r_ref=1;
+	base->r_type=RT_STRING;
+	return bs;
 }
 
 
-	
 
-	
+
+BtString* bt_string_create(char* str)
+{
+	int length=strlen(str);
+	BtString* bs=bt_string_malloc(length);
+	memcpy(bs->s_value,str,length);
+	return bs;
+}
+
+BtString* bt_string_create_empty()
+{
+	if(bs_empty_string==0)
+	{
+		bs_empty_string=bt_string_malloc(0);
+		Robject* base=&bs_empty_string->s_base;
+		base->r_ops=&bs_empty_string_ops;
+	}
+	robject_addref(S_TO_R(bs_empty_string));
+	return  bs_empty_string;
+}
+
+BtString* bt_string_from_char(char c)
+{
+	BtString* bs=bt_string_malloc(1);
+	bs->s_value[0]=c;
+	return bs;
+}
+
+
+
+
+
 
 
 

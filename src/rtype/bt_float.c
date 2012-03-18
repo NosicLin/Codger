@@ -38,7 +38,7 @@ static Robject* bf_mul(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MUL);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MUL));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -54,7 +54,7 @@ static Robject* bf_div(Robject* left,Robject* right)
 	{
 		if(R_TO_F(right)->f_value==0)
 		{
-			rt_raise_div_zero(left);
+			rt_raise_div_zero(MSG_DIV(robject_name(left)));
 			robject_addref(robject_null);
 			return robject_null;
 		}
@@ -72,7 +72,7 @@ static Robject* bf_div(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_DIV);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_DIV));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -102,7 +102,7 @@ static Robject* bf_plus(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_PLUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_PLUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -132,7 +132,7 @@ static Robject* bf_minus(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_MINUS);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MINUS));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -170,7 +170,7 @@ static Robject* bf_cmp(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_oper_type_error(left,right,OPER_CMP);
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_CMP));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -199,7 +199,7 @@ static Robject*  bf_bool(Robject* btf)
 
 static void  bf_print(Robject* btf)
 {
-	printf("%g\n",R_TO_F(btf)->f_value);
+	printf("%g",R_TO_F(btf)->f_value);
 }
 
 

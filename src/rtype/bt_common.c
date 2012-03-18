@@ -37,7 +37,7 @@ Robject* r_div_int_float(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_FLOAT,"ERR Right Type(%s)",right->r_name);
 	if(bt_float_is_zero(R_TO_F(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -57,7 +57,7 @@ Robject* r_div_int_long(Robject* left,Robject* right)
 
 	if(bt_long_is_zero(R_TO_L(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -77,7 +77,7 @@ Robject* r_mod_int_long(Robject* left,Robject* right)
 
 	if(bt_long_is_zero(R_TO_L(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -154,13 +154,13 @@ Robject* r_lshift_int_long(Robject* left,Robject* right)
 	BGInteger* r_val=R_TO_L(right)->l_value;
 	if(bg_overflow_int(r_val))
 	{
-		rt_raise_overflow(right);
+		rt_raise_overflow(MSG_LONG_OVERFLOW);
 		robject_addref(robject_null);
 		return robject_null;
 	}
 	if(bg_is_negative(r_val))
 	{
-		rt_raise_value_error("Negative Shift Count");
+		rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -184,13 +184,13 @@ Robject* r_rshift_int_long(Robject* left,Robject* right)
 	BGInteger* r_val=R_TO_L(right)->l_value;
 	if(bg_overflow_int(r_val))
 	{
-		rt_raise_overflow(right);
+		rt_raise_overflow(MSG_LONG_OVERFLOW);
 		robject_addref(robject_null);
 		return robject_null;
 	}
 	if(bg_is_negative(r_val))
 	{
-		rt_raise_value_error("Negative Shift Count");
+		rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -314,7 +314,7 @@ Robject* r_div_float_int(Robject* left, Robject* right)
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
 	if(bt_int_is_zero(R_TO_I(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -334,7 +334,7 @@ Robject* r_div_float_long(Robject* left, Robject* right)
 
 	if(bt_long_is_zero(R_TO_L(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -457,7 +457,7 @@ Robject* r_div_long_float(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_FLOAT,"ERR Right Type(%s)",right->r_name);
 	if(bt_float_is_zero(R_TO_F(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -476,7 +476,7 @@ Robject* r_div_long_int(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
 	if(bt_int_is_zero(R_TO_I(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -498,7 +498,7 @@ Robject* r_mod_long_int(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
 	if(bt_int_is_zero(R_TO_I(right)))
 	{
-		rt_raise_div_zero(left);
+		rt_raise_div_zero(MSG_DIV(robject_name(left)));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -551,7 +551,7 @@ Robject* r_lshift_long_int(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
 	if(R_TO_I(right)->i_value<0)
 	{
-		rt_raise_value_error("Negative Shift Count");
+		rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -571,7 +571,7 @@ Robject* r_rshift_long_int(Robject* left,Robject* right)
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
 	if(R_TO_I(right)->i_value<0)
 	{
-		rt_raise_value_error("Negative Shift Count");
+		rt_raise_value_error(MSG_SHIFT_NEGATIVE);
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -590,12 +590,6 @@ Robject* r_cmp_long_int(Robject* left,Robject* right)
 {
 	BUG_ON(left->r_type!=RT_LONG,"ERR Left Type(%s)",left->r_name);
 	BUG_ON(right->r_type!=RT_INT,"ERR Right Type(%s)",right->r_name);
-	if(R_TO_I(right)->i_value<0)
-	{
-		rt_raise_value_error("Negative Shift Count");
-		robject_addref(robject_null);
-		return robject_null;
-	}
 
 	BGInteger* l_val=R_TO_L(left)->l_value;
 	BGInteger* r_val=bg_create_from_int(R_TO_I(right)->i_value);

@@ -1,6 +1,6 @@
 PROJECT=rtype
 SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
-	rtype.c robject.c
+	rtype.c robject.c except_msg.c   bt_string.c bt_array.c
 DEBUG=gen_lib.c 
 BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
 	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
@@ -11,8 +11,16 @@ BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
 
 
 
-OBJ_NAME=$(SRC:%.c=%.o) $(DEBUG:%.c=%.o)
+OBJ_NAME=$(SRC:%.c=%.o) 
 OBJ_NAME_WITH_PATH=$(addprefix obj/,$(OBJ_NAME))
+
+DEBUG_OBJ_NAME=$(DEBUG:%.c=%.o) 
+DEBUG_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(DEBUG_OBJ_NAME))
+
+ALL_OBJ=$(OBJ_NAME) $(DEBUG_OBJ_NAME)
+ALL_OBJ_WITH_PATH= $(DEBUG_OBJ_NAME_WITH_PATH) $(DEBUG_OBJ_NAME_WITH_PATH)
+
+
 
 BIN_NAME=$(BIN:%.c=%.exe)
 BIN_NAME_WITH_PATH=$(addprefix bin/,$(BIN_NAME))
@@ -23,18 +31,21 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 CC=gcc
 FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug  -I../../
-LIB=-Llib -l$(PROJECT) -L../../lib -lutility_c
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c 
 
 
 
 
-main: $(OBJ_NAME_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
+main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
 
+lib/lib$(PROJECT)debug.a:$(DEBUG_OBJ_NAME_WITH_PATH)
+	ar cr $@ $(DEBUG_OBJ_NAME_WITH_PATH)
 
-bin/%.exe:obj/%.o lib/lib$(PROJECT).a
+
+bin/%.exe:obj/%.o lib/lib$(PROJECT).a lib/lib$(PROJECT)debug.a 
 	$(CC) $(FLAGS) -o $@ $< $(LIB)
 
 obj/%.o:%.c
