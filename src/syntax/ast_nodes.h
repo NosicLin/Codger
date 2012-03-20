@@ -1,0 +1,9 @@
+#ifndef _REDY_SYNTAX_AST_NODE_H_
+#define _REDY_SYNTAX_AST_NODE_H_
+#include"ast_node_literal.h"
+#include"ast_node_stmt.h"
+#include"ast_node_binary_expr.h"
+
+#endif  /*_REDY_SYNTAX_AST_NODE_H_*/
+
+

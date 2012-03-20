@@ -4,6 +4,7 @@
 #include <string.h>
 #include "token.h"
 
+#define KEYWORD_NUM (TOKEN_FALSE-TOKEN_AND+1)
 struct state lex_state_err=
 {
 	"lex_state_err",
@@ -30,20 +31,11 @@ char* token_info[]=
 {
 	"unkown",
 	"err",
-	"eof",
 
-	/*integer parts*/
-	"nu_bin",
-	"nu_oct",
-	"nu_dec",
-	"nu_hex",
-	"nu_long",
-
-	/*float parts*/
+	/*base type*/
+	"integer",
+	"long",
 	"float",
-	"exp_float",
-
-	/*string parts*/
 	"string",
 
 	/*identifier parts*/
@@ -56,40 +48,39 @@ char* token_info[]=
 	"r_rb",
 	"l_sb",
 	"r_sb",
-	"reverse",
-	"not_equal",
-	"bits_and",
-	"bits_and_assign",
-	"bit_or",
-	"bit_or_assign",
-	"bit_xor",
-	"bit_xor_assign",
-	"mul",
-	"mul_assign",
-	"mod",
-	"mod_assign",
-	"minus",
-	"minus_assign",
-	"plus",
-	"plus_assign",
-	"divide",
-	"divide_assign",
+
+	/*expr operator and assign*/
 	"assign",
-	"equal",
-	"right_shift",
+	"mul_assign",
+	"divide_assign",
+	"mod_assign",
+	"plus_assign",
+	"minus_assign",
+	"left_shift_assign",
 	"right_shift_assign",
+	"bits_and_assign",
+	"bit_or_assign",
+	"bit_xor_assign",
+
+	/*expr operator */
+	"mul",
+	"divide",
+	"mod",
+	"plus",
+	"minus",
+	"left_shift",
+	"right_shift",
+	"bits_and",
+	"bit_or",
+	"bit_xor",
+	"negated",
+	"lt",
+	"le",
+	"not_equal",
+	"equal",
 	"ge",
 	"gt",
-	"left_shift",
-	"left_shift_assign",
-	"le",
-	"lt",
 	
-	/*annotate*/
-	"annotate",
-
-	/*white space*/
-	"white_space",
 
 	/*sentence break*/
 	"semicolon",
@@ -124,6 +115,14 @@ char* token_info[]=
 	"try",
 	"vfunc",
 	"while",
+	"true",
+	"false",
+
+	/*annotate*/
+	"annotate",
+
+	/*white space*/
+	"white_space",
 
 };
 
@@ -235,6 +234,7 @@ struct keyword key_words[]=
 	{"elif",TOKEN_ELIF},
 	{"else",TOKEN_ELSE},
 	{"end",TOKEN_END},
+	{"false",TOKEN_FALSE},
 	{"finally",TOKEN_FINALLY},
 	{"for",TOKEN_FOR},
 	{"from",TOKEN_FROM},
@@ -249,6 +249,7 @@ struct keyword key_words[]=
 	{"return",TOKEN_RETURN},
 	{"then",TOKEN_THEN},
 	{"to",TOKEN_TO},
+	{"true",TOKEN_TRUE},
 	{"try",TOKEN_TRY},
 	{"vfunc",TOKEN_VFUNC},
 	{"while",TOKEN_WHILE},

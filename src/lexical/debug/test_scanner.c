@@ -18,12 +18,8 @@ int main(int argc,char** argv)
 	while(1)
 	{
 		i++;
-		if(i%5==0)
-		{
-			printf("\n");
-		}
 		token=sc_next_token(sc);
-		if(token==TOKEN_EOF)
+		if(token==EOF)
 		{
 			break;
 		}
@@ -54,15 +50,18 @@ int main(int argc,char** argv)
 		}
 		if(token==TOKEN_NEWLINE)
 		{
-			printf("{newline}  ");
+			printf("{newline}\n");
 			continue;
 		}
 		printf("{%s,%s}  ",token_name(token),sc_token_string(sc));
 	};
 
+	sc_destory(sc);
 	printf("\n");
 	return 0;
 err:
+	sc_destory(sc);
 	printf("err token at line %d\n",sc->s_line);
 	return -1;
+	
 }

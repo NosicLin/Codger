@@ -1,5 +1,8 @@
 #ifndef _UTILITY_LIST_HEAD_H_
 #define _UTILITY_LIST_HEAD_H_
+#ifndef NULL
+#define NULL 0
+#endif 
 struct list_head 
 {
 	struct list_head* prev;

@@ -35,6 +35,7 @@ enum OPER_INPUT_TYPE
 	ME_WS,
 	ME_NEWLINE,
 	ME_SEMICOLON,
+	ME_ANNO,
 
 	OPER_COMMA,
 	OPER_PERIOD,
@@ -82,6 +83,7 @@ void id_array_create()
 	id_array['\t']=ME_WS;
 	id_array['\n']=ME_NEWLINE;
 	id_array[';']=ME_SEMICOLON;
+	id_array['#']=ME_ANNO;
 
 
 	id_array[',']=OPER_COMMA;

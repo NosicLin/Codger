@@ -13,6 +13,7 @@ struct scanner
 	int s_literial_size;
 
 };
+typedef struct scanner Scanner;
 
 
 int sc_next_token(struct scanner* sc);

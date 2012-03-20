@@ -33,3 +33,25 @@ static struct robject __robject_other=
 };
 
 struct robject* robject_other= &__robject_other;
+
+void robject_print(Robject* rt)
+{
+	if(!rt->r_expr_ops)
+	{
+		goto default_action;
+	}
+	if(!rt->r_expr_ops->ro_print)
+	{
+		goto default_action;
+	}
+
+	rt->r_expr_ops->ro_print(rt);
+	printf("\n");
+	return ;
+default_action:
+	printf("Object At %ld\n",(long)rt);
+	return ;
+
+}
+
+

@@ -32,19 +32,17 @@ int sc_next_token(struct scanner* sc)
 
 		if(cur==EOF)
 		{
-			sc->s_cur_token=TOKEN_EOF;
+			sc->s_cur_token=EOF;
 			break;
 		}
-		if(cur=='\n')
-		{
-			sc->s_line++;
-		}
+	
 		next_state=state_next(cur_state,cur);
 		if(next_state==&lex_state_err)
 		{
 			if(finnal_state==NULL)
 			{
 				sc->s_cur_token=TOKEN_ERR;
+				printf("cur_state=%s\n",cur_state->s_name);
 			}
 			else
 			{
@@ -61,10 +59,16 @@ int sc_next_token(struct scanner* sc)
 		}
 		next=lf_next_char(lf);
 		cur_state=next_state;
+
 	}
 
 	sc_set_cur_literial(sc,lf->l_buf+lf->l_begin,lf->l_mark-lf->l_begin);
 	lf_reset_to_mark(lf);
+
+	if(sc->s_cur_token==TOKEN_NEWLINE||sc->s_cur_token==TOKEN_ANNO)
+	{
+		sc->s_line++;
+	}
 
 	return sc->s_cur_token;
 }
