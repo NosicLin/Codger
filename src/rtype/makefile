@@ -31,15 +31,16 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 CC=gcc
 FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug   -I../
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../lib -lutility_c  -lvm
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
+	-L../lib/ -lvm 
 
 
-
-
-main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
+main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
 
-lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
+
+
+lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH) ../lib 
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
 	cp $@ ../lib/
 
@@ -56,11 +57,22 @@ obj/%.o:%.c
 obj/%.o:debug/%.c
 	$(CC) $(FLAGS) -c -o $@ $< $(INCLUDE) 
 	
+grammar.tab.c: grammar.y
+	bison grammar.y
 	
 init:
 	mkdir -p obj 
 	mkdir -p bin
 	mkdir -p lib
+obj:
+	mkdir -p obj
+bin:
+	mkdir -p bin
+lib:
+	mkdir -p lib 
+../lib:
+	mkdir -p ../lib 
+
 rm:
 	rm -f obj/*
 	rm -f lib/*
@@ -79,4 +91,4 @@ depend:
 		gcc -M -MT "obj/$$result" $$element $(INCLUDE) >>.$(PROJECT).dep ;\
 	done
 
-include .$(PROJECT).dep
+-include .$(PROJECT).dep
