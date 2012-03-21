@@ -43,7 +43,7 @@ int yylex()
 	}
 	if(token!=EOF)
 	{
-	//	printf("token_name=%s\n",token_name(token));
+//		printf("token_name=%s\n",token_name(token));
 		token+=TOKEN_BASE;
 	}
 	return token;

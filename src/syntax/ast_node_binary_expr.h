@@ -4,7 +4,7 @@
 
 struct ast_binary_expr
 {
-	struct ast_object b_base;
+	BASE_AST_OBJECT;
 	struct ast_object* b_left;
 	struct ast_object* b_right;
 };
@@ -48,7 +48,7 @@ static inline  AstObject* ast_bexpr_get_right(AstBinaryExpr* ab)
 /* creator interface */
 AstNodeMul* ast_create_mul();
 AstNodeDiv* ast_create_div();
-AstNodeMod* ast_create_div();
+AstNodeMod* ast_create_mod();
 
 /* type cast*/
 AST_TYPE_CAST(MUL,Mul,ATN_MUL);

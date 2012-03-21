@@ -1,7 +1,7 @@
 PROJECT=syntax
 
 SRC= ast_object.c ast_machine.c ast_node_literal.c grammar.tab.c \
-	 yylex.c   
+	 yylex.c  ast_machine.c
 
 DEBUG=
 BIN=test_literal.c
@@ -34,7 +34,16 @@ LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 
 
 
-main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
+main: other_model $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
+
+other_model: 
+	make -C ../rtype/ 
+	make -C ../lexical/ 
+	make -C  ../utility_c/ 
+	cp ../rtype/lib/librtype.a ../lib/
+	cp ../lexical/lib/liblexical.a ../lib/
+	cp ../vm/lib/libvm.a ../lib/ 
+	cp ../utility_c/lib/libutility_c.a ../lib/
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
 	ar cr $@ $(OBJ_NAME_WITH_PATH)

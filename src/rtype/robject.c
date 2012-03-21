@@ -55,3 +55,71 @@ default_action:
 }
 
 
+
+
+Robject* robject_mul(Robject* left,Robject* right)
+{
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+	if(left->r_expr_ops->ro_mul==0)
+	{
+		goto default_action;
+	}
+	Robject* ret=0;
+	ret=left->r_expr_ops->ro_mul(left,right);
+	return ret;
+
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MUL));
+	robject_addref(robject_null);
+	return robject_null;
+}
+
+
+Robject* robject_div(Robject* left,Robject* right)
+{
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+	if(left->r_expr_ops->ro_mul==0)
+	{
+		goto default_action;
+	}
+	Robject* ret=0;
+	ret=left->r_expr_ops->ro_div(left,right);
+	return ret;
+
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_DIV));
+	robject_addref(robject_null);
+	return robject_null;
+}
+
+Robject* robject_mod(Robject* left,Robject* right)
+{
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+	if(left->r_expr_ops->ro_mul==0)
+	{
+		goto default_action;
+	}
+	Robject* ret=0;
+	ret=left->r_expr_ops->ro_mod(left,right);
+	return ret;
+
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MOD));
+	robject_addref(robject_null);
+	return robject_null;
+}
+
+
+
+
+
+

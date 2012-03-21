@@ -1,6 +1,5 @@
 #include "ast_node_literal.h"
 #include<stdlib.h>
-
 #ifdef AST_MACHINE 
 #include "ast_machine.h"
 #endif /* AST_MACHINE */

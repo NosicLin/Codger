@@ -13,14 +13,10 @@ AST_TYPE_CAST(STMT,Stmt,ATN_STMT);
 
 
 /*getter and setter */
-static inline void ast_stmt_set_value(AstNodeStmt* stmt,AstObject* ab)
-{
-	stmt->s_value=ab;
-}
 static inline AstObject* ast_stmt_get_value(AstNodeStmt* stmt)
 {
 	return stmt->s_value;
 }
-AstNodeStmt* ast_create_stmt();
+AstNodeStmt* ast_create_stmt(AstObject* ab);
 
 #endif 

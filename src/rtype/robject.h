@@ -76,6 +76,8 @@ struct robject_ops
 	void (*ro_free)(Robject*);
 };
 
+extern Robject* robject_null;
+extern Robject* robject_other;
 
 /*create and free*/
 Robject* robject_create();
@@ -116,7 +118,18 @@ static inline char* robject_name(Robject* rt)
 	return rt->r_name;
 }
 
+/* robject expr */
 void robject_print(Robject* rt);
-extern Robject* robject_null;
-extern Robject* robject_other;
+Robject* robject_mul(Robject* left,Robject* right);
+Robject* robject_div(Robject* left,Robject* right);
+Robject* robject_mod(Robject* left,Robject* right);
+Robject* robject_plus(Robject* left,Robject* right);
+Robject* robject_minus(Robject* left,Robject* right);
+Robject* robject_lshift(Robject* left,Robject* right);
+Robject* robject_rshift(Robject* left,Robject* right);
+Robject* robject_or(Robject* left,Robject* right);
+Robject* robject_and(Robject* left,Robject* right);
+Robject* robject_xor(Robject* left,Robject* right);
+
 #endif 
+

@@ -30,13 +30,14 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 FLAGS=-g -Wall  -Werror
-INCLUDE=-I. -I./debug  -I../../
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c 
+INCLUDE=-I. -I./debug   -I../
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../lib -lutility_c  -lvm
 
 
 
 
-main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
+main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
+   	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
 	ar cr $@ $(OBJ_NAME_WITH_PATH)

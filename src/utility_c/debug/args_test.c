@@ -17,7 +17,6 @@ int main()
 		{
 			printf("input divide chars:\n");
 			scanf("%s",divide);
-			char c;
 			getc(stdin);
 			buffer[read-1]=0;
 

@@ -31,16 +31,39 @@
 %start AstTree
 %%
 
-AstTree : stmts{printf("paser success\n");}
+AstTree : stmts{parser_set_root($1);}
 ;
 
 stmts: stmt 
+	 {
+		AstNodeStmts* stmts=ast_create_stmts();
+		ast_addto_pending(STMTS_TO_AST(stmts));
+		AstNodeStmt* node=AST_TO_STMT($1);
+		ast_stmts_add(stmts,node);
+		$$=STMTS_TO_AST(stmts);
+	 }
 	 | tNEWLINE
-	 | stmts tNEWLINE stmt 
+	 {
+		AstNodeStmts* node=ast_create_stmts();
+		ast_addto_pending(STMTS_TO_AST(node));
+		$$=STMTS_TO_AST(node);
+	 }
+	 | stmts stmt  tNEWLINE
+	 {
+		AstNodeStmts* stmts=AST_TO_STMTS($1);
+		AstNodeStmt* node=AST_TO_STMT($2);
+		ast_stmts_add(stmts,node);
+		$$=STMTS_TO_AST(stmts);
+	 }
 	 | stmts tNEWLINE 
 ;
 
 stmt: stmt_expr
+	{
+	AstNodeStmt* node=ast_create_stmt($1);
+	ast_addto_pending(STMT_TO_AST(node));
+	$$=STMT_TO_AST(node);
+	}
 	 ;
 literal: tINTEGER 
 	   {

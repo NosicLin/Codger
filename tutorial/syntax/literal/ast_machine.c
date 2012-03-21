@@ -1,5 +1,4 @@
 #include"ast_machine.h"
-#include<stdio.h>
 #ifdef AST_MACHINE 
 Robject* cup_reg0=0;
 int ast_machine_init()
@@ -17,7 +16,6 @@ int ast_machine_exit()
 
 int ast_execute(AstObject* ab)
 {
-//	printf("execute AstObject(%s)\n",ab->a_name);
 	if(ab->a_ops)
 	{
 		if(ab->a_ops->ao_execute)

@@ -1,10 +1,12 @@
 PROJECT=syntax
 
-SRC= ast_object.c ast_machine.c ast_node_literal.c grammar.tab.c \
-	 yylex.c   ast_node_stmt.c
+SRC= ast_object.c ast_machine.c ast_node_literal.c \
+	 yylex.c   ast_node_stmt.c ast_node_binary_expr.c  \
+	 ast_node_stmts.c \
+	 grammar.tab.c   parser.c
 
 DEBUG=
-BIN=test_literal.c
+BIN=test_literal.c redy.c
 
 
 
@@ -27,7 +29,7 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 FLAGS=-g -Wall  -Werror
-INCLUDE=-I. -I./debug  -I../../ -I../
+INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 	-L../lib/ -lrtype -llexical -lvm
 

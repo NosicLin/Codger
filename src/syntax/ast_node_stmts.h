@@ -10,15 +10,17 @@ struct ast_node_stmts
 	struct list_head st_head;
 };
 typedef struct ast_node_stmts AstNodeStmts;
-AST_TYPE_CAST(STMTS,stmts,ATN_STMTS);
+AST_TYPE_CAST(STMTS,Stmts,ATN_STMTS);
+
+AstNodeStmts* ast_create_stmts();
 
 static inline void ast_stmts_add(AstNodeStmts* stmts,AstNodeStmt* node)
 {
-	list_head_add_tail(&stmts->st_head,&node->s_list);
+	list_add_tail(&node->s_list,&stmts->st_head);
 }
 static inline void ast_stmts_remove(AstNodeStmt* node)
 {
-	list_head_del(&node->s_list);
+	list_del(&node->s_list);
 }
 
 #endif  /*_REDY_SYNTAX_AST_NODE_STMTS_H_*/

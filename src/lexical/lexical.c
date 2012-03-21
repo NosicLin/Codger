@@ -169,6 +169,7 @@ struct lex_file* lf_stream_create(FILE* file)
 void lf_destory(struct lex_file* lf)
 {
 	free(lf->l_buf);
+	fclose(lf->l_file);
 	free(lf);
 }
 int lf_load_data(struct lex_file* lf)

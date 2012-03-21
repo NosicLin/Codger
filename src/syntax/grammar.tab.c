@@ -70,6 +70,7 @@
 /* Line 189 of yacc.c  */
 #line 1 "grammar.y"
 
+
 #include"yylex.h"
 #include"ast_nodes.h"
 #include"parser.h"
@@ -78,7 +79,7 @@
 
 
 /* Line 189 of yacc.c  */
-#line 82 "grammar.tab.c"
+#line 83 "grammar.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -194,7 +195,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 198 "grammar.tab.c"
+#line 199 "grammar.tab.c"
 
 #ifdef short
 # undef short
@@ -407,18 +408,18 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  14
+#define YYFINAL  16
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   13
+#define YYLAST   48
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  75
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  8
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  15
+#define YYNRULES  19
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  22
+#define YYNSTATES  27
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -470,24 +471,25 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     5,     7,     9,    11,    13,    15,    17,
-      21,    23,    27,    31,    35,    37
+       0,     0,     3,     5,     7,     9,    13,    16,    18,    20,
+      22,    24,    26,    28,    32,    34,    38,    42,    46,    48
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      76,     0,    -1,    77,    -1,    82,    -1,     5,    -1,     6,
-      -1,     7,    -1,     8,    -1,    78,    -1,    12,    81,    13,
-      -1,    79,    -1,    80,    27,    79,    -1,    80,    28,    79,
-      -1,    80,    29,    79,    -1,    80,    -1,    81,    -1
+      76,     0,    -1,    77,    -1,    78,    -1,    45,    -1,    77,
+      78,    45,    -1,    77,    45,    -1,    83,    -1,     5,    -1,
+       6,    -1,     7,    -1,     8,    -1,    79,    -1,    12,    82,
+      13,    -1,    80,    -1,    81,    27,    80,    -1,    81,    28,
+      80,    -1,    81,    29,    80,    -1,    81,    -1,    82,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    36,    38,    46,    54,    60,    67,    68,
-      70,    73,    81,    89,    98,   100
+       0,    34,    34,    37,    45,    51,    58,    61,    68,    76,
+      84,    90,    97,    98,   100,   103,   111,   119,   128,   130
 };
 #endif
 
@@ -506,7 +508,7 @@ static const char *const yytname[] =
   "kCONTINUE", "kDO", "kELIF", "kELSE", "kEND", "kFINALLY", "kFOR",
   "kFROM", "kFUNC", "kIF", "kIMPORT", "kIN", "kINHRIT", "kNOT", "kOR",
   "kPRINT", "kTHEN", "kTO", "KTRY", "kVFUNC", "kWHILE", "kTRUE", "kFALSE",
-  "$accept", "AstTree", "stmts", "literal", "primary_expr",
+  "$accept", "AstTree", "stmts", "stmt", "literal", "primary_expr",
   "multiply_expr", "expr", "stmt_expr", 0
 };
 #endif
@@ -530,15 +532,15 @@ static const yytype_uint16 yytoknum[] =
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    75,    76,    77,    78,    78,    78,    78,    79,    79,
-      80,    80,    80,    80,    81,    82
+       0,    75,    76,    77,    77,    77,    77,    78,    79,    79,
+      79,    79,    80,    80,    81,    81,    81,    81,    82,    83
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     1,     1,     1,     1,     3,
-       1,     3,     3,     3,     1,     1
+       0,     2,     1,     1,     1,     3,     2,     1,     1,     1,
+       1,     1,     1,     3,     1,     3,     3,     3,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -546,15 +548,15 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     4,     5,     6,     7,     0,     0,     2,     8,    10,
-      14,    15,     3,     0,     1,     0,     0,     0,     9,    11,
-      12,    13
+       0,     8,     9,    10,    11,     0,     4,     0,     2,     3,
+      12,    14,    18,    19,     7,     0,     1,     6,     0,     0,
+       0,     0,    13,     5,    15,    16,    17
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     6,     7,     8,     9,    10,    11,    12
+      -1,     7,     8,     9,    10,    11,    12,    13,    14
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -562,15 +564,15 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -24
 static const yytype_int8 yypact[] =
 {
-      -5,   -24,   -24,   -24,   -24,    -5,    11,   -24,   -24,   -24,
-     -23,   -24,   -24,    -1,   -24,    -5,    -5,    -5,   -24,   -24,
-     -24,   -24
+      -5,   -24,   -24,   -24,   -24,    11,   -24,    20,     3,   -24,
+     -24,   -24,   -23,   -24,   -24,     8,   -24,   -24,   -21,    11,
+      11,    11,   -24,   -24,   -24,   -24,   -24
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -24,   -24,   -24,   -24,    -7,   -24,     8,   -24
+     -24,   -24,   -24,    14,   -24,    -7,   -24,    21,   -24
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -580,23 +582,29 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       1,     2,     3,     4,    15,    16,    17,     5,    19,    20,
-      21,    14,    18,    13
+       1,     2,     3,     4,    19,    20,    21,     5,     1,     2,
+       3,     4,    24,    25,    26,     5,     1,     2,     3,     4,
+      16,    22,    18,     5,    23,     0,    15,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       6,     0,     0,     0,     0,     0,     0,     0,    17
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       5,     6,     7,     8,    27,    28,    29,    12,    15,    16,
-      17,     0,    13,     5
+       5,     6,     7,     8,    27,    28,    29,    12,     5,     6,
+       7,     8,    19,    20,    21,    12,     5,     6,     7,     8,
+       0,    13,     8,    12,    45,    -1,     5,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+      45,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    45
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     5,     6,     7,     8,    12,    76,    77,    78,    79,
-      80,    81,    82,    81,     0,    27,    28,    29,    13,    79,
-      79,    79
+       0,     5,     6,     7,     8,    12,    45,    76,    77,    78,
+      79,    80,    81,    82,    83,    82,     0,    45,    78,    27,
+      28,    29,    13,    45,    80,    80,    80
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1410,14 +1418,61 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 33 "grammar.y"
-    {printf("paser success\n");;}
+#line 34 "grammar.y"
+    {parser_set_root((yyvsp[(1) - (1)]));;}
+    break;
+
+  case 3:
+
+/* Line 1455 of yacc.c  */
+#line 38 "grammar.y"
+    {
+		AstNodeStmts* stmts=ast_create_stmts();
+		ast_addto_pending(STMTS_TO_AST(stmts));
+		AstNodeStmt* node=AST_TO_STMT((yyvsp[(1) - (1)]));
+		ast_stmts_add(stmts,node);
+		(yyval)=STMTS_TO_AST(stmts);
+	 ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 39 "grammar.y"
+#line 46 "grammar.y"
+    {
+		AstNodeStmts* node=ast_create_stmts();
+		ast_addto_pending(STMTS_TO_AST(node));
+		(yyval)=STMTS_TO_AST(node);
+	 ;}
+    break;
+
+  case 5:
+
+/* Line 1455 of yacc.c  */
+#line 52 "grammar.y"
+    {
+		AstNodeStmts* stmts=AST_TO_STMTS((yyvsp[(1) - (3)]));
+		AstNodeStmt* node=AST_TO_STMT((yyvsp[(2) - (3)]));
+		ast_stmts_add(stmts,node);
+		(yyval)=STMTS_TO_AST(stmts);
+	 ;}
+    break;
+
+  case 7:
+
+/* Line 1455 of yacc.c  */
+#line 62 "grammar.y"
+    {
+	AstNodeStmt* node=ast_create_stmt((yyvsp[(1) - (1)]));
+	ast_addto_pending(STMT_TO_AST(node));
+	(yyval)=STMT_TO_AST(node);
+	;}
+    break;
+
+  case 8:
+
+/* Line 1455 of yacc.c  */
+#line 69 "grammar.y"
     {
 		BtInt* bi=bt_int_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
@@ -1426,10 +1481,10 @@ yyreduce:
 		(yyval)=LITERAL_TO_AST(t); ;}
     break;
 
-  case 5:
+  case 9:
 
 /* Line 1455 of yacc.c  */
-#line 47 "grammar.y"
+#line 77 "grammar.y"
     {
 		BtLong* bl=bt_long_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(bl);
@@ -1438,10 +1493,10 @@ yyreduce:
 		(yyval)=LITERAL_TO_AST(t);;}
     break;
 
-  case 6:
+  case 10:
 
 /* Line 1455 of yacc.c  */
-#line 54 "grammar.y"
+#line 84 "grammar.y"
     {
 		BtFloat* bf=bt_float_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
@@ -1450,10 +1505,10 @@ yyreduce:
 		(yyval)=LITERAL_TO_AST(t);;}
     break;
 
-  case 7:
+  case 11:
 
 /* Line 1455 of yacc.c  */
-#line 60 "grammar.y"
+#line 90 "grammar.y"
     {
 		BtString* bs=bt_string_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
@@ -1462,33 +1517,33 @@ yyreduce:
 		(yyval)=LITERAL_TO_AST(t);;}
     break;
 
-  case 8:
+  case 12:
 
 /* Line 1455 of yacc.c  */
-#line 67 "grammar.y"
+#line 97 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
-  case 9:
+  case 13:
 
 /* Line 1455 of yacc.c  */
-#line 68 "grammar.y"
+#line 98 "grammar.y"
     {(yyval)=(yyvsp[(2) - (3)]);;}
     break;
 
-  case 10:
+  case 14:
 
 /* Line 1455 of yacc.c  */
-#line 70 "grammar.y"
+#line 100 "grammar.y"
     {
 			 (yyval)=(yyvsp[(1) - (1)]);
 			;}
     break;
 
-  case 11:
+  case 15:
 
 /* Line 1455 of yacc.c  */
-#line 73 "grammar.y"
+#line 103 "grammar.y"
     {
 			AstNodeMul* t=ast_create_mul();
 			ast_bexpr_set_left(t,(yyvsp[(1) - (3)]));
@@ -1499,10 +1554,10 @@ yyreduce:
 	;}
     break;
 
-  case 12:
+  case 16:
 
 /* Line 1455 of yacc.c  */
-#line 81 "grammar.y"
+#line 111 "grammar.y"
     {
 			AstNodeDiv* t=ast_create_div();
 			ast_bexpr_set_left(t,(yyvsp[(1) - (3)]));
@@ -1513,12 +1568,12 @@ yyreduce:
 	;}
     break;
 
-  case 13:
+  case 17:
 
 /* Line 1455 of yacc.c  */
-#line 89 "grammar.y"
+#line 119 "grammar.y"
     {
-			AstNodeDiv* t=ast_create_div();
+			AstNodeDiv* t=ast_create_mod();
 			ast_bexpr_set_left(t,(yyvsp[(1) - (3)]));
 			ast_bexpr_set_right(t,(yyvsp[(3) - (3)]));
 			AstObject* ab=MOD_TO_AST(t);
@@ -1527,24 +1582,24 @@ yyreduce:
 	;}
     break;
 
-  case 14:
+  case 18:
 
 /* Line 1455 of yacc.c  */
-#line 98 "grammar.y"
+#line 128 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
-  case 15:
+  case 19:
 
 /* Line 1455 of yacc.c  */
-#line 100 "grammar.y"
+#line 130 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1548 "grammar.tab.c"
+#line 1603 "grammar.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

@@ -12,6 +12,12 @@ static int stmt_execute(AstObject* ab)
 {
 	AstNodeStmt* stmt=AST_TO_STMT(ab);
 	int ret=ast_execute(stmt->s_value);
+	if(ret>=0)
+	{
+		Robject* r=get_reg0();
+		robject_print(r);
+		robject_release(r);
+	}
 	return ret;
 }
 #endif /*AST_MACHINE */
@@ -24,11 +30,11 @@ static struct ast_object_ops stmt_ops=
 #endif 
 };
 
-AstNodeStmt* ast_create_stmt()
+AstNodeStmt* ast_create_stmt(AstObject* ab)
 {
 	AstNodeStmt* stmt=(AstNodeStmt*)malloc(sizeof(*stmt));
 	INIT_LIST_HEAD(&stmt->s_list);
-	stmt->s_value=0;
+	stmt->s_value=ab;
 	AstObject* base=AST_BASE(stmt);
 	ast_init(base,ATN_STMT,"AstNodeStmt",&stmt_ops);
 	return stmt;
