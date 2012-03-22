@@ -12,6 +12,10 @@
 #define OPER_AND "and"
 #define OPER_OR "or"
 #define OPER_XOR "xor"
+#define OPER_NEGATIVE "-"
+#define OPER_NEGATED "~"
+#define OPER_POSITIVE "+"
+
 
 
 #define MSG_LONG_OVERFLOW "long overflow integer"
@@ -26,6 +30,9 @@ char* MSG_STRING_INDEX_TYPE(char* name);
 char* MSG_ARRAY_INDEX_TYPE(char* name);
 char* MSG_OPER(char* l,char* r ,char* ops);
 char* MSG_DIV(char* type);
+char* MSG_UEXPR(char* name,char* ops);
 
 
 #endif 
+
+

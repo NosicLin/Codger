@@ -12,7 +12,7 @@ static void literal_free(AstObject* ab)
 	free(node);
 }
 #ifdef AST_MACHINE 
-int literal_execute(AstObject* ab)
+static int literal_execute(AstObject* ab)
 {
 	AstNodeLiteral* node=AST_TO_LITERAL(ab);
 	Robject* value=node->l_value;
@@ -35,7 +35,7 @@ static struct ast_object_ops literal_ops=
 AstNodeLiteral* ast_create_literal(Robject* r)
 {
 	AstNodeLiteral* node=(AstNodeLiteral*) malloc(sizeof(*node));
-	AstObject* base=&node->l_base;
+	AstObject* base=AST_BASE(node);
 	ast_init(base,ATN_LITERAL,"AstNodeLiteral",&literal_ops);
 	robject_addref(r);
 	node->l_value=r;

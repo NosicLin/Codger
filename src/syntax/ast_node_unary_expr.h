@@ -1,43 +1,33 @@
 #ifndef _REDY_SYNTAX_AST_UNARY_EXPR_H_
+#include"ast_object.h"
+#include"node_type.h"
 struct ast_unary_expr
 {
-	struct ast_object u_base;
+	BASE_AST_OBJECT;
 	struct ast_object* u_value;
 };
 
-typedef struct ast_unary_expr AstUnaryExpr;
+typedef struct ast_unary_expr AstNodeUExpr;
 typedef struct ast_unary_expr AstNodePositive;
 typedef struct ast_unary_expr AstNodeNegative;
-typedef struct ast_unary_expr AstNodeNegated;
-typedef struct ast_unary_expr AstNodeMulAssign;
-typedef struct ast_unary_expr AstNodeDivAssign;
-typedef struct ast_unary_expr AstNodeModAssign;
-typedef struct ast_unary_expr AstNodePlusAssign;
-typedef struct ast_unary_expr AstNodeMinusAssign;
-typedef struct ast_unary_expr AstNodeLsAssign;
-typedef struct ast_unary_expr AstNodeRsAssign;
-typedef struct ast_unary_expr AstNodeAndAssign;
-typedef struct ast_unary_expr AstNodeOrAssign;
-typedef struct ast_unary_expr AstNodeXorAssign;
+typedef struct ast_unary_expr AstNodeBitNegated;
 
 
 /*unary expr getter and setter */
-static inline  AstObject* ast_uexpr_get_value(AstUnaryExpr* ab)
+static inline  AstObject* ast_uexpr_get_value(AstNodeUExpr* ab)
 {
 	return  ab->u_value;
 }
 
-static inline void ast_uexpr_set_value(AstUnaryExpr* ab,AstObject* value)
-{
-	ab->u_value=value;
-}
-
 /* creater interface*/
-AstNodeMul* ast_create_mul();
-AstNodeDiv* ast_create_div();
-AstNodeMod* ast_create_mod();
-AstNodePlus* ast_create_plus();
-AstNodeMinus* ast_create_minus();
+AstNodePositive* ast_create_positive(AstObject* sub_node);
+AstNodeNegative* ast_create_negative(AstObject* sub_node);
+AstNodeBitNegated* ast_create_bit_negated(AstObject* sub_node);
 
+/*type cast*/
+AST_TYPE_CAST(UEXPR,UExpr,ATN_UEXPR);
+AST_TYPE_CAST(POSITIVE,Positive,ATN_POSITIVE);
+AST_TYPE_CAST(NEGATIVE,Negative,ATN_NEGATIVE);
+AST_TYPE_CAST(BIT_NEGATED,BitNegated,ATN_BIT_NEGATED);
 #endif /*_REDY_SYNTAX_AST_UNARY_EXPR_H_*/
 

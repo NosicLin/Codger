@@ -5,12 +5,13 @@
 /* literal */
 struct ast_node_literal
 {
-	struct ast_object l_base;
+	BASE_AST_OBJECT;
 	struct robject* l_value;
 };
 
 typedef struct ast_node_literal AstNodeLiteral;
-AstNodeLiteral* ast_create_literal();
+
+AstNodeLiteral* ast_create_literal(Robject*);
 
 /*getter and setter */
 static inline Robject* ast_literal_get_value(AstNodeLiteral* node)

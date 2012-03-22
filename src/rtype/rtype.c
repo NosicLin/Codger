@@ -4,28 +4,33 @@
 
 void rt_raise_type_error(char* msg)
 {
-	TODO("TypeError");
+	//TODO("TypeError");
+	printf("TypeError:%s\n",msg);
 	vm_set_except(1);
 }
 
 void rt_raise_div_zero(char* msg)
 {
-	TODO("DivZeroError");
+	//TODO("DivZeroError");
+	printf("DivZeroError:%s\n",msg);
 	vm_set_except(1);
 }
 void rt_raise_overflow(char* msg)
 {
-	TODO("OverflowError");
+	//TODO("OverflowError");
+	printf("OverflowError:%s\n",msg);
 	vm_set_except(1);
 }
 void rt_raise_value_error(char* msg )
 {
-	TODO("VauleError");
+	//TODO("VauleError");
+	printf("VauleError:%s\n",msg);
 	vm_set_except(1);
 }
 
 void rt_raise_index_error(char* msg )
 {
-	TODO("IndexError");
+	//TODO("IndexError");
+	printf("IndexError:%s\n",msg);
 	vm_set_except(1);
 }

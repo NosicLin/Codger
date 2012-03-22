@@ -8,6 +8,7 @@ struct ast_object;
 struct ast_object_ops
 {
 	void (*ao_free)(struct ast_object*);
+	void (*ao_free_self)(struct ast_object*);
 #ifdef AST_MACHINE
 	int (*ao_execute)(struct ast_object*);
 #endif 

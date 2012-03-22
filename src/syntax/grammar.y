@@ -76,7 +76,7 @@ literal: tINTEGER
 		| tLONG
 		{
 		BtLong* bl=bt_long_from_str(yl_cur_string());
-	    AstNodeLiteral* t=ast_create_literal(bl);
+	    AstNodeLiteral* t=ast_create_literal(L_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
 		$$=LITERAL_TO_AST(t);}
@@ -93,39 +93,97 @@ literal: tINTEGER
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));
 		$$=LITERAL_TO_AST(t);}
+		| kFALSE{
+		BtBoolean* bl=bt_boolean_create(0);
+		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
+		ast_addto_pending(LITERAL_TO_AST(node));
+   		robject_release(B_TO_R(bl));
+		$$=LITERAL_TO_AST(node);
+		}
+		| kTRUE{
+		BtBoolean* bl=bt_boolean_create(1);
+		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
+		ast_addto_pending(LITERAL_TO_AST(node));
+   		robject_release(B_TO_R(bl));
+		$$=LITERAL_TO_AST(node);
+		}
 ;
 primary_expr: literal {$$=$1;}
 			|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
+			;
+unary_expr:primary_expr{$$=$1;}
+		  	|tPLUS unary_expr {    /*eg. +4*/
+			AstNodePositive* node=ast_create_positive($2);
+			AstObject* ab=POSITIVE_TO_AST(node);
+			ast_addto_pending(ab);
+			$$=ab;
+			}   
+			|tMINUS unary_expr{   /*eg. -4*/
+			AstNodeNegative* node=ast_create_negative($2);
+			AstObject* ab=NEGATIVE_TO_AST(node);
+			ast_addto_pending(ab);
+			$$=ab;
 
-multiply_expr: primary_expr {
+			}   
+			|tNegated unary_expr{  /*eg. ~4*/
+			AstNodeBitNegated* node=ast_create_bit_negated($2);
+			AstObject* ab=BIT_NEGATED_TO_AST(node);
+			ast_addto_pending(ab);
+			$$=ab;
+			} 
+			;
+
+multiply_expr: unary_expr{
 			 $$=$1;
 			}
-	|multiply_expr tMUL primary_expr {
-			AstNodeMul* t=ast_create_mul();
-			ast_bexpr_set_left(t,$1);
-			ast_bexpr_set_right(t,$3);
+	|multiply_expr tMUL unary_expr{
+			AstNodeMul* t=ast_create_mul($1,$3);
 			AstObject* ab=MUL_TO_AST(t);
 			ast_addto_pending(ab);
 			$$=ab;
 	}
-	| multiply_expr tDIV primary_expr{
-			AstNodeDiv* t=ast_create_div();
-			ast_bexpr_set_left(t,$1);
-			ast_bexpr_set_right(t,$3);
+	| multiply_expr tDIV unary_expr{
+			AstNodeDiv* t=ast_create_div($1,$3);
 			AstObject* ab=DIV_TO_AST(t);
 			ast_addto_pending(ab);
 			$$=ab;
 	}
-	| multiply_expr tMOD primary_expr{
-			AstNodeDiv* t=ast_create_mod();
-			ast_bexpr_set_left(t,$1);
-			ast_bexpr_set_right(t,$3);
+	| multiply_expr tMOD unary_expr{
+			AstNodeDiv* t=ast_create_mod($1,$3);
 			AstObject* ab=MOD_TO_AST(t);
 			ast_addto_pending(ab);
 			$$=ab;
 	}
 ;
-expr :multiply_expr{$$=$1;}
+additive_expr:multiply_expr{$$=$1;}
+	|additive_expr tPLUS multiply_expr{
+		AstNodePlus* node=ast_create_plus($1,$3);
+		AstObject* ab=PLUS_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	|additive_expr tMINUS multiply_expr{
+		AstNodeMinus* node=ast_create_minus($1,$3);
+		AstObject* ab=MINUS_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+shift_expr:additive_expr{$$=$1;}
+	|shift_expr tLS additive_expr{   /*left shift*/
+		AstNodeLShift* node=ast_create_lshift($1,$3);
+		AstObject* ab=LSHIFT_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	|shift_expr tRS additive_expr{  /* right shift */
+		AstNodeRShift* node=ast_create_rshift($1,$3);
+		AstObject* ab=RSHIFT_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+
+expr :shift_expr{$$=$1;}
 	;
 stmt_expr:expr {$$=$1;}
 		 ;

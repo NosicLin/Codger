@@ -11,7 +11,11 @@ static void binary_expr_free(AstObject* ab)
 	ast_free(bexpr->b_right);
 	free(bexpr);
 }
-
+static void binary_expr_free_self(AstObject* ab)
+{
+	AstBinaryExpr* bexpr=(AstBinaryExpr*) ab;
+	free(bexpr);
+}
 
 #ifdef AST_MACHINE
 #define BINARY_EXPR_EXECUTE(Hl,Ml,Ll)  \
@@ -58,13 +62,15 @@ error: \
 #define AST_BEXPR_OPS(Ll) \
 static struct ast_object_ops Ll##_ops= \
 { \
-	.ao_free=binary_expr_free, \
-	.ao_execute=Ll##_execute, \
+	.ao_free_self=&binary_expr_free_self, \
+	.ao_free=& binary_expr_free, \
+	.ao_execute=& Ll##_execute, \
 };
 #else 
 #define AST_BEXPR_OPS(Ll) \
 static struct ast_object_ops Ll##_ops= \
 { \
+	.ao_free_self=&binary_expr_free_self, \
 	.ao_free=binary_expr_free, \
 };
 #endif /*AST_MACHINE*/
@@ -73,16 +79,26 @@ static struct ast_object_ops Ll##_ops= \
 #define BEXPR_METHOD(Hl,Ml,Ll) \
 	BINARY_EXPR_EXECUTE(Hl,Ml,Ll) \
 AST_BEXPR_OPS(Ll) \
-AstNodeMul* ast_create_##Ll() \
+AstNode##Ml* ast_create_##Ll(AstObject* l,AstObject* r) \
 { \
 	AstNode##Ml* node=(AstNode##Ml*) malloc(sizeof(*node)); \
+	node->b_left=l; \
+	node->b_right=r; \
 	AstObject* base=AST_BASE(node); \
 	ast_init(base,ATN_##Hl,"AstNode"#Ml ,& Ll##_ops); \
 	return node; \
 } 
 
-
+/* multiply_expr */
 BEXPR_METHOD(MUL,Mul,mul); 
 BEXPR_METHOD(DIV,Div,div); 
 BEXPR_METHOD(MOD,Mod,mod); 
+
+/* additive_expr*/
+BEXPR_METHOD(PLUS,Plus,plus); 
+BEXPR_METHOD(MINUS,Minus,minus); 
+
+/* shift expr */ 
+BEXPR_METHOD(LSHIFT,LShift,lshift); 
+BEXPR_METHOD(RSHIFT,RShift,rshift); 
 

@@ -1,0 +1,49 @@
+parse <shift1.r> success
+"int oper int "
+32
+2
+"int oper long"
+2
+3802951800684688204490109616128
+"int oper float"
+TypeError:unsupported operand >> for 'Integer' and 'Float'
+TypeError:unsupported operand << for 'Integer' and 'Float'
+"int oper string"
+TypeError:unsupported operand << for 'Integer' and 'String'
+TypeError:unsupported operand >> for 'Integer' and 'String'
+"float oper float "
+TypeError:unsupported operand << for 'Float' and 'Float'
+TypeError:unsupported operand << for 'Float' and 'Float'
+"float oper int"
+TypeError:unsupported operand << for 'Float' and 'Integer'
+TypeError:unsupported operand << for 'Float' and 'Integer'
+"float oper string"
+TypeError:unsupported operand << for 'Float' and 'String'
+TypeError:unsupported operand << for 'Float' and 'String'
+"float oper long"
+TypeError:unsupported operand << for 'Float' and 'LongInteger'
+TypeError:unsupported operand << for 'Float' and 'LongInteger'
+"long oper long"
+295362589853177450548731846852608
+776102145512898763020833333333333333
+"long oper int"
+295362589853177450548731846852608
+776102145512898763020833333333333333
+"long oper float"
+TypeError:unsupported operand << for 'LongInteger' and 'Float'
+TypeError:unsupported operand >> for 'LongInteger' and 'Float'
+"long oper string"
+TypeError:unsupported operand << for 'LongInteger' and 'String'
+TypeError:unsupported operand >> for 'LongInteger' and 'String'
+"string oper string"
+TypeError:unsupported operand << for 'String' and 'String'
+TypeError:unsupported operand << for 'String' and 'String'
+"string oper int"
+TypeError:unsupported operand << for 'String' and 'Integer'
+TypeError:unsupported operand << for 'String' and 'Integer'
+"string oper float"
+TypeError:unsupported operand << for 'String' and 'Float'
+TypeError:unsupported operand << for 'String' and 'Float'
+"string oper long"
+TypeError:unsupported operand << for 'String' and 'LongInteger'
+TypeError:unsupported operand << for 'String' and 'LongInteger'

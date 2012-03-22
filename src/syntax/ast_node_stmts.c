@@ -1,6 +1,7 @@
 #include"ast_node_stmts.h"
 #include<stdlib.h>
 #include"ast_machine.h"
+#include<vm/except.h>
 
 static void stmts_free(AstObject* ab)
 {
@@ -31,7 +32,11 @@ static int stmts_execute(AstObject* ab)
 		ret=ast_execute(STMT_TO_AST(p));
 		if(ret<0)
 		{
-			break;
+			if(vm_except_happened())
+			{
+				vm_clear_except();
+			}
+//			break;
 		}
 	}
 	return ret;

@@ -15,8 +15,8 @@ typedef struct ast_binary_expr AstNodeDiv;
 typedef struct ast_binary_expr AstNodeMod;
 typedef struct ast_binary_expr AstNodePlus;
 typedef struct ast_binary_expr AstNodeMinus;
-typedef struct ast_binary_expr AstNodeLs;
-typedef struct ast_binary_expr AstNodeRs;
+typedef struct ast_binary_expr AstNodeLShift;
+typedef struct ast_binary_expr AstNodeRShift;
 typedef struct ast_binary_expr AstNodeLt;
 typedef struct ast_binary_expr AstNodeLe;
 typedef struct ast_binary_expr AstNodeNe;
@@ -28,6 +28,8 @@ typedef struct ast_binary_expr AstNodeOr;
 typedef struct ast_binary_expr AstNodeXor;
 
 /*binary expr getter and setter*/
+/* don't need setter any more */
+/*
 static inline void ast_bexpr_set_left(AstBinaryExpr* ab,AstObject* value)
 {
 	ab->b_left=value;
@@ -36,6 +38,7 @@ static inline void ast_bexpr_set_right(AstBinaryExpr* ab,AstObject* value)
 {
 	ab->b_right=value;
 }
+*/
 static inline  AstObject* ast_bexpr_get_left(AstBinaryExpr* ab)
 {
 	return  ab->b_left;
@@ -46,9 +49,18 @@ static inline  AstObject* ast_bexpr_get_right(AstBinaryExpr* ab)
 }
 
 /* creator interface */
-AstNodeMul* ast_create_mul();
-AstNodeDiv* ast_create_div();
-AstNodeMod* ast_create_mod();
+/*multiply_expr*/
+AstNodeMul* ast_create_mul(AstObject* l,AstObject* r);
+AstNodeDiv* ast_create_div(AstObject* l,AstObject* r);
+AstNodeMod* ast_create_mod(AstObject* l,AstObject* r);
+
+/*additive_expr*/
+AstNodePlus* ast_create_plus(AstObject* l,AstObject* r);
+AstNodeMinus* ast_create_minus(AstObject* l,AstObject* r);
+
+/*shift_expr*/
+AstNodeLShift* ast_create_lshift(AstObject* l, AstObject* r);
+AstNodeRShift* ast_create_rshift(AstObject* l,AstObject* r);
 
 /* type cast*/
 AST_TYPE_CAST(MUL,Mul,ATN_MUL);
@@ -56,8 +68,8 @@ AST_TYPE_CAST(DIV,Div,ATN_DIV);
 AST_TYPE_CAST(MOD,Mod,ATN_MOD);
 AST_TYPE_CAST(PLUS,Plus,ATN_PLUS);
 AST_TYPE_CAST(MINUS,Minus,ATN_MINUS);
-AST_TYPE_CAST(LS,Ls,ATN_LS);
-AST_TYPE_CAST(RS,Rs,ATN_RS);
+AST_TYPE_CAST(LSHIFT,LShift,ATN_LSHIFT);
+AST_TYPE_CAST(RSHIFT,RShift,ATN_RSHIFT);
 
 
 

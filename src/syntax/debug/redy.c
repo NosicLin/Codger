@@ -31,14 +31,7 @@ int main(int argc ,char** argv)
 	{
 		printf("parse <%s> success\n",argv[1]);
 		root=parser_get_root();
-		if(ast_execute(root))
-		{
-			printf("execute failed\n");
-		}
-		else
-		{
-			printf("execute success\n");
-		}
+		ast_execute(root);
 	}
 	
 	sc_destory(sc);

@@ -33,5 +33,11 @@ char* MSG_OPER(char* l,char* r ,char* ops)
 char* MSG_DIV(char* type)
 {
 	sprintf(msg_buf,"%s division or module by zero",type);
-	return 0;
+	return msg_buf;
 }
+char* MSG_UEXPR(char* name,char* ops)
+{
+	sprintf(msg_buf,"unsupported unary operand %s for '%s'",ops,name);
+	return msg_buf;
+}
+

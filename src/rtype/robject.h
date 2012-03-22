@@ -120,6 +120,11 @@ static inline char* robject_name(Robject* rt)
 
 /* robject expr */
 void robject_print(Robject* rt);
+/*unary expr*/
+Robject* robject_positive(Robject* r);
+Robject* robject_negative(Robject* r);
+Robject* robject_bit_negated(Robject* r);
+/*binary expr*/
 Robject* robject_mul(Robject* left,Robject* right);
 Robject* robject_div(Robject* left,Robject* right);
 Robject* robject_mod(Robject* left,Robject* right);

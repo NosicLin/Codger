@@ -2,7 +2,7 @@ PROJECT=syntax
 
 SRC= ast_object.c ast_machine.c ast_node_literal.c \
 	 yylex.c   ast_node_stmt.c ast_node_binary_expr.c  \
-	 ast_node_stmts.c \
+	 ast_node_stmts.c  ast_node_unary_expr.c \
 	 grammar.tab.c   parser.c
 
 DEBUG=
@@ -76,6 +76,7 @@ rm:
 	rm -f obj/*
 	rm -f lib/*
 	rm -f bin/*.exe
+	rm -f ../lib/lib$(PROJECT).a
 clear:
 	rm -rf obj 
 	rm -rf bin 

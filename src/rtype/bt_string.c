@@ -73,7 +73,7 @@ static Robject* bs_plus(Robject* left,Robject* right)
 		{
 			new_str[i]=c_left[i];
 		}
-		for(;i<r_length;i++)
+		for(i=0;i<r_length;i++)
 		{
 			new_str[i+l_length]=c_right[i];
 		}
@@ -117,7 +117,7 @@ static Robject* bs_bool(Robject* bt)
 static void bs_print(Robject* bt)
 {
 	BtString* bs=R_TO_S(bt);
-	printf("%s",bs->s_value);
+	printf("\"%s\"",bs->s_value);
 }
 
 static struct rexpr_ops bs_expr_ops=
@@ -171,12 +171,12 @@ BtString* bt_string_malloc(int length)
 
 
 
-
+/*FIXME  escape special character */
 BtString* bt_string_create(char* str)
 {
 	int length=strlen(str);
-	BtString* bs=bt_string_malloc(length);
-	memcpy(bs->s_value,str,length);
+	BtString* bs=bt_string_malloc(length-2);
+	memcpy(bs->s_value,str+1,length-2);
 	return bs;
 }
 
