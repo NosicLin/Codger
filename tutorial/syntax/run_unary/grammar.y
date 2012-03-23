@@ -32,6 +32,13 @@
 %%
 
 AstTree : stmts{parser_set_root($1);}
+		| stmts stmt{
+		    AstNodeStmts* stmts=AST_TO_STMTS($1);
+			AstNodeStmt* node=AST_TO_STMT($2);
+			ast_stmts_add(stmts,node);
+			parser_set_root(STMTS_TO_AST(stmts));
+		}
+        
 ;
 
 stmts: stmt  tNEWLINE
@@ -58,12 +65,6 @@ stmts: stmt  tNEWLINE
 	 | stmts tNEWLINE 
 ;
 
-stmt: stmt_expr
-	{
-	AstNodeStmt* node=ast_create_stmt($1);
-	ast_addto_pending(STMT_TO_AST(node));
-	$$=STMT_TO_AST(node);
-	}
 	 ;
 literal: tINTEGER 
 	   {
@@ -109,7 +110,6 @@ literal: tINTEGER
 		}
 ;
 primary_expr: literal {$$=$1;}
-			|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
 			;
 
 unary_expr:primary_expr{$$=$1;}
@@ -134,84 +134,9 @@ unary_expr:primary_expr{$$=$1;}
 			} 
 			;
 
-multiply_expr: unary_expr{
-			 $$=$1;
-			}
-	|multiply_expr tMUL unary_expr{
-			AstNodeMul* t=ast_create_mul($1,$3);
-			AstObject* ab=MUL_TO_AST(t);
-			ast_addto_pending(ab);
-			$$=ab;
+stmt: unary_expr
+	{
+	AstNodeStmt* node=ast_create_stmt($1);
+	ast_addto_pending(STMT_TO_AST(node));
+	$$=STMT_TO_AST(node);
 	}
-	| multiply_expr tDIV unary_expr{
-			AstNodeDiv* t=ast_create_div($1,$3);
-			AstObject* ab=DIV_TO_AST(t);
-			ast_addto_pending(ab);
-			$$=ab;
-	}
-	| multiply_expr tMOD unary_expr{
-			AstNodeDiv* t=ast_create_mod($1,$3);
-			AstObject* ab=MOD_TO_AST(t);
-			ast_addto_pending(ab);
-			$$=ab;
-	}
-;
-additive_expr:multiply_expr{$$=$1;}
-	|additive_expr tPLUS multiply_expr{
-		AstNodePlus* node=ast_create_plus($1,$3);
-		AstObject* ab=PLUS_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	|additive_expr tMINUS multiply_expr{
-		AstNodeMinus* node=ast_create_minus($1,$3);
-		AstObject* ab=MINUS_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	;
-shift_expr:additive_expr{$$=$1;}
-	|shift_expr tLS additive_expr{   /*left shift*/
-		AstNodeLShift* node=ast_create_lshift($1,$3);
-		AstObject* ab=LSHIFT_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	|shift_expr tRS additive_expr{  /* right shift */
-		AstNodeRShift* node=ast_create_rshift($1,$3);
-		AstObject* ab=RSHIFT_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-;
-relational_expr:shift_expr{$$=$1;} 
-	|relational_expr tLT shift_expr{
-		AstNodeLt* node =ast_create_lt($1,$3);
-		AstObject* ab=LT_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	|relational_expr tLE shift_expr{
-		AstNodeLe* node=ast_create_le($1,$3);
-		AstObject* ab=LE_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	|relational_expr tGE shift_expr{
-		AstNodeGe* node=ast_create_ge($1,$3);
-		AstObject* ab=GE_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}	
-	|relational_expr tGT shift_expr{
-		AstNodeGt* node=ast_create_gt($1,$3);
-		AstObject* ab=GT_TO_AST(node);
-		ast_addto_pending(ab);
-		$$=ab;
-	}
-	;
-
-expr :relational_expr{$$=$1;}
-	;
-stmt_expr:expr {$$=$1;}
-		 ;
