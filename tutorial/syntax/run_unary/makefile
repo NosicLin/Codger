@@ -36,7 +36,7 @@ LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 
 
 
-main: other_model obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
+main: obj lib bin ../lib other_model $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
 
 

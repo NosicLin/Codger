@@ -3,7 +3,6 @@ SRC=  args.c splstr.c
 DEBUG=
 BIN=args_test.c  test_splstr.c  \
 
-   
 OBJ_NAME=$(SRC:%.c=%.o) 
 OBJ_NAME_WITH_PATH=$(addprefix obj/,$(OBJ_NAME))
 
@@ -23,15 +22,17 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 FLAGS=-g -Wall  -Werror
-INCLUDE=-I. -I./debug  -I../../ -I../
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../lib -lutility_c  \
+INCLUDE=-I. -I./debug   -I../
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
+	-L../lib/ -lrtype -llexical -lvm
 
 
 
-main: $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
+
+main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
 
-lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
+lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH) ../lib 
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
 	cp $@ ../lib/
 
@@ -55,10 +56,20 @@ init:
 	mkdir -p obj 
 	mkdir -p bin
 	mkdir -p lib
+obj:
+	mkdir -p obj
+bin:
+	mkdir -p bin
+lib:
+	mkdir -p lib 
+../lib:
+	mkdir -p ../lib 
+
 rm:
 	rm -f obj/*
 	rm -f lib/*
 	rm -f bin/*.exe
+	rm -f ../lib/lib$(PROJECT).a
 clear:
 	rm -rf obj 
 	rm -rf bin 
@@ -73,6 +84,6 @@ depend:
 		gcc -M -MT "obj/$$result" $$element $(INCLUDE) >>.$(PROJECT).dep ;\
 	done
 
-include .$(PROJECT).dep
+-include .$(PROJECT).dep
 
 
