@@ -24,7 +24,6 @@ CC=gcc
 FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lrtype -llexical -lvm
 
 
 
