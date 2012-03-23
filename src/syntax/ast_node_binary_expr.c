@@ -102,3 +102,10 @@ BEXPR_METHOD(MINUS,Minus,minus);
 BEXPR_METHOD(LSHIFT,LShift,lshift); 
 BEXPR_METHOD(RSHIFT,RShift,rshift); 
 
+/*relational_expr*/
+BEXPR_METHOD(LE,Le,le); 
+BEXPR_METHOD(LT,Lt,lt); 
+BEXPR_METHOD(GT,Gt,gt); 
+BEXPR_METHOD(GE,Ge,ge); 
+
+

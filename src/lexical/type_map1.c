@@ -90,7 +90,7 @@ void id_array_create()
 	id_array['.']=OPER_PERIOD;
 	id_array['~']=OPER_REVERSE;
 	id_array['(']=OPER_L_RB;
-	id_array[')']=OPER_L_RB;
+	id_array[')']=OPER_R_RB;
 	id_array['[']=OPER_L_SB;
 	id_array[']']=OPER_R_SB;
 	id_array['!']=OPER_EXCLAMATION;

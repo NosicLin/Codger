@@ -125,13 +125,26 @@ Robject* robject_positive(Robject* r);
 Robject* robject_negative(Robject* r);
 Robject* robject_bit_negated(Robject* r);
 /*binary expr*/
+
+/*multiply_expr*/
 Robject* robject_mul(Robject* left,Robject* right);
 Robject* robject_div(Robject* left,Robject* right);
 Robject* robject_mod(Robject* left,Robject* right);
+
+/*additive_expr*/
 Robject* robject_plus(Robject* left,Robject* right);
 Robject* robject_minus(Robject* left,Robject* right);
+
+/*shift_expr*/
 Robject* robject_lshift(Robject* left,Robject* right);
 Robject* robject_rshift(Robject* left,Robject* right);
+
+/*relational_expr*/
+Robject* robject_lt(Robject* left,Robject* right);
+Robject* robject_le(Robject* left,Robject* right);
+Robject* robject_gt(Robject* left,Robject* right);
+Robject* robject_ge(Robject* left,Robject* right);
+
 Robject* robject_or(Robject* left,Robject* right);
 Robject* robject_and(Robject* left,Robject* right);
 Robject* robject_xor(Robject* left,Robject* right);

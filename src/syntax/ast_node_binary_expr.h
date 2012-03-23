@@ -62,14 +62,32 @@ AstNodeMinus* ast_create_minus(AstObject* l,AstObject* r);
 AstNodeLShift* ast_create_lshift(AstObject* l, AstObject* r);
 AstNodeRShift* ast_create_rshift(AstObject* l,AstObject* r);
 
+/*relational_expr*/
+AstNodeLt* ast_create_lt(AstObject* l,AstObject* r);
+AstNodeLe* ast_create_le(AstObject* l,AstObject* r);
+AstNodeGt* ast_create_gt(AstObject* l,AstObject* r);
+AstNodeGe* ast_create_ge(AstObject* l,AstObject* r);
+
+
 /* type cast*/
+/*multiply_expr*/
 AST_TYPE_CAST(MUL,Mul,ATN_MUL);
 AST_TYPE_CAST(DIV,Div,ATN_DIV);
 AST_TYPE_CAST(MOD,Mod,ATN_MOD);
+
+/*additive_expr*/
 AST_TYPE_CAST(PLUS,Plus,ATN_PLUS);
 AST_TYPE_CAST(MINUS,Minus,ATN_MINUS);
+
+/*shift_expr*/
 AST_TYPE_CAST(LSHIFT,LShift,ATN_LSHIFT);
 AST_TYPE_CAST(RSHIFT,RShift,ATN_RSHIFT);
+
+/*relational_expr*/
+AST_TYPE_CAST(LE,Le,ATN_LE);
+AST_TYPE_CAST(LT,Lt,ATN_LT);
+AST_TYPE_CAST(GE,Ge,ATN_GE);
+AST_TYPE_CAST(GT,Gt,ATN_GT);
 
 
 

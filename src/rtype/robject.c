@@ -267,3 +267,173 @@ default_action:
 }
 
 
+Robject* robject_lt(Robject* left,Robject* right)
+{
+	Robject* ret=0;
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+
+	if(left->r_expr_ops->ro_lt)
+	{
+		ret=left->r_expr_ops->ro_lt(left,right);
+		goto over;
+	}
+	if(ret==0)
+	{
+		if(left->r_expr_ops->ro_cmp)
+		{
+			ret=left->r_expr_ops->ro_cmp(left,right);
+			if(rt_type(ret)==RT_INT)
+			{
+				int value=bt_int_get(R_TO_I(ret));
+				robject_release(ret);
+				if(value<0)
+				{
+					ret=B_TO_R(bt_boolean_create(1));
+				}
+				else
+				{
+					ret=B_TO_R(bt_boolean_create(0));
+				}
+			}
+			return ret;
+		}
+	}
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LT));
+	robject_addref(robject_null);
+	return robject_null;
+over:
+	return ret;
+}
+
+
+Robject* robject_le(Robject* left,Robject* right)
+{
+	Robject* ret=0;
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+
+	if(left->r_expr_ops->ro_le)
+	{
+		ret=left->r_expr_ops->ro_le(left,right);
+		goto over;
+	}
+	if(ret==0)
+	{
+		if(left->r_expr_ops->ro_cmp)
+		{
+			ret=left->r_expr_ops->ro_cmp(left,right);
+			if(rt_type(ret)==RT_INT)
+			{
+				int value=bt_int_get(R_TO_I(ret));
+				robject_release(ret);
+				if(value<=0)
+				{
+					ret=B_TO_R(bt_boolean_create(1));
+				}
+				else
+				{
+					ret=B_TO_R(bt_boolean_create(0));
+				}
+			}
+			return ret;
+		}
+	}
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LE));
+	robject_addref(robject_null);
+	return robject_null;
+over:
+	return ret;
+}
+
+
+Robject* robject_ge(Robject* left,Robject* right)
+{
+	Robject* ret=0;
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+
+	if(left->r_expr_ops->ro_ge)
+	{
+		ret=left->r_expr_ops->ro_ge(left,right);
+		goto over;
+	}
+	if(ret==0)
+	{
+		if(left->r_expr_ops->ro_cmp)
+		{
+			ret=left->r_expr_ops->ro_cmp(left,right);
+			if(rt_type(ret)==RT_INT)
+			{
+				int value=bt_int_get(R_TO_I(ret));
+				robject_release(ret);
+				if(value>=0)
+				{
+					ret=B_TO_R(bt_boolean_create(1));
+				}
+				else
+				{
+					ret=B_TO_R(bt_boolean_create(0));
+				}
+			}
+			return ret;
+		}
+	}
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_GE));
+	robject_addref(robject_null);
+	return robject_null;
+over:
+	return ret;
+}
+
+Robject* robject_gt(Robject* left,Robject* right)
+{
+	Robject* ret=0;
+	if(left->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+
+	if(left->r_expr_ops->ro_gt)
+	{
+		ret=left->r_expr_ops->ro_gt(left,right);
+		goto over;
+	}
+	if(ret==0)
+	{
+		if(left->r_expr_ops->ro_cmp)
+		{
+			ret=left->r_expr_ops->ro_cmp(left,right);
+			if(rt_type(ret)==RT_INT)
+			{
+				int value=bt_int_get(R_TO_I(ret));
+				robject_release(ret);
+				if(value>0)
+				{
+					ret=B_TO_R(bt_boolean_create(1));
+				}
+				else
+				{
+					ret=B_TO_R(bt_boolean_create(0));
+				}
+			}
+			return ret;
+		}
+	}
+default_action:
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_GT));
+	robject_addref(robject_null);
+	return robject_null;
+over:
+	return ret;
+}
+

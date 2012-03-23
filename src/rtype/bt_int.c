@@ -557,6 +557,90 @@ static struct robject_ops bt_bool_ops=
 	.ro_free=bt_bool_free,
 };
 
+static void  bl_true_print(Robject* bt)
+{
+	printf("%s","true");
+}
+
+static struct rexpr_ops bl_true_ops=
+{
+	/* unary operator + - */
+	.ro_negative=bi_negative,
+	.ro_positive=bi_positive,
+
+	/* arithmetic * / % */
+	.ro_mul=bi_mul,
+	.ro_div=bi_div,
+	.ro_mod=bi_mod,
+
+	/* arithmetic + - */
+	.ro_plus=bi_plus,
+	.ro_minus=bi_minus,
+
+	/* bit_operator << >>*/
+	.ro_lshift=bi_lshift,
+	.ro_rshift=bi_rshift,
+
+	/* simple compare operator used for 
+	 * < <= == != >= > */
+	.ro_cmp=bi_cmp,
+
+	/* bit_operator & | ^ ~ */
+	.ro_bit_and=bi_and,
+	.ro_bit_or=bi_or,
+	.ro_bit_xor=bi_xor,
+	.ro_bit_negated=bi_negated,
+
+	/* logic operator and or not */
+	.ro_bool=bi_booleaned,
+
+	/*print */
+	.ro_print=bl_true_print,
+
+};
+
+static void  bl_false_print(Robject* bt)
+{
+	printf("%s","false");
+}
+
+static struct rexpr_ops bl_false_ops=
+{
+	/* unary operator + - */
+	.ro_negative=bi_negative,
+	.ro_positive=bi_positive,
+
+	/* arithmetic * / % */
+	.ro_mul=bi_mul,
+	.ro_div=bi_div,
+	.ro_mod=bi_mod,
+
+	/* arithmetic + - */
+	.ro_plus=bi_plus,
+	.ro_minus=bi_minus,
+
+	/* bit_operator << >>*/
+	.ro_lshift=bi_lshift,
+	.ro_rshift=bi_rshift,
+
+	/* simple compare operator used for 
+	 * < <= == != >= > */
+	.ro_cmp=bi_cmp,
+
+	/* bit_operator & | ^ ~ */
+	.ro_bit_and=bi_and,
+	.ro_bit_or=bi_or,
+	.ro_bit_xor=bi_xor,
+	.ro_bit_negated=bi_negated,
+
+	/* logic operator and or not */
+	.ro_bool=bi_booleaned,
+
+	/*print */
+	.ro_print=bl_false_print,
+
+};
+
 static BtInt bt_bool_true=
 {
 	{
@@ -564,12 +648,10 @@ static BtInt bt_bool_true=
 		.r_type=RT_INT,
 		.r_name="Boolean",
 		.r_ops=&bt_bool_ops,
-		.r_expr_ops=&bt_int_expr_ops,
+		.r_expr_ops=&bl_true_ops,
 	},
 	1,
 };
-
-
 
 static BtInt bt_bool_false=
 {
@@ -578,7 +660,7 @@ static BtInt bt_bool_false=
 		.r_type=RT_INT,
 		.r_name="Boolean",
 		.r_ops=&bt_bool_ops,
-		.r_expr_ops=&bt_int_expr_ops,
+		.r_expr_ops=&bl_false_ops,
 	},
 	0,
 };

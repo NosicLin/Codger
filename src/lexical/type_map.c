@@ -59,7 +59,7 @@ void id_array_create()
 	id_array['.']=OPER_PERIOD;
 	id_array['~']=OPER_REVERSE;
 	id_array['(']=OPER_L_RB;
-	id_array[')']=OPER_L_RB;
+	id_array[')']=OPER_R_RB;
 	id_array['[']=OPER_L_SB;
 	id_array[']']=OPER_R_SB;
 	id_array['!']=OPER_EXCLAMATION;
@@ -127,7 +127,7 @@ void input_map_me_divide()
 }
 int main()
 {
-	input_map_me_divide();
+	id_array_create();
 	print_array(id_array);
 	return 0;
 }
