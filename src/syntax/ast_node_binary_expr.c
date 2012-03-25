@@ -2,6 +2,7 @@
 #include"ast_machine.h"
 #include<vm/except.h>
 #include<stdlib.h>
+#include<rtype/bt_boolean.h>
 
 static void binary_expr_free(AstObject* ab)
 {
@@ -102,10 +103,167 @@ BEXPR_METHOD(MINUS,Minus,minus);
 BEXPR_METHOD(LSHIFT,LShift,lshift); 
 BEXPR_METHOD(RSHIFT,RShift,rshift); 
 
+/*bitwise_expr*/
+BEXPR_METHOD(BIT_AND,BitAnd,bit_and);
+BEXPR_METHOD(BIT_XOR,BitXor,bit_xor);
+BEXPR_METHOD(BIT_OR,BitOr,bit_or);
+
 /*relational_expr*/
 BEXPR_METHOD(LE,Le,le); 
 BEXPR_METHOD(LT,Lt,lt); 
 BEXPR_METHOD(GT,Gt,gt); 
 BEXPR_METHOD(GE,Ge,ge); 
 
+/*equal_expr*/
+BEXPR_METHOD(NE,Ne,ne);
+BEXPR_METHOD(EQ,Eq,eq);
+
+
+/*logic expr*/
+
+#ifdef AST_MACHINE 
+static int logic_and_execute(AstObject* ab)
+{
+	AstNodeLogicAnd* node=AST_TO_LOGIC_AND(ab);
+	Robject* logic_value=0;  
+	Robject* bool_flags=0;
+	int  exe_info=0;
+	int ret=AST_EXE_SUCCESS;
+
+	/* left parts*/
+	exe_info=ast_execute(node->b_left);
+	if(exe_info<0)
+	{
+		ret=exe_info;
+		goto  error;
+	}
+	logic_value=get_reg0();
+	bool_flags=robject_bool(logic_value);
+	if(vm_except_happened())
+	{
+		ret=AST_EXE_EXCEPTION;
+		robject_release(bool_flags);
+		bool_flags=0;
+		robject_release(logic_value);
+		logic_value=0;
+		goto error;
+	}
+	if(bt_boolean_is_false(bool_flags)) /*if left==false ;return*/
+	{
+		robject_release(bool_flags);
+		bool_flags=0;
+		robject_release(logic_value); /*ret_value already in reg0*/
+		logic_value=0;
+		goto over;
+	}
+	robject_release(bool_flags);
+	bool_flags=0;
+	robject_release(logic_value);
+	logic_value=0;
+
+	/*right parts*/
+	exe_info=ast_execute(node->b_right);  
+	if(exe_info<0)
+	{
+		ret=exe_info;
+		goto error;
+	}
+
+over:
+	return ret;
+error:
+	return ret;
+}
+
+static int logic_or_execute(AstObject* ab)
+{
+	AstNodeLogicOr* node=AST_TO_LOGIC_OR(ab);
+	Robject* logic_value=0;  
+	Robject* bool_flags=0;
+	int  exe_info=0;
+	int ret=AST_EXE_SUCCESS;
+
+	/* left parts*/
+	exe_info=ast_execute(node->b_left);
+	if(exe_info<0)
+	{
+		ret=exe_info;
+		goto  error;
+	}
+	logic_value=get_reg0();
+	bool_flags=robject_bool(logic_value);
+	if(vm_except_happened())
+	{
+		ret=AST_EXE_EXCEPTION;
+		robject_release(bool_flags);
+		bool_flags=0;
+		robject_release(logic_value);
+		logic_value=0;
+		goto error;
+	}
+	if(!bt_boolean_is_false(bool_flags)) /*if left==false ;return*/
+	{
+		robject_release(bool_flags);
+		bool_flags=0;
+		robject_release(logic_value); /*ret_value already in reg0*/
+		logic_value=0;
+		goto over;
+	}
+	robject_release(bool_flags);
+	bool_flags=0;
+	robject_release(logic_value);
+	logic_value=0;
+
+	/*right parts*/
+	exe_info=ast_execute(node->b_right);  
+	if(exe_info<0)
+	{
+		ret=exe_info;
+		goto error;
+	}
+
+over:
+	return ret;
+error:
+	return ret;
+}
+#endif /*AST_MACHINE*/
+
+static struct ast_object_ops  logic_and_ops=
+{
+	.ao_free_self=binary_expr_free_self,
+	.ao_free=binary_expr_free,
+#ifdef AST_MACHINE 
+	.ao_execute=logic_and_execute,
+#endif /*AST_MACHINE*/
+};
+
+static struct ast_object_ops  logic_or_ops=
+{
+	.ao_free_self=binary_expr_free_self,
+	.ao_free=binary_expr_free,
+#ifdef AST_MACHINE 
+	.ao_execute=logic_or_execute,
+#endif /*AST_MACHINE*/
+};
+
+AstNodeLogicAnd* ast_create_logic_and(AstObject* l,AstObject* r) 
+{ 
+	AstNodeLogicAnd* node=(AstNodeLogicAnd*) malloc(sizeof(*node)); 
+	node->b_left=l; 
+	node->b_right=r; 
+	AstObject* base=AST_BASE(node); 
+	ast_init(base,ATN_LOGIC_AND,"AstNodeLogicAnd",& logic_and_ops);
+	return node; 
+} 
+
+AstNodeLogicOr* ast_create_logic_or(AstObject* l,AstObject* r) 
+{ 
+	AstNodeLogicOr* node=(AstNodeLogicOr*) malloc(sizeof(*node)); 
+	node->b_left=l; 
+	node->b_right=r; 
+	AstObject* base=AST_BASE(node); 
+	ast_init(base,ATN_LOGIC_OR,"AstNodeLogicOr",& logic_or_ops);
+	return node; 
+} 
 

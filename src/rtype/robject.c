@@ -63,377 +63,137 @@ default_action:
 }
 
 /*unary expr*/
-Robject* robject_positive(Robject* r)
-{
-	if(r->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(r->r_expr_ops->ro_positive==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=r->r_expr_ops->ro_positive(r);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_UEXPR(robject_name(r),OPER_POSITIVE));
-	robject_addref(robject_null);
-	return robject_null;
+#define UNARY_OPERATOR(Hl,Ll) \
+Robject* robject_##Ll(Robject* r) \
+{ \
+	if(r->r_expr_ops==0) \
+	{ \
+		goto default_action; \
+	}  \
+	if(r->r_expr_ops->ro_##Ll==0) \
+	{ \
+		goto default_action; \
+	} \
+	Robject* ret=0; \
+	ret=r->r_expr_ops->ro_##Ll(r); \
+	return ret; \
+default_action: \
+	rt_raise_type_error(MSG_UEXPR(robject_name(r),OPER_##Hl)); \
+	robject_addref(robject_null); \
+	return robject_null; \
 }
-
-
-Robject* robject_negative(Robject* r)
-{
-	if(r->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(r->r_expr_ops->ro_negative==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=r->r_expr_ops->ro_negative(r);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_UEXPR(robject_name(r),OPER_NEGATIVE));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
-Robject* robject_bit_negated(Robject* r)
-{
-	if(r->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(r->r_expr_ops->ro_bit_negated==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=r->r_expr_ops->ro_bit_negated(r);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_UEXPR(robject_name(r),OPER_NEGATED));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
+UNARY_OPERATOR(POSITIVE,positive);
+UNARY_OPERATOR(NEGATIVE,negative);
+UNARY_OPERATOR(NEGATED,bit_negated);
 
 /*binary expr*/
-Robject* robject_mul(Robject* left,Robject* right)
-{
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_mul==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_mul(left,right);
-	return ret;
-
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MUL));
-	robject_addref(robject_null);
-	return robject_null;
+#define BINARY_OPERATOR(Hl,Ll) \
+Robject* robject_##Ll(Robject* left,Robject* right) \
+{ \
+	if(left->r_expr_ops==0) \
+	{ \
+		goto default_action; \
+	} \
+	if(left->r_expr_ops->ro_##Ll==0) \
+	{ \
+		goto default_action; \
+	} \
+	Robject* ret=0; \
+	ret=left->r_expr_ops->ro_##Ll(left,right); \
+	return ret; \
+default_action: \
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_##Hl)); \
+	robject_addref(robject_null); \
+	return robject_null; \
 }
 
+/*multiply_oper*/
+BINARY_OPERATOR(MUL,mul);
+BINARY_OPERATOR(DIV,div);
+BINARY_OPERATOR(MOD,mod);
 
-Robject* robject_div(Robject* left,Robject* right)
-{
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_div==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_div(left,right);
-	return ret;
+/*addtive_expr*/
+BINARY_OPERATOR(PLUS,plus);
+BINARY_OPERATOR(MINUS,minus);
 
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_DIV));
-	robject_addref(robject_null);
-	return robject_null;
+/*shift_expr*/
+BINARY_OPERATOR(LSHIFT,lshift);
+BINARY_OPERATOR(RSHIFT,rshift);
+
+/*bitwise_expr*/
+BINARY_OPERATOR(BIT_AND,bit_and);
+BINARY_OPERATOR(BIT_XOR,bit_xor);
+BINARY_OPERATOR(BIT_OR,bit_or);
+
+
+#define COMPARE_OPERATOR(Hl,Ll,op)  \
+Robject* robject_##Ll(Robject* left,Robject* right) \
+{ \
+	Robject* ret=0; \
+	if(left->r_expr_ops==0) \
+	{ \
+		goto default_action; \
+	} \
+	if(left->r_expr_ops->ro_##Ll) \
+	{ \
+		ret=left->r_expr_ops->ro_##Ll(left,right); \
+		goto over; \
+	} \
+	if(ret==0) \
+	{ \
+		if(left->r_expr_ops->ro_cmp) \
+		{ \
+			ret=left->r_expr_ops->ro_cmp(left,right); \
+			if(rt_type(ret)==RT_INT) \
+			{ \
+				int value=bt_int_get(R_TO_I(ret)); \
+				robject_release(ret); \
+				if(value op 0) \
+				{ \
+					ret=B_TO_R(bt_boolean_create(1)); \
+				} \
+				else \
+				{ \
+					ret=B_TO_R(bt_boolean_create(0)); \
+				} \
+			} \
+			return ret; \
+		} \
+	} \
+default_action: \
+	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LT)); \
+	robject_addref(robject_null); \
+	return robject_null; \
+over: \
+	return ret; \
 }
 
-Robject* robject_mod(Robject* left,Robject* right)
-{
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_mod==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_mod(left,right);
-	return ret;
+COMPARE_OPERATOR(LT,lt,<);
+COMPARE_OPERATOR(LE,le,<=);
+COMPARE_OPERATOR(GT,gt,>);
+COMPARE_OPERATOR(GE,ge,>=);
+COMPARE_OPERATOR(EQ,eq,==);
+COMPARE_OPERATOR(NE,ne,!=);
 
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MOD));
-	robject_addref(robject_null);
-	return robject_null;
-}
-/* additive_expr*/
-Robject* robject_plus(Robject* left,Robject* right)
-{
 
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_plus==0)
-	{
-		goto default_action;
-	}
+/*logic expr*/
+Robject* robject_bool(Robject* rt)
+{
 	Robject* ret=0;
-	ret=left->r_expr_ops->ro_plus(left,right);
+	if(rt->r_expr_ops==0)
+	{
+		goto default_action;
+	}
+	if(rt->r_expr_ops->ro_bool==0)
+	{
+		goto default_action;
+	}
+	ret=rt->r_expr_ops->ro_bool(rt);
 	return ret;
 default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_PLUS));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
-Robject* robject_minus(Robject* left,Robject* right)
-{
-
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_minus==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_minus(left,right);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_MINUS));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
-/* shift_expr */
-
-Robject* robject_lshift(Robject* left,Robject* right)
-{
-
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_lshift==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_lshift(left,right);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LSHIFT));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
-Robject* robject_rshift(Robject* left,Robject* right)
-{
-
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-	if(left->r_expr_ops->ro_rshift==0)
-	{
-		goto default_action;
-	}
-	Robject* ret=0;
-	ret=left->r_expr_ops->ro_rshift(left,right);
-	return ret;
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LSHIFT));
-	robject_addref(robject_null);
-	return robject_null;
-}
-
-
-Robject* robject_lt(Robject* left,Robject* right)
-{
-	Robject* ret=0;
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-
-	if(left->r_expr_ops->ro_lt)
-	{
-		ret=left->r_expr_ops->ro_lt(left,right);
-		goto over;
-	}
-	if(ret==0)
-	{
-		if(left->r_expr_ops->ro_cmp)
-		{
-			ret=left->r_expr_ops->ro_cmp(left,right);
-			if(rt_type(ret)==RT_INT)
-			{
-				int value=bt_int_get(R_TO_I(ret));
-				robject_release(ret);
-				if(value<0)
-				{
-					ret=B_TO_R(bt_boolean_create(1));
-				}
-				else
-				{
-					ret=B_TO_R(bt_boolean_create(0));
-				}
-			}
-			return ret;
-		}
-	}
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LT));
-	robject_addref(robject_null);
-	return robject_null;
-over:
+	ret=B_TO_R(bt_boolean_create(1));
 	return ret;
 }
 
 
-Robject* robject_le(Robject* left,Robject* right)
-{
-	Robject* ret=0;
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-
-	if(left->r_expr_ops->ro_le)
-	{
-		ret=left->r_expr_ops->ro_le(left,right);
-		goto over;
-	}
-	if(ret==0)
-	{
-		if(left->r_expr_ops->ro_cmp)
-		{
-			ret=left->r_expr_ops->ro_cmp(left,right);
-			if(rt_type(ret)==RT_INT)
-			{
-				int value=bt_int_get(R_TO_I(ret));
-				robject_release(ret);
-				if(value<=0)
-				{
-					ret=B_TO_R(bt_boolean_create(1));
-				}
-				else
-				{
-					ret=B_TO_R(bt_boolean_create(0));
-				}
-			}
-			return ret;
-		}
-	}
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_LE));
-	robject_addref(robject_null);
-	return robject_null;
-over:
-	return ret;
-}
-
-
-Robject* robject_ge(Robject* left,Robject* right)
-{
-	Robject* ret=0;
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-
-	if(left->r_expr_ops->ro_ge)
-	{
-		ret=left->r_expr_ops->ro_ge(left,right);
-		goto over;
-	}
-	if(ret==0)
-	{
-		if(left->r_expr_ops->ro_cmp)
-		{
-			ret=left->r_expr_ops->ro_cmp(left,right);
-			if(rt_type(ret)==RT_INT)
-			{
-				int value=bt_int_get(R_TO_I(ret));
-				robject_release(ret);
-				if(value>=0)
-				{
-					ret=B_TO_R(bt_boolean_create(1));
-				}
-				else
-				{
-					ret=B_TO_R(bt_boolean_create(0));
-				}
-			}
-			return ret;
-		}
-	}
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_GE));
-	robject_addref(robject_null);
-	return robject_null;
-over:
-	return ret;
-}
-
-Robject* robject_gt(Robject* left,Robject* right)
-{
-	Robject* ret=0;
-	if(left->r_expr_ops==0)
-	{
-		goto default_action;
-	}
-
-	if(left->r_expr_ops->ro_gt)
-	{
-		ret=left->r_expr_ops->ro_gt(left,right);
-		goto over;
-	}
-	if(ret==0)
-	{
-		if(left->r_expr_ops->ro_cmp)
-		{
-			ret=left->r_expr_ops->ro_cmp(left,right);
-			if(rt_type(ret)==RT_INT)
-			{
-				int value=bt_int_get(R_TO_I(ret));
-				robject_release(ret);
-				if(value>0)
-				{
-					ret=B_TO_R(bt_boolean_create(1));
-				}
-				else
-				{
-					ret=B_TO_R(bt_boolean_create(0));
-				}
-			}
-			return ret;
-		}
-	}
-default_action:
-	rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_GT));
-	robject_addref(robject_null);
-	return robject_null;
-over:
-	return ret;
-}
 

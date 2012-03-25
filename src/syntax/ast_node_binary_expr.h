@@ -10,22 +10,38 @@ struct ast_binary_expr
 };
 typedef struct ast_binary_expr AstBinaryExpr;
 
+/*multiply_expr*/
 typedef struct ast_binary_expr AstNodeMul; 
 typedef struct ast_binary_expr AstNodeDiv;
 typedef struct ast_binary_expr AstNodeMod;
+
+/*additive_expr*/
 typedef struct ast_binary_expr AstNodePlus;
 typedef struct ast_binary_expr AstNodeMinus;
+
+/*shift_expr*/
 typedef struct ast_binary_expr AstNodeLShift;
 typedef struct ast_binary_expr AstNodeRShift;
+
+/*bitwise_expr*/
+typedef struct ast_binary_expr AstNodeBitAnd;
+typedef struct ast_binary_expr AstNodeBitXor;
+typedef struct ast_binary_expr AstNodeBitOr;
+
+/*relational_expr*/
 typedef struct ast_binary_expr AstNodeLt;
 typedef struct ast_binary_expr AstNodeLe;
-typedef struct ast_binary_expr AstNodeNe;
-typedef struct ast_binary_expr AstNodeEq;
 typedef struct ast_binary_expr AstNodeGe;
 typedef struct ast_binary_expr AstNodeGt;
-typedef struct ast_binary_expr AstNodeAnd;
-typedef struct ast_binary_expr AstNodeOr;
-typedef struct ast_binary_expr AstNodeXor;
+
+/*equal_expr*/
+typedef struct ast_binary_expr AstNodeNe;
+typedef struct ast_binary_expr AstNodeEq;
+
+/*logic_expr*/
+typedef struct ast_binary_expr AstNodeLogicAnd;
+typedef struct ast_binary_expr AstNodeLogicOr;
+
 
 /*binary expr getter and setter*/
 /* don't need setter any more */
@@ -68,6 +84,19 @@ AstNodeLe* ast_create_le(AstObject* l,AstObject* r);
 AstNodeGt* ast_create_gt(AstObject* l,AstObject* r);
 AstNodeGe* ast_create_ge(AstObject* l,AstObject* r);
 
+/*equal_expr*/
+AstNodeGt* ast_create_ne(AstObject* l,AstObject* r);
+AstNodeGe* ast_create_eq(AstObject* l,AstObject* r);
+
+/*bitwise_expr*/
+AstNodeBitAnd* ast_create_bit_and(AstObject* l,AstObject* r);
+AstNodeBitXor* ast_create_bit_xor(AstObject* l,AstObject* r);
+AstNodeBitOr* ast_create_bit_or(AstObject* l,AstObject* r);
+
+/*logic_expr*/
+AstNodeLogicAnd* ast_create_logic_and(AstObject* l,AstObject* r);
+AstNodeLogicOr* ast_create_logic_or(AstObject* l,AstObject* r);
+
 
 /* type cast*/
 /*multiply_expr*/
@@ -83,12 +112,23 @@ AST_TYPE_CAST(MINUS,Minus,ATN_MINUS);
 AST_TYPE_CAST(LSHIFT,LShift,ATN_LSHIFT);
 AST_TYPE_CAST(RSHIFT,RShift,ATN_RSHIFT);
 
+/*bitwise_expr*/
+AST_TYPE_CAST(BIT_AND,BitAnd,ATN_BIT_AND);
+AST_TYPE_CAST(BIT_XOR,BitXor,ATN_BIT_XOR);
+AST_TYPE_CAST(BIT_OR,BitOr,ATN_BIT_OR);
+
 /*relational_expr*/
 AST_TYPE_CAST(LE,Le,ATN_LE);
 AST_TYPE_CAST(LT,Lt,ATN_LT);
 AST_TYPE_CAST(GE,Ge,ATN_GE);
 AST_TYPE_CAST(GT,Gt,ATN_GT);
 
+/*equal_expr*/
+AST_TYPE_CAST(NE,Ne,ATN_NE);
+AST_TYPE_CAST(EQ,Eq,ATN_EQ);
 
+/*logic_expr*/
+AST_TYPE_CAST(LOGIC_AND,LogicAnd,ATN_LOGIC_AND);
+AST_TYPE_CAST(LOGIC_OR,LogicOr,ATN_LOGIC_OR);
 
 #endif /*_REDY_SYNTAX_AST_NODE_BINARY_EXPR_H_*/

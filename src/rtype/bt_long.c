@@ -318,7 +318,7 @@ static  Robject* bl_and(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_AND));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_AND));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -345,7 +345,7 @@ static  Robject* bl_or(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_OR));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_OR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -371,7 +371,7 @@ static  Robject* bl_xor(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_XOR));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_XOR));
 		robject_addref(robject_null);
 		return robject_null;
 	}

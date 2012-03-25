@@ -145,9 +145,16 @@ Robject* robject_le(Robject* left,Robject* right);
 Robject* robject_gt(Robject* left,Robject* right);
 Robject* robject_ge(Robject* left,Robject* right);
 
-Robject* robject_or(Robject* left,Robject* right);
-Robject* robject_and(Robject* left,Robject* right);
-Robject* robject_xor(Robject* left,Robject* right);
+/*equal_expr*/
+Robject* robject_ne(Robject* left,Robject* right);
+Robject* robject_eq(Robject* left,Robject* right);
 
+/*bitwise_expr*/
+Robject* robject_bit_or(Robject* left,Robject* right);
+Robject* robject_bit_and(Robject* left,Robject* right);
+Robject* robject_bit_xor(Robject* left,Robject* right);
+
+/*logic_expr*/
+Robject* robject_bool(Robject* rt);
 #endif 
 

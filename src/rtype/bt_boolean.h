@@ -10,6 +10,8 @@ typedef BtInt BtBoolean;
 
 /*implement in bt_int.c*/
 BtBoolean* bt_boolean_create(int value);
+int bt_boolean_is_false(Robject* value);
+int bt_boolean_is_true(Robject* value);
 
 
 #endif 

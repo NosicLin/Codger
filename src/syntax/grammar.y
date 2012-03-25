@@ -184,26 +184,52 @@ shift_expr:additive_expr{$$=$1;}
 		$$=ab;
 	}
 ;
-relational_expr:shift_expr{$$=$1;} 
-	|relational_expr tLT shift_expr{
+
+bit_and_expr:shift_expr{$$=$1;}
+	|bit_and_expr tAND shift_expr{
+		AstNodeBitAnd* node=ast_create_bit_and($1,$3);
+		AstObject* ab=BIT_AND_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+bit_xor_expr:bit_and_expr{$$=$1;}
+	|bit_xor_expr tXOR bit_and_expr{
+		AstNodeBitXor* node=ast_create_bit_xor($1,$3);
+		AstObject* ab=BIT_XOR_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+bit_or_expr:bit_xor_expr{$$=$1;}
+	|bit_or_expr tOR bit_xor_expr{
+		AstNodeBitOr* node=ast_create_bit_or($1,$3);
+		AstObject* ab=BIT_OR_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+
+relational_expr:bit_or_expr{$$=$1;} 
+	|relational_expr tLT bit_or_expr{
 		AstNodeLt* node =ast_create_lt($1,$3);
 		AstObject* ab=LT_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}
-	|relational_expr tLE shift_expr{
+	|relational_expr tLE bit_or_expr{
 		AstNodeLe* node=ast_create_le($1,$3);
 		AstObject* ab=LE_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}
-	|relational_expr tGE shift_expr{
+	|relational_expr tGE bit_or_expr{
 		AstNodeGe* node=ast_create_ge($1,$3);
 		AstObject* ab=GE_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}	
-	|relational_expr tGT shift_expr{
+	|relational_expr tGT bit_or_expr{
 		AstNodeGt* node=ast_create_gt($1,$3);
 		AstObject* ab=GT_TO_AST(node);
 		ast_addto_pending(ab);
@@ -211,7 +237,45 @@ relational_expr:shift_expr{$$=$1;}
 	}
 	;
 
-expr :relational_expr{$$=$1;}
+equal_expr:relational_expr{$$=$1;}
+	|equal_expr tEQ relational_expr{
+		AstNodeEq* node=ast_create_eq($1,$3);
+		AstObject* ab=EQ_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	|equal_expr tNE relational_expr{
+		AstNodeNe* node=ast_create_ne($1,$3);
+		AstObject* ab=NE_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+logic_not_expr:equal_expr{$$=$1;}
+	|kNOT logic_not_expr{
+		AstNodeLogicNot* node=ast_create_logic_not($2);
+		AstObject* ab=LOGIC_NOT_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+logic_and_expr:logic_not_expr{$$=$1;}
+	|logic_and_expr kAND logic_not_expr{
+		AstNodeLogicAnd* node=ast_create_logic_and($1,$3);
+		AstObject* ab=LOGIC_AND_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;	
+logic_or_expr:logic_and_expr{$$=$1;}
+	|logic_or_expr kOR logic_and_expr{
+		AstNodeLogicOr* node=ast_create_logic_or($1,$3);
+		AstObject* ab=LOGIC_OR_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}
+	;
+expr :logic_or_expr{$$=$1;}
 	;
 stmt_expr:expr {$$=$1;}
 		 ;

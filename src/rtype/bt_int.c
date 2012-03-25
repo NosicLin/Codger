@@ -387,7 +387,7 @@ static Robject* bi_and(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_AND));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_AND));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -411,7 +411,7 @@ static Robject* bi_or(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_OR));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_OR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -435,7 +435,7 @@ static Robject* bi_xor(Robject* left,Robject* right)
 	}
 	else
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_XOR));
+		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_BIT_XOR));
 		robject_addref(robject_null);
 		return robject_null;
 	}
@@ -680,3 +680,11 @@ BtBoolean* bt_boolean_create(int value)
 	return ret;
 }
 
+int bt_boolean_is_false(Robject* value)
+{
+	return B_TO_R(&bt_bool_false)==value;
+}
+int bt_boolean_is_true(Robject* value)
+{
+	return B_TO_R(&bt_bool_true)==value;
+}
