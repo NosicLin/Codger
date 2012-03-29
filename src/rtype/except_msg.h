@@ -15,15 +15,15 @@
 #define OPER_GT ">"
 #define OPER_NE "!="
 #define OPER_EQ "=="
-#define OPER_BIT_AND "&"
-#define OPER_BIT_OR "|"
-#define OPER_BIT_XOR "^"
+#define OPER_AND "&"
+#define OPER_OR "|"
+#define OPER_XOR "^"
 #define OPER_NEGATIVE "-"
 #define OPER_NEGATED "~"
 #define OPER_POSITIVE "+"
 
 
-
+#define MSG_BINARY_UNSUPPORT "unsupport operand(%s) for '%s'"
 #define MSG_LONG_OVERFLOW "long overflow integer"
 #define MSG_STRING_INDEX_NEGATIVE "string index must be positive,not negative"
 #define MSG_STRING_OUT_OF_RANGE "string index out of range"

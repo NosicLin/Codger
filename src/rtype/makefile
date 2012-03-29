@@ -1,8 +1,11 @@
 PROJECT=rtype
-SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
+SRC=bt_int.c bt_float.c
+DEBUG=
+BIN=
+#SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
 	rtype.c robject.c except_msg.c   bt_string.c bt_array.c
-DEBUG=gen_lib.c 
-BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
+#DEBUG=gen_lib.c 
+#BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
 	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
 	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c \
 	gen_cmp2.c  gen_bl_str.c \

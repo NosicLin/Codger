@@ -12,11 +12,30 @@ struct  bt_array
 
 typedef struct bt_array BtArray;
 
+#ifdef RTYPE_DEBUG 
+
+static inline BtArray* R_TO_A(Robject* rt)
+{
+	assert(rt_type(rt)==RT_ARRAY);
+	return (BtArray*) rt;
+}
+static inline Robject* A_TO_R(BtArray* bt)
+{
+	assert(rt_type((Robject*)bt)==RT_ARRAY);
+	return (Robject*)bt;
+}
+#else 
+
+#define R_TO_A(bt) ((BtArray*)bt)
+#define A_TO_R(btl) ((Robject*)btl)
+
+#endif 
+
 /* constructor */
 BtArray* bt_array_malloc(int cap);
 BtArray* bt_array_create();
 
-/* deconstructor */
+/* destructor */
 void bt_array_free(BtArray* ba);
 
 /* interface */

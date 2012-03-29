@@ -4,6 +4,249 @@
 #include<utility_c/marocs.h>
 
 
+struct bt_int * btlong_to_btint(BtLong* bl)
+{
+	TODO("Convert BtLong TO BtInt");
+	return NULL;
+}
+struct bt_float* btlong_to_btfloat(Btlong* bl);
+{
+	TODO("Convert BtLong TO BtFloat");
+	return NULL;
+}
+struct bt_string* btlong_to_btstring(BtLong* bl);
+{
+	TODO("Convert BtLong TO BtString");
+	return NULL;
+}
+BtLong* btlong_positive(BtLong* bl)
+{
+	robject_addref(L_TO_R(bl));
+	return bl;
+}
+
+	
+BtLong* btlong_negative(BtLong* bl)
+{
+	BGInteger* bg=bg_negative(bl->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+BtLong* btlong_negated(BtLong* bl)
+{
+	BGInteger* bg=bg_negated(bl->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+/*arithmetic expr*/
+BtLong* btlong_mul(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_mul(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+BtLong* btlong_div(BtLong* x,BtLong* y)
+{
+	if(btlong_is_zero(y))
+	{
+		except_divzero_err_format("%s divide or module zero",
+				robject_name(L_TO_R(x)));
+		return NULL;
+	}
+	BGInteger* bg=bg_div(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+		
+BtLong* btlong_mod(BtLong* x,BtLong* y)
+{
+	if(btlong_is_zero(y))
+	{
+		except_divzero_err_format("%s divide or module zero",
+				robject_name(L_TO_R(x)));
+		return NULL;
+	}
+	BGInteger* bg=bg_mod(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+BtLong* btlong_plus(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_plus(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+BtLong* btlong_minus(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_minus(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+/*bltwise expr*/
+BtLong* btlong_lshift(BtLong* x,BtLong* y)
+{
+	if(bglong_over_int(y))
+	{
+		except_overflow_err("long to large to convert to int");
+		return NULL;
+	}
+	if(bglong_lt_zero(y))
+	{
+		except_value_err_format("negative shift count");
+		return NULL;
+	}
+	BGInteger* bg=bg_lshift(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+
+BtLong* btlong_rshift(BtLong* x,BtLong* y)
+{
+	if(bglong_over_int(y))
+	{
+		except_overflow_err("long to large to convert to int");
+		return NULL;
+	}
+	if(bglong_lt_zero(y))
+	{
+		except_value_err_format("negative shift count");
+		return NULL;
+	}
+	BGInteger* bg=bg_rshift(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+BtLong* btlong_or(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_or(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+
+BtLong* btlong_xor(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_xor(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+BtLong* btlong_and(BtLong* x,BtLong* y)
+{
+	BGInteger* bg=bg_and(x->l_value,y->l_value);
+	if(bg==NULL)
+	{
+		return NULL;
+	}
+	BtLong* ret=btlong_create(bg);
+	return ret;
+}
+
+/*compare expr*/
+int btlong_lt(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret<0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_le(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret<=0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_eq(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret==0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_ne(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret!=0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_ge(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret>=0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_gt(BtLong* x,BtLong* y)
+{
+	int ret=bg_cmp(x->l_value,y->l_value);
+	if(ret>0)
+		return 1;
+	else 
+		return 0;
+}
+int btlong_cmp(BtLong* x,BtLong* y,int op)
+{
+}
+
+
+
 
 /* unary operator + - */
 static Robject* bl_negative(Robject* left)

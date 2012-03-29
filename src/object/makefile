@@ -1,19 +1,7 @@
-PROJECT=syntax
-
-SRC= ast_object.c ast_machine.c ast_node_literal.c \
-	 yylex.c   ast_node_stmt.c ast_node_binary_expr.c  \
-	 ast_node_stmts.c  ast_node_unary_expr.c \
-	 grammar.tab.c   parser.c
-
+PROJECT=object
+SRC=hash_object.c robject.c
 DEBUG=
-BIN=test_literal.c redy.c
-
-CC=gcc
-FLAGS=-g -Wall  -Werror -include ../rstd/redy_types.h 
-INCLUDE=-I. -I./debug   -I../
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lrtype -llexical -lvm
-
+BIN=
 
 
 OBJ_NAME=$(SRC:%.c=%.o) 
@@ -33,11 +21,17 @@ BIN_NAME_WITH_PATH=$(addprefix bin/,$(BIN_NAME))
 BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
-
+CC=gcc
+FLAGS=-g -Wall  -Werror -include sys/types.h
+INCLUDE=-I. -I./debug   -I../ 
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
+	-L../lib/ -lvm  -rstd
 
 
 main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
+
+
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH) ../lib 
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
@@ -76,7 +70,6 @@ rm:
 	rm -f obj/*
 	rm -f lib/*
 	rm -f bin/*.exe
-	rm -f ../lib/lib$(PROJECT).a
 clear:
 	rm -rf obj 
 	rm -rf bin 
