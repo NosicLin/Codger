@@ -95,13 +95,15 @@ BtInt* btint_from_str(char* str)
 
 struct bt_long* btint_to_btlong(BtInt* i)
 {
-	TODO("Convert Int TO Long");
-	return NULL;
+	BtLong* ret=btlong_from_int(i->i_value);
+	if(ret==NULL) return NULL;
+	return ret;
 }
 struct bt_float* btint_to_btfloat(BtInt* i)
 {
-	TODO("Convert Int TO Float");
-	return NULL;
+	float value=i->i_value;
+	BtFloat* ret=btfloat_create(value);
+	return ret;
 }
 struct bt_string* btint_to_btstring(BtInt* i)
 {
@@ -254,7 +256,7 @@ int btint_cmp(BtInt* x,BtInt* y,int op)
 			return btint_gt(x,y);
 	}
 	BUG("Error cmpare op(%d)",op);
-	return 0;
+	return -1;
 }
 int btint_bool(BtInt* bi)
 {
@@ -266,6 +268,10 @@ int btint_bool(BtInt* bi)
 	{
 		return 1;
 	}
+}
+inline ssize_t btint_hash(BtInt* bi)
+{
+	return  bi->i_value;
 }
 
 
@@ -345,7 +351,9 @@ static Robject* bi_mul(Robject* x,Robject* y)
 		return L_TO_R(ret);
 	}
 	/* error type */
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_MUL);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_MUL, robject_name(x),
+						robject_name(y));
 	return NULL;
 
 }
@@ -360,7 +368,7 @@ static Robject* bi_div(Robject* x,Robject* y)
 	int type=rt_type(y);
 	if(type==RT_INT)
 	{
-		BtInt* ret=btint_mul(R_TO_I(x),R_TO_I(y));
+		BtInt* ret=btint_div(R_TO_I(x),R_TO_I(y));
 		if(ret==NULL)
 		{
 			return NULL;
@@ -397,7 +405,9 @@ static Robject* bi_div(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_DIV);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+								OPER_DIV,robject_name(x),
+								robject_name(y));
 	return NULL;
 
 }
@@ -448,7 +458,9 @@ static Robject* bi_mod(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_MOD);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+							OPER_MOD,robject_name(x),
+							robject_name(y));
 	return NULL;
 
 }
@@ -519,7 +531,9 @@ static Robject* bi_plus(Robject* x,Robject* y)
 	}
 
 
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_PLUS);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+							OPER_PLUS,robject_name(x),
+							robject_name(y));
 	return NULL;
 }
 
@@ -571,7 +585,9 @@ static Robject* bi_minus(Robject* x,Robject* y)
 	}
 
 
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_MINUS);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_MINUS,robject_name(x),
+						robject_name(y));
 	return NULL;
 }
 
@@ -607,7 +623,9 @@ static Robject* bi_lshift(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_LSHIFT);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+					OPER_LSHIFT,robject_name(x),
+					robject_name(y));
 	return NULL;
 
 }
@@ -642,7 +660,9 @@ static Robject* bi_rshift(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_RSHIFT);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_RSHIFT,robject_name(x),
+						robject_name(y));
 	return NULL;
 }
 
@@ -654,31 +674,27 @@ int bi_cmp(Robject* x,Robject* y,int op)
 	if(type==RT_INT)
 	{
 		int ret=btint_cmp(R_TO_I(x),R_TO_I(y),op);
-		return op;
+		return ret;
 	}
 	if(type==RT_FLOAT)
 	{
 		BtFloat* c_x=btint_to_btfloat(R_TO_I(x));
-		if(c_x==NULL)
-		{
-			return -1;
-		}
-		int  ret=btlong_rshift(c_x,R_TO_L(y));
+		if(c_x==NULL) return -1;
+		int  ret=btfloat_cmp(c_x,R_TO_F(y),op);
 		robject_release(F_TO_R(c_x));
 		return ret;
 	}
 	if(rt_type(y)==RT_LONG)
 	{
 		BtLong* c_x=btint_to_btlong(R_TO_I(x));
-		if(c_x==NULL)
-		{
-			return -1;
-		}
-		int ret=btlong_rshift(c_x,R_TO_L(y));
+		if(c_x==NULL) return -1;
+		int ret=btlong_cmp(c_x,R_TO_L(y),op);
 		robject_release(L_TO_R(c_x));
 		return ret;
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_NAME[op]);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+					CMP_NAME(op),robject_name(x),
+					robject_name(y));
 	return -1;
 }
 static int bi_lt(Robject* x,Robject* y)
@@ -736,7 +752,9 @@ static Robject* bi_and(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_RSHIFT);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_RSHIFT,robject_name(x),
+						robject_name(y));
 	return NULL;
 }
 
@@ -771,7 +789,9 @@ static Robject* bi_or(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject(y),OPER_OR);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_OR,robject_name(x),
+						robject_name(y));
 	return NULL;
 }
 
@@ -806,7 +826,9 @@ static Robject* bi_xor(Robject* x,Robject* y)
 		}
 		return L_TO_R(ret);
 	}
-	except_type_err_format(MSG_BINARY_UNSUPPORT,robject_name(x),robject_name(y),OPER_XOR);
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+						OPER_XOR,robject_name(x),
+					   	robject_name(y));
 	return NULL;
 	
 }
@@ -828,11 +850,47 @@ static int bi_bool(Robject* bti)
 	return btint_bool(R_TO_I(bti));
 }
 
+static int bi_rich_cmp(Robject* x,Robject* y,int op)
+{
+
+	int type=rt_type(y);
+	if(type==RT_INT)
+	{
+		int ret=btint_cmp(R_TO_I(x),R_TO_I(y),op);
+		return ret;
+	}
+	if(type==RT_FLOAT)
+	{
+		BtFloat* c_x=btint_to_btfloat(R_TO_I(x));
+		if(c_x==NULL) return -1;
+		int  ret=btfloat_cmp(c_x,R_TO_F(y),op);
+		robject_release(F_TO_R(c_x));
+		return ret;
+	}
+	if(rt_type(y)==RT_LONG)
+	{
+		BtLong* c_x=btint_to_btlong(R_TO_I(x));
+		if(c_x==NULL) return -1;
+		int ret=btlong_cmp(c_x,R_TO_L(y),op);
+		robject_release(L_TO_R(c_x));
+		return ret;
+	}
+	return CMP_NOT_SUPPORT;
+}
+
+
+/* FIXME int hash is use for temp*/
+static ssize_t bi_hash(Robject* bt)
+{
+	return btint_hash(R_TO_I(bt));
+}
+
 
 /* print operator */
-static void bi_print(Robject* bt,FILE* f,int flags)
+static int bi_print(Robject* bt,FILE* f,int flags)
 {
 	printf("%d",R_TO_I(bt)->i_value);
+	return 1;
 }
 
 static struct  expr_ops bi_expr_ops=
@@ -891,20 +949,21 @@ static TypeObject type_int=
 	.t_name="Integer",
 	.t_type=RT_INT,
 	.t_expr_funcs=&bi_expr_ops,
-	.t_object_func=&int_object_ops,
+	.t_object_funcs=&int_object_ops,
+	.t_rich_cmp=&bi_rich_cmp,
+	.t_hash=bi_hash,
 };
 
-inline BtInt* bt_int_malloc()
+inline BtInt* btint_malloc()
 {
 	return robject_new(BtInt,&type_int);
 }
 
-BtInt* bt_int_create(int value)
+BtInt* btint_create(int value)
 {
-	BtInt* ret=bt_int_malloc();
+	BtInt* ret=btint_malloc();
 	ret->i_value=value;
 	return ret;
 }
-
 
 

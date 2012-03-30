@@ -1,23 +1,26 @@
-#include"robject.h"
 #include<stdio.h>
 #include"rtype.h"
 #include<assert.h>
+#include"bt_string.h"
+#include"bt_int.h"
+#include"bt_float.h"
+#include"bt_long.h"
 
 /* binary operator */
 #define f_func(name) \
 Robject* r_##name(Robject* l,Robject* r) \
 { \
-	if(l->r_expr_ops->ro_##name) \
+	if(l->r_type->t_expr_funcs->ro_##name) \
 	{  \
-		return l->r_expr_ops->ro_##name(l,r); \
+		return l->r_type->t_expr_funcs->ro_##name(l,r); \
 	} \
 	else \
 	{ \
-		robject_addref(robject_null); \
-		return robject_null; \
+		return NULL;\
 	} \
 } 
 
+#define RT_NULL 0
 f_func(mul);
 f_func(div);
 f_func(mod);
@@ -25,34 +28,32 @@ f_func(plus);
 f_func(minus);
 f_func(lshift);
 f_func(rshift);
-f_func(bit_and);
-f_func(bit_or);
-f_func(bit_xor);
+f_func(and);
+f_func(or);
+f_func(xor);
+
 
 /* unary operator */
+
 
 #define unary_func(name) \
 Robject* r_##name(Robject* u)\
 { \
-	if(u->r_expr_ops->ro_##name) \
+	if(u->r_type->t_expr_funcs->ro_##name) \
 	{  \
-		return u->r_expr_ops->ro_##name(u); \
+		return u->r_type->t_expr_funcs->ro_##name(u); \
 	} \
 	else \
 	{ \
-		robject_addref(robject_null); \
-		return robject_null; \
+		return NULL; \
 	} \
 }
 
-
-
 unary_func(positive);
 unary_func(negative);
-unary_func(bit_negated);
+unary_func(negated);
 
 
-f_func(cmp)
 #define L_INT_VAL 14
 #define R_INT_VAL  9
 
@@ -103,7 +104,7 @@ do{ \
 	Robject* u=func(l,r); \
 	int l_val=R_TO_I(l)->i_value; \
 	float r_val=R_TO_F(r)->f_value; \
-	if(u!=robject_null) \
+	if(u!=NULL) \
 	{ \
 		float u_val=R_TO_F(u)->f_value; \
 		printf("%d %s %g = %g",l_val,#op,r_val,u_val); \
@@ -132,7 +133,7 @@ do{ \
 	Robject* u=func(l,r); \
 	float l_val=R_TO_F(l)->f_value; \
 	float r_val=R_TO_F(r)->f_value; \
-	if(u!=robject_null) \
+	if(u!=NULL) \
 	{ \
 		float u_val=R_TO_F(u)->f_value; \
 		printf("%g %s %g = %g",l_val,#op,r_val,u_val); \
@@ -161,7 +162,7 @@ do{ \
 	Robject* u=func(l,r); \
 	float l_val=R_TO_F(l)->f_value; \
 	int r_val=R_TO_I(r)->i_value; \
-	if(u!=robject_null) \
+	if(u!=NULL) \
 	{ \
 		float u_val=R_TO_F(u)->f_value; \
 		printf("%g %s %d = %g",l_val,#op,r_val,u_val); \
@@ -190,7 +191,7 @@ do{ \
 	Robject* u=func(l,r); \
 	float l_val=R_TO_F(l)->f_value; \
 	int r_val=R_TO_L(r)->l_value->b_val[0]; \
-	if(u!=robject_null) \
+	if(u!=NULL) \
 	{ \
 		float u_val=R_TO_F(u)->f_value; \
 		printf("%g %s %d = %g",l_val,#op,r_val,u_val); \
@@ -261,7 +262,7 @@ do{ \
 	Robject* u=func(l,r); \
 	int l_val=R_TO_L(l)->l_value->b_val[0]; \
 	float r_val=R_TO_F(r)->f_value; \
-	if(u!=robject_null) \
+	if(u!=NULL) \
 	{ \
 		float u_val=R_TO_F(u)->f_value; \
 		printf("%d %s %g = %g",l_val,#op,r_val,u_val); \
@@ -323,9 +324,9 @@ int g_ingor=0;
 #define test_oper_bitwise(l_type,r_type,l,r) \
 	test_##l_type##_oper_##r_type(r_lshift,l,r,<<); \
 	test_##l_type##_oper_##r_type(r_rshift,l,r,>>); \
-	test_##l_type##_oper_##r_type(r_bit_and,l,r,&); \
-	test_##l_type##_oper_##r_type(r_bit_xor,l,r,^); \
-	test_##l_type##_oper_##r_type(r_bit_or,l,r,|);
+	test_##l_type##_oper_##r_type(r_and,l,r,&); \
+	test_##l_type##_oper_##r_type(r_xor,l,r,^); \
+	test_##l_type##_oper_##r_type(r_or,l,r,|);
 
 #define test_oper_all(l_type,r_type,l,r) \
 	test_oper_arithmetic(l_type,r_type,l,r); \
@@ -336,12 +337,12 @@ Robject* l=0;
 Robject* r=0;
 int main()
 {
-	BtInt* l_int=bt_int_create(L_INT_VAL);
-	BtInt* r_int=bt_int_create(R_INT_VAL);
-	BtFloat* l_float=bt_float_create(L_INT_VAL);
-	BtFloat* r_float=bt_float_create(R_INT_VAL);
-	BtLong* l_long=bt_long_from_int(L_INT_VAL);
-	BtLong* r_long=bt_long_from_int(R_INT_VAL);
+	BtInt* l_int=btint_create(L_INT_VAL);
+	BtInt* r_int=btint_create(R_INT_VAL);
+	BtFloat* l_float=btfloat_create(L_INT_VAL);
+	BtFloat* r_float=btfloat_create(R_INT_VAL);
+	BtLong* l_long=btlong_from_int(L_INT_VAL);
+	BtLong* r_long=btlong_from_int(R_INT_VAL);
 
 	l=I_TO_R(l_int);
 	r=I_TO_R(r_int);
@@ -352,7 +353,7 @@ int main()
 	printf("----unary int---- \n");
 	test_unary_int(r_negative,l, -);
 	test_unary_int(r_positive,l, + );
-	test_unary_int(r_bit_negated, l,~);
+	test_unary_int(r_negated, l,~);
 
 	printf("----int oper float---- \n");
 	r=F_TO_R(r_float);

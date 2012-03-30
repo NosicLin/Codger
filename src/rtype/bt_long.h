@@ -5,7 +5,7 @@
 struct bt_long
 {
 	INHERIT_ROBJECT;
-	struct blg_integer* l_value;
+	struct big_integer* l_value;
 };
 
 typedef struct bt_long BtLong;
@@ -48,8 +48,13 @@ static inline int btlong_over_int(BtLong* bl)
 {
 	return bg_overflow_int(bl->l_value);
 }
+static inline int btlong_lt_zero(BtLong* bl)
+{
+	return bl->l_value->b_len<0;
+}
+int btlong_to_int(BtLong* bl);
 
-static inline int btlong_over_float(BtLong* bl);
+int btlong_over_float(BtLong* bl);
 static inline int btlong_is_zero(BtLong* bl)
 {
 	return bl->l_value->b_len==0;
@@ -60,8 +65,9 @@ struct bt_float;
 struct bt_string;
 
 struct bt_int * btlong_to_btint(BtLong* bl);
-struct bt_float* btlong_to_btfloat(Btlong* bl);
+struct bt_float* btlong_to_btfloat(BtLong* bl);
 struct bt_string* btlong_to_btstring(BtLong* bl);
+
 
 BtLong* btlong_positive(BtLong* bl);
 BtLong* btlong_negative(BtLong* bl);

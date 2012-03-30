@@ -13,14 +13,17 @@ typedef struct robject Robject;
 #define robject_new(TYPE,type_ops) ((TYPE*)__robject_new(sizeof(TYPE),type_ops))
 
 void* __robject_new(ssize_t size,TypeObject* t);
-void robject_init(Robject* r);
+void robject_init(Robject* r,TypeObject* t);
 
-void robject_addref(Robject* r){r->r_ref++;}
+static inline void robject_addref(Robject* r){r->r_ref++;}
 void robject_release(Robject* r);
-ssize_t robject_refcnt(Robject* r){ return r->r_ref;}
+static inline ssize_t robject_refcnt(Robject* r){ return r->r_ref;}
 static inline void robject_initref(Robject* r){r->r_ref=1;}
 
-const char* robject_name(Robject* r);
+static inline const char* robject_name(Robject* r)
+{
+	return r->r_type->t_name;
+}
 TypeObject* robject_type(Robject* r);
 int robject_typeid(Robject* r);
 

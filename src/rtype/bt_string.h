@@ -2,6 +2,8 @@
 #define _REDY_RTYPE_STRING_H_
 
 #include"rtype.h"
+#include<string.h>
+#include"rstd/redy_std.h"
 struct bt_string
 {
 	INHERIT_ROBJECT;	
@@ -33,15 +35,54 @@ static inline Robject* S_TO_R(BtString* bt)
 
 /* implement in bt_string.c */ 
 /* constructor */
-BtString* bt_string_malloc(int length);
-BtString* bt_string_create(char* str);
-BtString* bt_string_create_empty();
-BtString* bt_string_from_char(char c);
+BtString* btstring_malloc(int length);
+BtString* btstring_create(char* str);
+BtString* btstring_create_empty();
+BtString* btstring_from_char(char c);
+
+/* expr*/
+BtString* btstring_get_item(BtString* bs,int index);
+BtString* btstring_plus(BtString* x,BtString* y);
+int btstring_cmp(BtString* x,BtString* y,int op);
+
+static inline int btstring_lt(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)<0;
+}
+static inline int btstring_le(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)<=0;
+}
+static inline int btstring_gt(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)>0;
+}
+static inline int btstring_ge(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)>=0;
+}
+static inline int btstring_eq(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)==0;
+}
+static inline int btstring_ne(BtString* x,BtString* y)
+{
+	return strcmp(x->s_value,y->s_value)!=0;
+}
+
+static inline int btstring_bool(BtString* bs)
+{
+	return bs->s_length==0;
+}
+
+int btstring_print(BtString* bs,FILE* f,int flags);
+
+
 
 /* destructor */
 static inline void bt_string_free(BtString* bs)
 {
-	free(bs);
+	ry_free(bs);
 }
 
 static inline char* bt_string_str(BtString* bts)

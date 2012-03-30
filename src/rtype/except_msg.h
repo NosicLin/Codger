@@ -22,22 +22,36 @@
 #define OPER_NEGATED "~"
 #define OPER_POSITIVE "+"
 
+#include<object/robject.h>
+static inline char* CMP_NAME(int op)
+{
+	switch(op)
+	{
+		case CMP_LT:
+			return "<";
+		case CMP_LE:
+			return "<=";
+		case CMP_GE:
+			return ">=";
+		case CMP_GT:
+			return ">";
+		case CMP_EQ:
+			return "==";
+		case CMP_NE:
+			return "!=";
+	}
+	return "Unkown CMP";
+}
 
-#define MSG_BINARY_UNSUPPORT "unsupport operand(%s) for '%s'"
+	
+
+
+#define MSG_BINARY_UNSUPPORT "unsupport operand(%s) for '%s' and '%s'"
 #define MSG_LONG_OVERFLOW "long overflow integer"
 #define MSG_STRING_INDEX_NEGATIVE "string index must be positive,not negative"
 #define MSG_STRING_OUT_OF_RANGE "string index out of range"
 #define MSG_SHIFT_NEGATIVE "negative shift count"
 #define MSG_ARRAY_OUT_OF_RANGE "array index out of range"
-
-char* MSG_STRING_PLUS(char*);
-char* MSG_CMP(char* ,char* );
-char* MSG_STRING_INDEX_TYPE(char* name);
-char* MSG_ARRAY_INDEX_TYPE(char* name);
-char* MSG_OPER(char* l,char* r ,char* ops);
-char* MSG_DIV(char* type);
-char* MSG_UEXPR(char* name,char* ops);
-
 
 #endif 
 

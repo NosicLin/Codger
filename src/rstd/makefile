@@ -1,17 +1,9 @@
-PROJECT=rtype
-SRC=bt_int.c bt_float.c bt_long.c bt_string.c  big_integer.c
-DEBUG=
-BIN=rtype_unit_test.c rtype_unit_test2.c
-#SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
-	rtype.c robject.c except_msg.c   bt_string.c bt_array.c
-#DEBUG=gen_lib.c 
-#BIN=bg_bin.c bg_oct.c bg_dec.c bg_hex.c  bg_expr.c  bg_expr2.c \
-	gen_expr.c gen_expr2.c  gen_bits.c gen_bits2.c \
-	gen_shift.c gen_shift2.c gen_div.c  gen_div2.c \
-	gen_cmp2.c  gen_bl_str.c \
-	bi_str_to_int.c  bg_to_float.c bl_from_str.c \
-	rtype_unit_test.c rtype_unit_test2.c
+PROJECT=rstd
 
+SRC=redy_std.c
+
+DEBUG=
+BIN=
 
 
 OBJ_NAME=$(SRC:%.c=%.o) 
@@ -35,7 +27,7 @@ CC=gcc
 FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lvm  -lobject -lrstd
+	-L../lib/ -lvm  -lobject
 
 
 main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \

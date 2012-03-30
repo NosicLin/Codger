@@ -89,5 +89,6 @@ ssize_t btint_hash(BtInt* bi);
 int btint_print(BtInt* bi,FILE* f,int flags);
 
 
+
 #endif /*_REDY_RTYPE_INT_H_*/
 

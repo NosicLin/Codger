@@ -3,8 +3,16 @@
 #include<rstd/redy_std.h>
 #include<stdio.h>
 #include<assert.h>
-
-void robject_init(Robject* r);
+#include<vm/except.h>
+static inline void __robject_init(Robject* r)
+{
+	r->r_ref=1;
+}
+void robject_init(Robject* r,TypeObject* t)
+{
+	__robject_init(r);
+	r->r_type=t;
+}
 void* __robject_new(ssize_t size,TypeObject* t)
 {
 	Robject* ret=(Robject*)ry_malloc(size);
@@ -13,8 +21,8 @@ void* __robject_new(ssize_t size,TypeObject* t)
 		ryerr_nomemory();
 		return NULL;
 	}
-	robject_init(ret);
-	ret->r_type=t;
+	robject_init(ret,t);
+
 	return ret;
 }
 static int s_swap_op[]={CMP_GT,CMP_GE,CMP_NE,CMP_EQ,CMP_LE,CMP_LT};
@@ -55,10 +63,26 @@ int robject_richcmp(Robject* x,Robject* y,int op)
 	return ret;
 }
 
+void robject_release(Robject* r)
+{
+	r->r_ref--;
+	assert(r->r_ref>=0);
+	if(r->r_ref==0)
+	{
+		if(!r->r_type->t_object_funcs)
+			goto default_action;
 
+		if(!r->r_type->t_object_funcs->ro_free)
+			goto default_action;
 
+		r->r_type->t_object_funcs->ro_free(r);
+	}
+	return ;
 
-
+default_action:
+	WARN("Object %s No ro_free Method",robject_name(r));
+	ry_free(r);
+}
 
 
 void robject_print(Robject* rt,FILE* f,int flags)
@@ -81,6 +105,41 @@ default_action:
 	return ;
 
 }
+
+ssize_t robject_hash(Robject* rt)
+{
+	TypeObject* t=rt->r_type;
+	assert(rt);
+	if(!t->t_hash)
+		goto default_action;
+
+	ssize_t hash=t->t_hash(rt);
+	return hash;
+default_action:
+	except_type_err_format("unhashed type:'%s'",robject_name(rt));
+	return -1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

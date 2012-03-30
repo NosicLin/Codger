@@ -2,6 +2,8 @@
 #include<rstd/redy_std.h>
 #include<string.h>
 #include<assert.h>
+#include<vm/except.h>
+#include<utility_c/marocs.h>
 
 #define HASH_SMALL_TABLE_MEM_INIT(h) \
 	do{ \
@@ -15,16 +17,35 @@
 		h->t_mask=HASH_TABLE_SMALL_TABLE-1;  \
 		h->t_fill=0; \
 		h->t_used=0; \
+		h->t_flags=0; \
 	}while(0)
 
 #define DEFALULT_PERTURB_SHIFT 5
 #define HASH_MAX_CACHE 200
 
+#define HASH_PRINT_FLAG 0x1 
+
+static inline int ht_is_print(HashTable* h)
+{
+	return  h->t_flags&HASH_PRINT_FLAG;
+}
+static inline void ht_clr_print(HashTable* h)
+{
+	h->t_flags=h->t_flags&(~HASH_PRINT_FLAG);
+}
+static inline void ht_set_print(HashTable* h)
+{
+	h->t_flags=h->t_flags| HASH_PRINT_FLAG;
+}
+
+
+	
+
+
 static HashTable* s_htable_cache[HASH_MAX_CACHE];
 static int s_cache_free=0;
 static Robject* dummy=NULL;
-TypeObject type_hash={};
-
+TypeObject hash_type;
 HashTable* hash_new()
 {
 	HashTable* ret=0;
@@ -35,7 +56,7 @@ HashTable* hash_new()
 	}
 	else
 	{
-		ret=robject_new(HashTable,&type_hash);
+		ret=robject_new(HashTable,&hash_type);
 	}
 	if(ret==NULL)
 	{
@@ -180,6 +201,7 @@ static int ht_insert(HashTable* h,Robject* key,ssize_t hash,Robject* value)
 	p->e_hash=hash;
 	return 0;
 }
+
 Robject* hash_get_item(HashTable* h,Robject* key)
 {
 	ssize_t hash=robject_hash(key);
@@ -190,6 +212,10 @@ Robject* hash_get_item(HashTable* h,Robject* key)
 	}
 	HashEntry* p=ht_look_up(h,key,hash);
 	if(p==NULL)
+	{
+		return NULL;
+	}
+	if(p->e_key==NULL||p->e_key==dummy)
 	{
 		return NULL;
 	}
@@ -351,4 +377,162 @@ int hash_del_item(HashTable* h,Robject* key)
 	p->e_value=0;
 	return 0;
 }
+inline int hash_bool(HashTable* h)
+{
+	if(h->t_used==0)
+	{
+		return 0;
+	}
+	return 1;
+}
+
+int hash_print(HashTable* h,FILE* f,int flags)
+{
+	ssize_t i=h->t_used;
+	HashEntry* table=h->t_table;
+	HashEntry* p=&table[0];
+	if(i==0)
+	{
+		printf("{}");
+		return 0;
+	}
+	if(ht_is_print(h))
+	{
+		printf("{...}");
+		return 0;
+	}
+	else 
+	{
+		ht_set_print(h);
+	}
+
+	int print_first=0;
+	while(!print_first)
+	{
+		if(p->e_key==NULL||p->e_key==dummy)
+		{
+			continue;
+		}
+		i--;
+		robject_print(p->e_key,f,flags);
+		printf("->");
+		assert(p->e_value);
+		robject_print(p->e_value,f,flags);
+		print_first=1;
+	}
+	while(i>0)
+	{
+		if(p->e_key==NULL||p->e_key==dummy)
+		{
+			continue;
+		}
+		i--;
+		printf(",");
+		robject_print(p->e_key,f,flags);
+		printf("->");
+		assert(p->e_value);
+		robject_print(p->e_value,f,flags);
+	}
+
+	ht_clr_print(h);
+	return 0;
+}
+
+
+
+
+
+
+
+static Robject* ht_get_item(Robject* r,Robject* key)
+{
+	HashTable* h=R_TO_HASH(r);
+	ssize_t hash=robject_hash(key);
+	if(hash==-1)
+	{
+		/*hash error*/
+		return NULL;
+	}
+	HashEntry* p=ht_look_up(h,key,hash);
+	if(p==NULL)
+	{
+		/* look up error*/
+		return NULL;
+	}
+	if(p->e_key==NULL||p->e_key==dummy)
+	{
+		except_key_err_format("key not map");
+		return NULL;
+	}
+	assert(p->e_value);
+	robject_addref(p->e_value);
+	return p->e_value;
+
+}	
+static int ht_set_item(Robject* r,Robject* key,Robject* value)
+{
+	HashTable* h=R_TO_HASH(r);
+	ssize_t hash=robject_hash(key);
+	if(hash==-1)
+	{
+		return -1;
+	}
+	int ret=ht_insert(h,key,hash,value);
+	return ret;
+}
+
+static int ht_bool(Robject* r)
+{
+	HashTable* h=R_TO_HASH(r);
+	return hash_bool(h);
+}
+static Robject* ht_iter(Robject* r)
+{
+	TODO("HashTable Iterator");
+	return NULL;
+}
+static int  ht_print(Robject* r,FILE* f,int flags)
+{
+	HashTable* h=R_TO_HASH(r);
+	return hash_print(h,f,flags);
+}
+static void ht_free(Robject* r)
+{
+	HashTable* h=R_TO_HASH(r);
+	hash_free(h);
+}
+
+
+struct expr_ops ht_expr_ops=
+{
+	.ro_get_item=ht_get_item,
+	.ro_set_item=ht_set_item,
+	.ro_print=ht_print,
+	.ro_bool=ht_bool,
+	.ro_iter=ht_iter,
+};
+
+struct object_ops hash_object_ops=
+{
+	.ro_free=ht_free,
+};
+
+struct type_object hash_type=
+{
+	.t_name="HashTable",
+	.t_type=TYPE_HASH,
+	.t_expr_funcs=&ht_expr_ops,
+	.t_object_funcs=&hash_object_ops,
+//	.t_rich_cmp=0,
+};
+
+
+
+
+
+
+
+
+
+
 

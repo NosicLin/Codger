@@ -1,130 +1,183 @@
-#include"rtype.h"
 #include<string.h>
 #include<stdio.h>
 #include<utility_c/marocs.h>
+#include"bt_string.h"
+#include"bt_long.h"
+#include"bt_int.h"
+#include"bt_float.h"
 
-static Robject* bs_get_item(Robject* left,Robject* right)
+BtString* btstring_get_item(BtString* bs,int index)
 {
-	int type=rt_type(right);
-	int pos=0;
+	if(index>=bs->s_length)
+	{
+		except_index_err_format("string index out of range");
+		return NULL;
+	}
+	return btstring_from_char(bs->s_value[index]);
+}
+
+
+BtString* btstring_plus(BtString* x,BtString* y)
+{
+	char* c_x=x->s_value;
+	int l_length=x->s_length;
+	char* c_y=y->s_value;
+	int r_length=y->s_length;
+	int new_length=l_length+r_length;
+	BtString* new_bs=0;
+	new_bs=btstring_malloc(new_length);
+
+	if(new_bs==NULL) return NULL;
+
+	char* new_str=new_bs->s_value;
+
+	int i=0;
+	for(;i<l_length;i++)
+	{
+		new_str[i]=c_x[i];
+	}
+	for(i=0;i<r_length;i++)
+	{
+		new_str[i+l_length]=c_y[i];
+	}
+	return new_bs;
+}
+
+int btstring_cmp(BtString* x,BtString* y,int op)
+{
+	switch(op)
+	{
+		case CMP_LT:
+			return btstring_lt(x,y);
+		case CMP_LE:
+			return btstring_le(x,y);
+		case CMP_GE:
+			return btstring_ge(x,y);
+		case CMP_GT:
+			return btstring_gt(x,y);
+		case CMP_NE:
+			return btstring_ne(x,y);
+		case CMP_EQ:
+			return btstring_eq(x,y);
+	}
+	BUG("Error cmpare op(%d)",op);
+	return -1;
+}
+
+static Robject* bs_get_item(Robject* x,Robject* y)
+{
+	int type=rt_type(y);
 	if(type==RT_INT)
 	{
-		 pos=R_TO_I(right)->i_value;
+		int index=btint_get(R_TO_I(y));
+		BtString* ret=btstring_get_item(R_TO_S(x),index);
+		return ret==NULL?NULL:S_TO_R(ret);
 	}
 	if(type==RT_LONG)
 	{
-		BtLong* bl=R_TO_L(right);
-		if(bt_long_overflow_int(bl))
+		if(btlong_over_int(R_TO_L(y)))
 		{
-			rt_raise_index_error(MSG_LONG_OVERFLOW);
-			goto error;
+			except_index_err_format("cannot fix long to int");
+			return NULL;
 		}
-		else
-		{
-			pos=bt_long_to_int(bl);
-		}
+		int index=btlong_to_int(R_TO_L(y));
+		BtString* ret=btstring_get_item(R_TO_S(x),index);
+		return ret==NULL?NULL:S_TO_R(ret);
 	}
-	else
-	{
-		rt_raise_type_error(MSG_STRING_INDEX_TYPE(robject_name(right)));
-		goto error;
-	}
-	BtString* bs=R_TO_S(left);
-	if(pos<0)
-	{
-		rt_raise_value_error(MSG_STRING_INDEX_NEGATIVE);
-		goto error;
-	}
-	if(pos>=bs->s_length)
-	{
-		rt_raise_index_error(MSG_STRING_OUT_OF_RANGE);
-		goto error;
-	}
-	char* str=bs->s_value;
-	BtString* ret=bt_string_from_char(str[pos]);
-	return S_TO_R(ret);
-error:
-	robject_addref(robject_null);
-	return robject_null;
+	except_type_err_format("string index must integer,not '%s'",
+							robject_name(y));
+	return NULL;
+
+
 }
 
-static Robject* bs_plus(Robject* left,Robject* right)
+static Robject* bs_plus(Robject* x,Robject* y)
 {
-	BtString* new_bs=0;
-	if(rt_type(right)!=RT_STRING)
+	int type=rt_type(y);
+	if(type==RT_STRING)
 	{
-		rt_raise_type_error(MSG_STRING_PLUS(robject_name(right)));
-		goto error;
+		BtString* ret=btstring_plus(R_TO_S(x),R_TO_S(y));
+		return ret==NULL?NULL:S_TO_R(ret);
 	}
-	else
-	{
-		char* c_left=R_TO_S(left)->s_value;
-		int l_length=R_TO_S(left)->s_length;
-		char* c_right=R_TO_S(right)->s_value;
-		int r_length=R_TO_S(right)->s_length;
-
-		int new_length=l_length+r_length;
-
-		new_bs=bt_string_malloc(new_length);
-		char* new_str=new_bs->s_value;
-
-		int i=0;
-		for(;i<l_length;i++)
-		{
-			new_str[i]=c_left[i];
-		}
-		for(i=0;i<r_length;i++)
-		{
-			new_str[i+l_length]=c_right[i];
-		}
-	}
-	return S_TO_R(new_bs);
-error:
-	robject_addref(robject_null);
-	return robject_null;
-
-
+	except_type_err_format(MSG_BINARY_UNSUPPORT, 
+							OPER_PLUS,robject_name(x),
+							robject_name(y));
+	return NULL;
 }
-static Robject* bs_cmp(Robject* left,Robject* right)
+static int  bs_cmp(Robject* x,Robject* y,int op)
 {
-	int cmp_value;
-	if(rt_type(right)!=RT_STRING)
+	int type=rt_type(y);
+	if(type==RT_STRING)
 	{
-
-		rt_raise_type_error(MSG_CMP(robject_name(left),robject_name(right)));
-		goto error;
+		int ret=btstring_cmp(R_TO_S(x),R_TO_S(y),op);
+		return ret;
 	}
-	else 
-	{
-
-		char* c_left=R_TO_S(left)->s_value;
-		char* c_right=R_TO_S(right)->s_value;
-		cmp_value=strcmp(c_left,c_right);
-	}
-	BtInt* ret=bt_int_create(cmp_value);
-	return I_TO_R(ret);
-
-error:
-	robject_addref(robject_null);
-	return robject_null;
+	except_type_err_format(MSG_BINARY_UNSUPPORT,
+							CMP_NAME(op),robject_name(x),
+							robject_name(y));
+	return -1;
 }
-static Robject* bs_bool(Robject* bt)
+static int  bs_rich_cmp(Robject* x,Robject* y,int op)
 {
-	BtString* bs=R_TO_S(bt);
-	BtBoolean* ret=bt_boolean_create(bs->s_length);
-	return B_TO_R(ret);
+	int type=rt_type(y);
+	if(type==RT_STRING)
+	{
+		int ret=btstring_cmp(R_TO_S(x),R_TO_S(y),op);
+		return ret;
+	}
+	return CMP_NOT_SUPPORT;
 }
-static void bs_print(Robject* bt)
+static int bs_lt(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_LT);
+}
+static int bs_le(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_LE);
+}
+
+static int bs_ge(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_GE);
+}
+
+static int bs_gt(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_GT);
+}
+
+static int bs_eq(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_EQ);
+}
+
+static int bs_ne(Robject* x,Robject* y)
+{
+	return bs_cmp(x,y,CMP_NE);
+}
+
+static int  bs_bool(Robject* bt)
+{
+	return btstring_bool(R_TO_S(bt));
+}
+
+static int bs_print(Robject* bt,FILE* f,int flags)
 {
 	BtString* bs=R_TO_S(bt);
 	printf("\"%s\"",bs->s_value);
+	return 0;
 }
 
-static struct rexpr_ops bs_expr_ops=
+static struct expr_ops bs_expr_ops=
 {
 	.ro_get_item=bs_get_item,
 	.ro_plus=bs_plus,
-	.ro_cmp=bs_cmp,
+	.ro_lt=bs_lt,
+	.ro_le=bs_le,
+	.ro_gt=bs_gt,
+	.ro_ge=bs_ge,
+	.ro_eq=bs_eq,
+	.ro_ne=bs_ne,
 	.ro_bool=bs_bool,
 	.ro_print=bs_print,
 };
@@ -135,66 +188,60 @@ static void bs_free(Robject* bts)
 	free(s);
 }
 
-static struct robject_ops bs_ops=
+static struct object_ops string_object_ops=
 {
 	.ro_free=bs_free,
 };
 
-
-
-static void bs_empty_free(Robject* bts)
+static TypeObject type_string=
 {
-	/* this func will never called*/
-	BUG("Free Empty String");
-}
-static struct robject_ops bs_empty_string_ops=
-{
-	.ro_free=bs_empty_free,
+	.t_name="String",
+	.t_type=RT_STRING,
+	.t_expr_funcs=&bs_expr_ops,
+	.t_object_funcs=&string_object_ops,
+	.t_rich_cmp=bs_rich_cmp,
 };
 
-static BtString* bs_empty_string=0;
 
 
-BtString* bt_string_malloc(int length)
+
+BtString* btstring_malloc(int length)
 {
-	BtString* bs=(BtString*) malloc(sizeof(*bs)+length+1);
-	bs->s_value[length]='\0';
-	bs->s_length=length;
-	Robject* base=&bs->s_base;
-	base->r_expr_ops=&bs_expr_ops;
-	base->r_name="String";
-	base->r_ops=&bs_ops;
-	base->r_ref=1;
-	base->r_type=RT_STRING;
-	return bs;
+	BtString* ret=(BtString*)ry_malloc(sizeof(*ret)+length+1);
+	if(ret==NULL)
+	{
+		ryerr_nomemory();
+		return NULL;
+	}
+	robject_init(S_TO_R(ret),&type_string);
+
+	ret->s_value[length]=0;
+	ret->s_length=length;
+	return ret;
 }
 
 
 
 /*FIXME  escape special character */
-BtString* bt_string_create(char* str)
+BtString* btstring_create(char* str)
 {
 	int length=strlen(str);
-	BtString* bs=bt_string_malloc(length-2);
+	BtString* bs=btstring_malloc(length-2);
+	if(bs==NULL)
+	{
+		return NULL;
+	}
 	memcpy(bs->s_value,str+1,length-2);
 	return bs;
 }
 
-BtString* bt_string_create_empty()
+BtString* btstring_from_char(char c)
 {
-	if(bs_empty_string==0)
+	BtString* bs=btstring_malloc(1);
+	if(bs==NULL)
 	{
-		bs_empty_string=bt_string_malloc(0);
-		Robject* base=&bs_empty_string->s_base;
-		base->r_ops=&bs_empty_string_ops;
+		return NULL;
 	}
-	robject_addref(S_TO_R(bs_empty_string));
-	return  bs_empty_string;
-}
-
-BtString* bt_string_from_char(char c)
-{
-	BtString* bs=bt_string_malloc(1);
 	bs->s_value[0]=c;
 	return bs;
 }

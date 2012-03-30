@@ -79,8 +79,9 @@ static inline BtFloat* btfloat_mul(BtFloat* x,BtFloat* y)
 	float value=x->f_value*y->f_value;
 	return btfloat_create(value);
 }
-static inline BtFloat* btfloat_div(BtFloat* x,BtFloat* y);
 
+
+BtFloat* btfloat_div(BtFloat* x,BtFloat* y);
 BtFloat* btfloat_mod(BtFloat* x,BtFloat* y);
 
 static inline BtFloat* btfloat_plus(BtFloat* x,BtFloat* y)
@@ -96,27 +97,27 @@ static inline BtFloat* btfloat_minus(BtFloat* x,BtFloat* y)
 }
 /*compare expr*/
 
-static int btfloat_lt(BtFloat* x,BtFloat* y)
+static inline int btfloat_lt(BtFloat* x,BtFloat* y)
 {
 	return x->f_value<y->f_value;
 }
-static int btfloat_le(BtFloat* x,BtFloat* y)
+static inline int btfloat_le(BtFloat* x,BtFloat* y)
 {
 	return x->f_value<=y->f_value;
 }
-static int btfloat_eq(BtFloat* x,BtFloat* y)
+static inline int btfloat_eq(BtFloat* x,BtFloat* y)
 {
 	return x->f_value==y->f_value;
 }
-static int btfloat_ne(BtFloat* x,BtFloat* y)
+static inline int btfloat_ne(BtFloat* x,BtFloat* y)
 {
 	return x->f_value!=y->f_value;
 }
-static int btfloat_ge(BtFloat* x,BtFloat* y)
+static inline int btfloat_ge(BtFloat* x,BtFloat* y)
 {
 	return x->f_value>=y->f_value;
 }
-static int btfloat_gt(BtFloat* x,BtFloat* y)
+static inline int btfloat_gt(BtFloat* x,BtFloat* y)
 {
 	return x->f_value>y->f_value;
 }

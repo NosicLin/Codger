@@ -9,8 +9,9 @@ struct type_object
 	const char* t_name;
 	const int  t_type;
 	struct expr_ops* t_expr_funcs;
-	struct object_ops* t_object_func;
+	struct object_ops* t_object_funcs;
 	int (*t_rich_cmp)(struct robject*,struct robject* ,int);
+	ssize_t (*t_hash)(struct robject*);
 };
 typedef struct type_object TypeObject;
 
@@ -24,7 +25,7 @@ struct expr_ops
 {
 	/*posifix operator '[]' */
 	struct robject* (*ro_get_item)(struct robject*,struct robject* );
-	void (*ro_set_item)(struct robject*,struct robject* index,struct robject* item);
+	int (*ro_set_item)(struct robject*,struct robject* index,struct robject* item);
 
 	/* unary operator + and - */
 	struct robject* (*ro_negative)(struct robject* );
@@ -68,7 +69,7 @@ struct expr_ops
 	int (*ro_print)(struct robject*,FILE* f,int flags);
 
 	/*get iterator */
-	struct robject* (*ro_iterator)(struct robject*);
+	struct robject* (*ro_iter)(struct robject*);
 };
 
 enum KnowObjectType
@@ -81,6 +82,7 @@ enum KnowObjectType
 	TYPE_ARRAY,
 	TYPE_ITER,
 	TYPE_NULL,
+	TYPE_HASH,
 };
 
 
