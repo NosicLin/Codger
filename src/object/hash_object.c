@@ -536,3 +536,4 @@ struct type_object hash_type=
 
 
 
+
