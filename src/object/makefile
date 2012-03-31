@@ -1,7 +1,7 @@
 PROJECT=object
-SRC=hash_object.c robject.c
+SRC=hash_table.c robject.c null_object.c 
 DEBUG=
-BIN=
+BIN=test_hash.c
 
 
 OBJ_NAME=$(SRC:%.c=%.o) 
@@ -24,8 +24,8 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../ 
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lvm  -rstd
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug \
+	-L../lib/ -lvm  -lrstd -lrtype -lutility_c  
 
 
 main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \

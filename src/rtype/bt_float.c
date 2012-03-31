@@ -71,9 +71,13 @@ int btfloat_cmp(BtFloat* x,BtFloat* y,int op)
 ssize_t btfloat_hash(BtFloat* bf);
 
 /* print */
-int btfloat_print(BtFloat* bf,FILE* f,int flags)
+inline int btfloat_print(BtFloat* bf,FILE* f,int flags)
 {
-	TODO("Print Float");
+	printf("%g",bf->f_value);
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
 	return 0;
 }
 
@@ -449,8 +453,10 @@ static int  bf_bool(Robject* btf)
 
 static int bf_print(Robject* btf,FILE* f,int flags)
 {
-	printf("%g",R_TO_F(btf)->f_value);
-	return 0;
+	BtFloat* bf=R_TO_F(btf);
+	int ret=btfloat_print(bf,f,flags);
+
+	return ret;
 }
 
 
@@ -483,8 +489,6 @@ static struct expr_ops bf_expr_ops=
 	/* logic operator */
 	.ro_bool=bf_bool,
 
-	/* print */
-	.ro_print=bf_print,
 
 };
 
@@ -506,6 +510,7 @@ static TypeObject type_float=
 	.t_expr_funcs=&bf_expr_ops,
 	.t_object_funcs=&float_object_ops,
 	.t_rich_cmp=bf_rich_cmp,
+	.t_print=bf_print,
 };
 
 BtFloat* btfloat_malloc()

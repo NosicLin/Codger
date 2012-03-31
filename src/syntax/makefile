@@ -1,18 +1,20 @@
 PROJECT=syntax
 
-SRC= ast_object.c ast_machine.c ast_node_literal.c \
+#SRC= ast_object.c ast_machine.c ast_node_literal.c \
 	 yylex.c   ast_node_stmt.c ast_node_binary_expr.c  \
 	 ast_node_stmts.c  ast_node_unary_expr.c \
 	 grammar.tab.c   parser.c
 
+SRC= ast_object.c node_literal.c node_stmt.c node_stmts.c
 DEBUG=
-BIN=test_literal.c redy.c
+#BIN=test_literal.c redy.c
+BIN=
 
 CC=gcc
-FLAGS=-g -Wall  -Werror -include ../rstd/redy_types.h 
+FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lrtype -llexical -lvm
+	-L../lib/ -lrtype -llexical -lvm -lrstd -lobject
 
 
 

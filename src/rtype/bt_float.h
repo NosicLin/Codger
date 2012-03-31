@@ -128,7 +128,7 @@ int btfloat_cmp(BtFloat* x,BtFloat* y,int op);
 /*logic expr*/
 static inline int btfloat_bool(BtFloat* bf)
 {
-	return bf->f_value==0;
+	return bf->f_value!=0;
 }
 
 /*hash code*/

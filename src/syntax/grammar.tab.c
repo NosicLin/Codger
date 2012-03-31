@@ -75,11 +75,15 @@
 #include"ast_nodes.h"
 #include"parser.h"
 #include<rtype/rtype.h>
+#include<rtype/bt_string.h>
+#include<rtype/bt_int.c>
+#include<rtype/bt_float.h>
+#include<rtype/bt_long.h>
 #define YYSTYPE  AstObject* 
 
 
 /* Line 189 of yacc.c  */
-#line 83 "grammar.tab.c"
+#line 87 "grammar.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -196,7 +200,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 200 "grammar.tab.c"
+#line 204 "grammar.tab.c"
 
 #ifdef short
 # undef short
@@ -504,12 +508,12 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    34,    34,    37,    45,    51,    58,    61,    68,    76,
-      84,    90,    96,   103,   111,   112,   115,   116,   122,   129,
-     137,   140,   146,   152,   159,   160,   166,   173,   174,   180,
-     188,   189,   196,   197,   204,   205,   213,   214,   220,   226,
-     232,   240,   241,   247,   254,   255,   262,   263,   270,   271,
-     278,   280
+       0,    38,    38,    41,    49,    55,    62,    65,    72,    80,
+      88,    94,   100,   107,   115,   116,   119,   120,   126,   133,
+     141,   144,   150,   156,   163,   164,   170,   177,   178,   184,
+     192,   193,   200,   201,   208,   209,   217,   218,   224,   230,
+     236,   244,   245,   251,   258,   259,   266,   267,   274,   275,
+     282,   284
 };
 #endif
 
@@ -1480,14 +1484,14 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 34 "grammar.y"
+#line 38 "grammar.y"
     {parser_set_root((yyvsp[(1) - (1)]));;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 38 "grammar.y"
+#line 42 "grammar.y"
     {
 		AstNodeStmts* stmts=ast_create_stmts();
 		ast_addto_pending(STMTS_TO_AST(stmts));
@@ -1500,7 +1504,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 46 "grammar.y"
+#line 50 "grammar.y"
     {
 		AstNodeStmts* node=ast_create_stmts();
 		ast_addto_pending(STMTS_TO_AST(node));
@@ -1511,7 +1515,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 52 "grammar.y"
+#line 56 "grammar.y"
     {
 		AstNodeStmts* stmts=AST_TO_STMTS((yyvsp[(1) - (3)]));
 		AstNodeStmt* node=AST_TO_STMT((yyvsp[(2) - (3)]));
@@ -1523,7 +1527,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 62 "grammar.y"
+#line 66 "grammar.y"
     {
 	AstNodeStmt* node=ast_create_stmt((yyvsp[(1) - (1)]));
 	ast_addto_pending(STMT_TO_AST(node));
@@ -1534,9 +1538,9 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 69 "grammar.y"
+#line 73 "grammar.y"
     {
-		BtInt* bi=bt_int_from_str(yl_cur_string());
+		BtInt* bi=btint_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(I_TO_R(bi));
@@ -1546,9 +1550,9 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 77 "grammar.y"
+#line 81 "grammar.y"
     {
-		BtLong* bl=bt_long_from_str(yl_cur_string());
+		BtLong* bl=btlong_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(L_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
@@ -1558,9 +1562,9 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 84 "grammar.y"
+#line 88 "grammar.y"
     {
-		BtFloat* bf=bt_float_from_str(yl_cur_string());
+		BtFloat* bf=btfloat_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(F_TO_R(bf));
@@ -1570,9 +1574,9 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 90 "grammar.y"
+#line 94 "grammar.y"
     {
-		BtString* bs=bt_string_create(yl_cur_string());
+		BtString* bs=btstring_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));
@@ -1582,9 +1586,9 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 96 "grammar.y"
+#line 100 "grammar.y"
     {
-		BtBoolean* bl=bt_boolean_create(0);
+		BtBool* bl=btbool_create(0);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
@@ -1595,9 +1599,9 @@ yyreduce:
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 103 "grammar.y"
+#line 107 "grammar.y"
     {
-		BtBoolean* bl=bt_boolean_create(1);
+		BtBool* bl=btbool_create(1);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
@@ -1608,28 +1612,28 @@ yyreduce:
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 111 "grammar.y"
+#line 115 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 112 "grammar.y"
+#line 116 "grammar.y"
     {(yyval)=(yyvsp[(2) - (3)]);;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 115 "grammar.y"
+#line 119 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 116 "grammar.y"
+#line 120 "grammar.y"
     {    /*eg. +4*/
 			AstNodePositive* node=ast_create_positive((yyvsp[(2) - (2)]));
 			AstObject* ab=POSITIVE_TO_AST(node);
@@ -1641,7 +1645,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 122 "grammar.y"
+#line 126 "grammar.y"
     {   /*eg. -4*/
 			AstNodeNegative* node=ast_create_negative((yyvsp[(2) - (2)]));
 			AstObject* ab=NEGATIVE_TO_AST(node);
@@ -1654,10 +1658,10 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 129 "grammar.y"
+#line 133 "grammar.y"
     {  /*eg. ~4*/
-			AstNodeBitNegated* node=ast_create_bit_negated((yyvsp[(2) - (2)]));
-			AstObject* ab=BIT_NEGATED_TO_AST(node);
+			AstNodeNegated* node=ast_create_negated((yyvsp[(2) - (2)]));
+			AstObject* ab=NEGATED_TO_AST(node);
 			ast_addto_pending(ab);
 			(yyval)=ab;
 			;}
@@ -1666,7 +1670,7 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 137 "grammar.y"
+#line 141 "grammar.y"
     {
 			 (yyval)=(yyvsp[(1) - (1)]);
 			;}
@@ -1675,7 +1679,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 140 "grammar.y"
+#line 144 "grammar.y"
     {
 			AstNodeMul* t=ast_create_mul((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 			AstObject* ab=MUL_TO_AST(t);
@@ -1687,7 +1691,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 146 "grammar.y"
+#line 150 "grammar.y"
     {
 			AstNodeDiv* t=ast_create_div((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 			AstObject* ab=DIV_TO_AST(t);
@@ -1699,7 +1703,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 152 "grammar.y"
+#line 156 "grammar.y"
     {
 			AstNodeDiv* t=ast_create_mod((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 			AstObject* ab=MOD_TO_AST(t);
@@ -1711,14 +1715,14 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 159 "grammar.y"
+#line 163 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 160 "grammar.y"
+#line 164 "grammar.y"
     {
 		AstNodePlus* node=ast_create_plus((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=PLUS_TO_AST(node);
@@ -1730,7 +1734,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 166 "grammar.y"
+#line 170 "grammar.y"
     {
 		AstNodeMinus* node=ast_create_minus((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=MINUS_TO_AST(node);
@@ -1742,14 +1746,14 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 173 "grammar.y"
+#line 177 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 174 "grammar.y"
+#line 178 "grammar.y"
     {   /*left shift*/
 		AstNodeLShift* node=ast_create_lshift((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=LSHIFT_TO_AST(node);
@@ -1761,7 +1765,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 180 "grammar.y"
+#line 184 "grammar.y"
     {  /* right shift */
 		AstNodeRShift* node=ast_create_rshift((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=RSHIFT_TO_AST(node);
@@ -1773,17 +1777,17 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 188 "grammar.y"
+#line 192 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 189 "grammar.y"
+#line 193 "grammar.y"
     {
-		AstNodeBitAnd* node=ast_create_bit_and((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
-		AstObject* ab=BIT_AND_TO_AST(node);
+		AstNodeAnd* node=ast_create_and((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
+		AstObject* ab=AND_TO_AST(node);
 		ast_addto_pending(ab);
 		(yyval)=ab;
 	;}
@@ -1792,17 +1796,17 @@ yyreduce:
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 196 "grammar.y"
+#line 200 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 197 "grammar.y"
+#line 201 "grammar.y"
     {
-		AstNodeBitXor* node=ast_create_bit_xor((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
-		AstObject* ab=BIT_XOR_TO_AST(node);
+		AstNodeXor* node=ast_create_xor((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
+		AstObject* ab=XOR_TO_AST(node);
 		ast_addto_pending(ab);
 		(yyval)=ab;
 	;}
@@ -1811,17 +1815,17 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 204 "grammar.y"
+#line 208 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 205 "grammar.y"
+#line 209 "grammar.y"
     {
-		AstNodeBitOr* node=ast_create_bit_or((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
-		AstObject* ab=BIT_OR_TO_AST(node);
+		AstNodeOr* node=ast_create_or((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
+		AstObject* ab=OR_TO_AST(node);
 		ast_addto_pending(ab);
 		(yyval)=ab;
 	;}
@@ -1830,14 +1834,14 @@ yyreduce:
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 213 "grammar.y"
+#line 217 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 214 "grammar.y"
+#line 218 "grammar.y"
     {
 		AstNodeLt* node =ast_create_lt((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=LT_TO_AST(node);
@@ -1849,7 +1853,7 @@ yyreduce:
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 220 "grammar.y"
+#line 224 "grammar.y"
     {
 		AstNodeLe* node=ast_create_le((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=LE_TO_AST(node);
@@ -1861,7 +1865,7 @@ yyreduce:
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 226 "grammar.y"
+#line 230 "grammar.y"
     {
 		AstNodeGe* node=ast_create_ge((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=GE_TO_AST(node);
@@ -1873,7 +1877,7 @@ yyreduce:
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 232 "grammar.y"
+#line 236 "grammar.y"
     {
 		AstNodeGt* node=ast_create_gt((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=GT_TO_AST(node);
@@ -1885,14 +1889,14 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 240 "grammar.y"
+#line 244 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 241 "grammar.y"
+#line 245 "grammar.y"
     {
 		AstNodeEq* node=ast_create_eq((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=EQ_TO_AST(node);
@@ -1904,7 +1908,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 247 "grammar.y"
+#line 251 "grammar.y"
     {
 		AstNodeNe* node=ast_create_ne((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=NE_TO_AST(node);
@@ -1916,14 +1920,14 @@ yyreduce:
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 254 "grammar.y"
+#line 258 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 255 "grammar.y"
+#line 259 "grammar.y"
     {
 		AstNodeLogicNot* node=ast_create_logic_not((yyvsp[(2) - (2)]));
 		AstObject* ab=LOGIC_NOT_TO_AST(node);
@@ -1935,14 +1939,14 @@ yyreduce:
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 262 "grammar.y"
+#line 266 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 263 "grammar.y"
+#line 267 "grammar.y"
     {
 		AstNodeLogicAnd* node=ast_create_logic_and((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=LOGIC_AND_TO_AST(node);
@@ -1954,14 +1958,14 @@ yyreduce:
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 270 "grammar.y"
+#line 274 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 271 "grammar.y"
+#line 275 "grammar.y"
     {
 		AstNodeLogicOr* node=ast_create_logic_or((yyvsp[(1) - (3)]),(yyvsp[(3) - (3)]));
 		AstObject* ab=LOGIC_OR_TO_AST(node);
@@ -1973,21 +1977,21 @@ yyreduce:
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 278 "grammar.y"
+#line 282 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 280 "grammar.y"
+#line 284 "grammar.y"
     {(yyval)=(yyvsp[(1) - (1)]);;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1991 "grammar.tab.c"
+#line 1995 "grammar.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

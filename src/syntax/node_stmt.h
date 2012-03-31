@@ -2,9 +2,10 @@
 #define _REDY_SYNTAX_AST_NODE_STMT_H_
 #include"node_type.h"
 #include<utility_c/list_head.h>
+#include"ast_object.h"
 struct ast_node_stmt
 {
-	BASE_AST_OBJECT;
+	INHERIT_AST_OBJECT;
 	struct list_head s_sibling;
 	AstObject* s_sub_node;
 };

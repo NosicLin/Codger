@@ -63,7 +63,7 @@
 "long oper string"
 3434l*"fsf"
 324l/"fsfaf"
-3434%"fsafasf"
+3434l%"fsafasf"
 
 
 

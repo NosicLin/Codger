@@ -1,7 +1,7 @@
 #ifndef _REDY_SYNTAX_AST_MACHINE_H_
 #define _REDY_SYNTAX_AST_MACHINE_H_
 #include"ast_object.h"
-#include<rtype/robject.h>
+#include<object/robject.h>
 #ifdef AST_MACHINE
 
 enum AST_EXE_INFO

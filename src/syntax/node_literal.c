@@ -1,6 +1,5 @@
-#include "ast_node_literal.h"
-#include<stdlib.h>
-
+#include "node_literal.h"
+#include<rstd/redy_std.h>
 #ifdef AST_MACHINE 
 #include "ast_machine.h"
 #endif /* AST_MACHINE */
@@ -9,7 +8,7 @@ static void literal_free(AstObject* ab)
 {
 	AstNodeLiteral* node=AST_TO_LITERAL(ab);
 	robject_release(node->l_value);
-	free(node);
+	ry_free(node);
 }
 #ifdef AST_MACHINE 
 static int literal_execute(AstObject* ab)
@@ -24,19 +23,24 @@ static int literal_execute(AstObject* ab)
 	
 
 
-static struct ast_object_ops literal_ops=
+static AstNodeType node_literal=
 {
-	.ao_free=literal_free,
+	.n_type=ATN_LITERAL,
+	.n_name="Literal",
+	.n_free=literal_free,
+	.n_free_node=literal_free
 #ifdef AST_MACHINE 
-	.ao_execute=literal_execute,
+	.n_execute=literal_execute,
 #endif /*AST_MACHINE*/
 };
 
 AstNodeLiteral* ast_create_literal(Robject* r)
 {
-	AstNodeLiteral* node=(AstNodeLiteral*) malloc(sizeof(*node));
-	AstObject* base=AST_BASE(node);
-	ast_init(base,ATN_LITERAL,"AstNodeLiteral",&literal_ops);
+	AstNodeLiteral* node=ast_node_new(AstNodeLiteral,&node_literal);
+	if(node==NULL)
+	{
+		return NULL;
+	}
 	robject_addref(r);
 	node->l_value=r;
 	return node;

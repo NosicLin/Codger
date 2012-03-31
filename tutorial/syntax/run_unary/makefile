@@ -1,12 +1,12 @@
 PROJECT=syntax
 
-SRC= ast_object.c ast_machine.c ast_node_literal.c \
-	 yylex.c   ast_node_stmt.c  \
-	 ast_node_stmts.c  ast_node_unary_expr.c \
-	 grammar.tab.c   parser.c
+SRC= ast_object.c ast_machine.c ast_node_literal.c grammar.tab.c \
+	 yylex.c  ast_machine.c ast_node_unary_expr.c ast_node_stmts.c \
+	 ast_node_stmt.c parser.c 
+
 
 DEBUG=
-BIN=redy.c
+BIN=test_literal.c redy.c
 
 
 
@@ -29,28 +29,24 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 FLAGS=-g -Wall  -Werror
-INCLUDE=-I. -I./debug   -I../
+INCLUDE=-I. -I./debug  -I../../ -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lrtype -llexical -lvm
+	-L../lib/ -lrtype -llexical -lvm -lobject -lrstd
 
 
 
 
-main: obj lib bin ../lib other_model $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
-   	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
-
+main: other_model $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH)  $(BIN_NAME_WITH_PATH)
 
 other_model: 
-	make -C  ../utility_c/ 
-	make -C ../vm/
-	make -C ../lexical/ 
 	make -C ../rtype/ 
-	cp ../rtype/lib/librtype.a ../lib/
-	cp ../lexical/lib/liblexical.a ../lib/
-	cp ../vm/lib/libvm.a ../lib/ 
-	cp ../utility_c/lib/libutility_c.a ../lib/
+	make -C ../lexical/ 
+	make -C  ../utility_c/ 
+	make -C ../object/ 
+	make -C ../vm/
+	make -C ../rstd/
 
-lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH) ../lib 
+lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
 	cp $@ ../lib/
 
@@ -74,20 +70,10 @@ init:
 	mkdir -p obj 
 	mkdir -p bin
 	mkdir -p lib
-obj:
-	mkdir -p obj
-bin:
-	mkdir -p bin
-lib:
-	mkdir -p lib 
-../lib:
-	mkdir -p ../lib 
-
 rm:
 	rm -f obj/*
 	rm -f lib/*
 	rm -f bin/*.exe
-	rm -f ../lib/lib$(PROJECT).a
 clear:
 	rm -rf obj 
 	rm -rf bin 
@@ -102,4 +88,3 @@ depend:
 		gcc -M -MT "obj/$$result" $$element $(INCLUDE) >>.$(PROJECT).dep ;\
 	done
 
--include .$(PROJECT).dep

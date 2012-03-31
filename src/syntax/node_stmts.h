@@ -1,12 +1,12 @@
 #ifndef _REDY_SYNTAX_AST_NODE_STMTS_H_
 #define _REDY_SYNTAX_AST_NODE_STMTS_H_
 #include"node_type.h"
-#include"ast_node_stmt.h"
+#include"node_stmt.h"
 #include<utility_c/list_head.h>
 
 struct ast_node_stmts
 {
-	BASE_AST_OBJECT;
+	INHERIT_AST_OBJECT;
 	struct list_head s_chirldren;
 };
 typedef struct ast_node_stmts AstNodeStmts;

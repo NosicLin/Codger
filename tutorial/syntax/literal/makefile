@@ -29,7 +29,7 @@ CC=gcc
 FLAGS=-g -Wall  -Werror
 INCLUDE=-I. -I./debug  -I../../ -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/ -lrtype -llexical -lvm
+	-L../lib/ -lrtype -llexical -lvm -lobject -lrstd
 
 
 
@@ -40,10 +40,9 @@ other_model:
 	make -C ../rtype/ 
 	make -C ../lexical/ 
 	make -C  ../utility_c/ 
-	cp ../rtype/lib/librtype.a ../lib/
-	cp ../lexical/lib/liblexical.a ../lib/
-	cp ../vm/lib/libvm.a ../lib/ 
-	cp ../utility_c/lib/libutility_c.a ../lib/
+	make -C ../object/ 
+	make -C ../vm/
+	make -C ../rstd/
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH)
 	ar cr $@ $(OBJ_NAME_WITH_PATH)

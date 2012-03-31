@@ -1,11 +1,12 @@
 #include"ast_machine.h"
 #include<stdio.h>
+#include<object/null_object.h>
 #ifdef AST_MACHINE 
 Robject* cup_reg0=0;
 int ast_machine_init()
 {
-	robject_addref(robject_null);
-	cup_reg0=robject_null;
+	robject_addref(NullObject);
+	cup_reg0=NullObject;
 	return 1;
 }
 int ast_machine_exit()

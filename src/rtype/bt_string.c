@@ -165,6 +165,10 @@ static int bs_print(Robject* bt,FILE* f,int flags)
 {
 	BtString* bs=R_TO_S(bt);
 	printf("\"%s\"",bs->s_value);
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
 	return 0;
 }
 
@@ -179,7 +183,6 @@ static struct expr_ops bs_expr_ops=
 	.ro_eq=bs_eq,
 	.ro_ne=bs_ne,
 	.ro_bool=bs_bool,
-	.ro_print=bs_print,
 };
 
 static void bs_free(Robject* bts)
@@ -200,6 +203,7 @@ static TypeObject type_string=
 	.t_expr_funcs=&bs_expr_ops,
 	.t_object_funcs=&string_object_ops,
 	.t_rich_cmp=bs_rich_cmp,
+	.t_print=bs_print,
 };
 
 
@@ -213,7 +217,7 @@ BtString* btstring_malloc(int length)
 		ryerr_nomemory();
 		return NULL;
 	}
-	robject_init(S_TO_R(ret),&type_string);
+	robject_init((Robject*)ret,&type_string);
 
 	ret->s_value[length]=0;
 	ret->s_length=length;

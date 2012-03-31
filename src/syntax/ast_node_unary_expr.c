@@ -4,8 +4,8 @@
 #endif /*AST_MACHINE*/
 #include<stdlib.h>
 #include<vm/except.h>
-#include<rtype/bt_boolean.h>
 #include<rtype/rtype.h>
+#include<rtype/bt_bool.h>
 
 static void unary_expr_free(AstObject* ab)
 {
@@ -83,7 +83,7 @@ AstNode##Ml* ast_create_##Ll(AstObject* sub_node) \
 
 UEXPR_METHOD(POSITIVE,Positive,positive);
 UEXPR_METHOD(NEGATIVE,Negative,negative);
-UEXPR_METHOD(BIT_NEGATED,BitNegated,bit_negated);
+UEXPR_METHOD(NEGATED,Negated,negated);
 
 #ifdef AST_MACHINE
 static int logic_not_execute(AstObject* ao)
@@ -91,7 +91,7 @@ static int logic_not_execute(AstObject* ao)
 	AstNodeLogicNot* node=AST_TO_LOGIC_NOT(ao);
 	Robject* sub_value=0;
 	Robject* ret_value=0;
-	Robject* bool_flags=0;
+	int bool_flags=0;
 	int exe_info;
 	int ret=AST_EXE_SUCCESS;
 	exe_info=ast_execute(node->u_value);
@@ -107,18 +107,12 @@ static int logic_not_execute(AstObject* ao)
 		ret=AST_EXE_EXCEPTION;
 		goto error;
 	}
-	if(bt_boolean_is_false(bool_flags))
-	{
-		ret_value=B_TO_R(bt_boolean_create(1));
-	}
-	else
-	{
-		ret_value=B_TO_R(bt_boolean_create(0));
-	}
+
+	ret_value=B_TO_R(btbool_create(bool_flags));
+
 	set_reg0(ret_value);
 error:
 	if(sub_value) robject_release(sub_value);
-	if(bool_flags) robject_release(bool_flags);
 	if(ret_value) robject_release(ret_value);
 	return ret;
 }

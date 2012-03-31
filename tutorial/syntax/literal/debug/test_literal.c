@@ -29,6 +29,7 @@ int main(int argc ,char** argv)
 	}
 
 	sc_destory(sc);
+
 	return 0;
 }
 

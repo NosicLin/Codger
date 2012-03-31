@@ -1,43 +1,36 @@
 #ifndef _REDY_SYNTAX_AST_OBJECT_H_
 #define _REDY_SYNTAX_AST_OBJECT_H_
 #include<utility_c/list_head.h>
+#include"node_type.h"
 
-#define AST_MACHINE
-struct ast_object;
+struct ast_node_type;
 
-struct ast_object_ops
-{
-	void (*ao_free)(struct ast_object*);
-	void (*ao_free_self)(struct ast_object*);
-#ifdef AST_MACHINE
-	int (*ao_execute)(struct ast_object*);
-#endif 
-
-};
 
 struct ast_object
 {
-	int a_type;
-	char* a_name;
 	struct list_head a_pending;
-	struct ast_object_ops* a_ops;
+	struct ast_node_type* a_type;
 };
 typedef struct ast_object AstObject;
-#define BASE_AST_OBJECT struct ast_object ast_base
-#define AST_BASE(node) (&node->ast_base)
+#define INHERIT_AST_OBJECT struct ast_object ast_base
+#define TO_ASTOBJECT(node) ((AstObject*)node)
+
+#define ast_node_new(TYPE,type_object) \
+   	((TYPE*)__ast_node_new(sizeof(TYPE),type_object))
+
 /*interface*/
 
 void ast_free(AstObject* ab);
+void ast_init(AstObject* ab,struct ast_node_type* node_type);
+void* __ast_node_new(ssize_t size,struct ast_node_type* node_type);
 
-void ast_init(AstObject* ab,int type,char* name ,struct ast_object_ops* ops);
-
-static inline char* ast_name(AstObject* ab)
+static inline const char* ast_name(AstObject* ab)
 {
-	return ab->a_name;
+	return ab->a_type->n_name;
 }
-static inline int ast_type(AstObject* ab)
+static inline int ast_typeid(AstObject* ab)
 {
-	return ab->a_type;
+	return ab->a_type->n_type;
 }
 
 

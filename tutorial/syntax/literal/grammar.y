@@ -2,7 +2,10 @@
 #include"yylex.h"
 #include"ast_nodes.h"
 #include"parser.h"
-#include<rtype/rtype.h>
+#include<rtype/bt_int.h>
+#include<rtype/bt_string.h>
+#include<rtype/bt_float.h>
+#include<rtype/bt_long.h>
 #define YYSTYPE  AstObject* 
 %}
 
@@ -35,12 +38,12 @@ AstTree : stmts{printf("paser success\n");}
 ;
 stmts: expr{
 	 Robject* r=ast_literal_get_value(AST_TO_LITERAL($1));
-	 robject_print(r);
+	 robject_print(r,NULL,0);
 	 robject_release(r); }
 	
 	 | stmts expr{
 	 Robject* r=ast_literal_get_value(AST_TO_LITERAL($2));
-	 robject_print(r);
+	 robject_print(r,NULL,0);
 	 robject_release(r); }
 	| tNEWLINE 
 	| stmts tNEWLINE
@@ -48,7 +51,7 @@ stmts: expr{
 
 literal: tINTEGER 
 	   {
-		BtInt* bi=bt_int_from_str(yl_cur_string());
+		BtInt* bi=btint_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(I_TO_R(bi));
@@ -56,20 +59,20 @@ literal: tINTEGER
 
 		| tLONG
 		{
-		BtLong* bl=bt_long_from_str(yl_cur_string());
+		BtLong* bl=btlong_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(bl);
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
 		$$=LITERAL_TO_AST(t);}
 
 		| tFLAOT{
-		BtFloat* bf=bt_float_from_str(yl_cur_string());
+		BtFloat* bf=btfloat_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(F_TO_R(bf));
 		$$=LITERAL_TO_AST(t);}
 		| tSTRING{
-		BtString* bs=bt_string_create(yl_cur_string());
+		BtString* bs=btstring_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));

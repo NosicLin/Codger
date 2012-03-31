@@ -1,11 +1,12 @@
 #ifndef _REDY_SYNTAX_AST_NODE_LITERAL_H_
 #define _REDY_SYNTAX_AST_NODE_LITERAL_H_
 #include"node_type.h"
-#include<rtype/robject.h>
+#include"ast_object.h"
+#include<object/robject.h>
 /* literal */
 struct ast_node_literal
 {
-	BASE_AST_OBJECT;
+	INHERIT_AST_OBJECT;
 	struct robject* l_value;
 };
 

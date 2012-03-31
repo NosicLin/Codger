@@ -293,7 +293,7 @@ int btlong_cmp(BtLong* x,BtLong* y,int op)
 
 int btlong_bool(BtLong* bl)
 {
-	return bl->l_value->b_len==0;
+	return bl->l_value->b_len!=0;
 }
 
 ssize_t btlong_hash(BtLong* bl)
@@ -305,6 +305,10 @@ ssize_t btlong_hash(BtLong* bl)
 int btlong_print(BtLong* bl,FILE* f,int flags)
 {
 	bg_print_dec(bl->l_value);
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
 	return 1;
 }
 
@@ -775,8 +779,6 @@ static struct expr_ops bl_expr_ops=
 	/* logic operator and or not */
 	.ro_bool=bl_bool,
 
-	/*print */
-	.ro_print=bl_print,
 };
 
 static void bl_free(Robject* bt)
@@ -797,6 +799,7 @@ static TypeObject type_long=
 	.t_expr_funcs=&bl_expr_ops,
 	.t_object_funcs=&long_object_ops,
 	.t_rich_cmp=bl_rich_cmp,
+	.t_print=bl_print,
 };
 
 inline BtLong* btlong_malloc()

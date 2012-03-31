@@ -4,6 +4,10 @@
 #include"ast_nodes.h"
 #include"parser.h"
 #include<rtype/rtype.h>
+#include<rtype/bt_string.h>
+#include<rtype/bt_int.c>
+#include<rtype/bt_float.h>
+#include<rtype/bt_long.h>
 #define YYSTYPE  AstObject* 
 %}
 
@@ -67,7 +71,7 @@ stmt: stmt_expr
 	 ;
 literal: tINTEGER 
 	   {
-		BtInt* bi=bt_int_from_str(yl_cur_string());
+		BtInt* bi=btint_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(I_TO_R(bi));
@@ -75,33 +79,33 @@ literal: tINTEGER
 
 		| tLONG
 		{
-		BtLong* bl=bt_long_from_str(yl_cur_string());
+		BtLong* bl=btlong_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(L_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
 		$$=LITERAL_TO_AST(t);}
 
 		| tFLAOT{
-		BtFloat* bf=bt_float_from_str(yl_cur_string());
+		BtFloat* bf=btfloat_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(F_TO_R(bf));
 		$$=LITERAL_TO_AST(t);}
 		| tSTRING{
-		BtString* bs=bt_string_create(yl_cur_string());
+		BtString* bs=btstring_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));
 		$$=LITERAL_TO_AST(t);}
 		| kFALSE{
-		BtBoolean* bl=bt_boolean_create(0);
+		BtBool* bl=btbool_create(0);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
 		$$=LITERAL_TO_AST(node);
 		}
 		| kTRUE{
-		BtBoolean* bl=bt_boolean_create(1);
+		BtBool* bl=btbool_create(1);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
@@ -127,8 +131,8 @@ unary_expr:primary_expr{$$=$1;}
 
 			}   
 			|tNegated unary_expr{  /*eg. ~4*/
-			AstNodeBitNegated* node=ast_create_bit_negated($2);
-			AstObject* ab=BIT_NEGATED_TO_AST(node);
+			AstNodeNegated* node=ast_create_negated($2);
+			AstObject* ab=NEGATED_TO_AST(node);
 			ast_addto_pending(ab);
 			$$=ab;
 			} 
@@ -187,24 +191,24 @@ shift_expr:additive_expr{$$=$1;}
 
 bit_and_expr:shift_expr{$$=$1;}
 	|bit_and_expr tAND shift_expr{
-		AstNodeBitAnd* node=ast_create_bit_and($1,$3);
-		AstObject* ab=BIT_AND_TO_AST(node);
+		AstNodeAnd* node=ast_create_and($1,$3);
+		AstObject* ab=AND_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}
 	;
 bit_xor_expr:bit_and_expr{$$=$1;}
 	|bit_xor_expr tXOR bit_and_expr{
-		AstNodeBitXor* node=ast_create_bit_xor($1,$3);
-		AstObject* ab=BIT_XOR_TO_AST(node);
+		AstNodeXor* node=ast_create_xor($1,$3);
+		AstObject* ab=XOR_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}
 	;
 bit_or_expr:bit_xor_expr{$$=$1;}
 	|bit_or_expr tOR bit_xor_expr{
-		AstNodeBitOr* node=ast_create_bit_or($1,$3);
-		AstObject* ab=BIT_OR_TO_AST(node);
+		AstNodeOr* node=ast_create_or($1,$3);
+		AstObject* ab=OR_TO_AST(node);
 		ast_addto_pending(ab);
 		$$=ab;
 	}

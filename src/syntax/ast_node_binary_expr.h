@@ -24,9 +24,9 @@ typedef struct ast_binary_expr AstNodeLShift;
 typedef struct ast_binary_expr AstNodeRShift;
 
 /*bitwise_expr*/
-typedef struct ast_binary_expr AstNodeBitAnd;
-typedef struct ast_binary_expr AstNodeBitXor;
-typedef struct ast_binary_expr AstNodeBitOr;
+typedef struct ast_binary_expr AstNodeAnd;
+typedef struct ast_binary_expr AstNodeXor;
+typedef struct ast_binary_expr AstNodeOr;
 
 /*relational_expr*/
 typedef struct ast_binary_expr AstNodeLt;
@@ -89,9 +89,9 @@ AstNodeGt* ast_create_ne(AstObject* l,AstObject* r);
 AstNodeGe* ast_create_eq(AstObject* l,AstObject* r);
 
 /*bitwise_expr*/
-AstNodeBitAnd* ast_create_bit_and(AstObject* l,AstObject* r);
-AstNodeBitXor* ast_create_bit_xor(AstObject* l,AstObject* r);
-AstNodeBitOr* ast_create_bit_or(AstObject* l,AstObject* r);
+AstNodeAnd* ast_create_and(AstObject* l,AstObject* r);
+AstNodeXor* ast_create_xor(AstObject* l,AstObject* r);
+AstNodeOr* ast_create_or(AstObject* l,AstObject* r);
 
 /*logic_expr*/
 AstNodeLogicAnd* ast_create_logic_and(AstObject* l,AstObject* r);
@@ -113,9 +113,9 @@ AST_TYPE_CAST(LSHIFT,LShift,ATN_LSHIFT);
 AST_TYPE_CAST(RSHIFT,RShift,ATN_RSHIFT);
 
 /*bitwise_expr*/
-AST_TYPE_CAST(BIT_AND,BitAnd,ATN_BIT_AND);
-AST_TYPE_CAST(BIT_XOR,BitXor,ATN_BIT_XOR);
-AST_TYPE_CAST(BIT_OR,BitOr,ATN_BIT_OR);
+AST_TYPE_CAST(AND,And,ATN_AND);
+AST_TYPE_CAST(XOR,Xor,ATN_XOR);
+AST_TYPE_CAST(OR,Or,ATN_OR);
 
 /*relational_expr*/
 AST_TYPE_CAST(LE,Le,ATN_LE);

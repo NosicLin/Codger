@@ -1,5 +1,6 @@
 #include"ast_node_stmt.h"
 #include"ast_machine.h"
+#include"object/robject.h"
 #include<stdlib.h>
 static void stmt_free_self(AstObject* ab)
 {
@@ -21,7 +22,7 @@ static int stmt_execute(AstObject* ab)
 	if(ret>=0)
 	{
 		Robject* r=get_reg0();
-		robject_print(r);
+		robject_print(r,NULL,PRINT_FLAGS_NEWLINE);
 		robject_release(r);
 	}
 	return ret;

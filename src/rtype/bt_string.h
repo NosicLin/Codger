@@ -72,7 +72,7 @@ static inline int btstring_ne(BtString* x,BtString* y)
 
 static inline int btstring_bool(BtString* bs)
 {
-	return bs->s_length==0;
+	return bs->s_length!=0;
 }
 
 int btstring_print(BtString* bs,FILE* f,int flags);

@@ -1,20 +1,25 @@
 #include"ast_object.h"
 #include<stdlib.h>
 #include<utility_c/marocs.h>
+#include<rstd/redy_std.h>
 
 static LIST_HEAD(pending_ast_object);
 
 void ast_free(AstObject* ab)
 {
-	if(ab->a_ops)
+	AstNodeType* t=ab->a_type;
+	if(t==NULL)
 	{
-		if(ab->a_ops->ao_free)
-		{
-			ab->a_ops->ao_free(ab);
-			return ;
-		}
+		BUG("Error AstObject");
+		goto error;
 	}
-	WARN("AstObject(%s) No Free Func",ab->a_name);
+	if(t->n_free)
+	{
+		t->n_free(ab);
+		return ;
+	}
+	WARN("AstObject No Free Func");
+error:
 	free(ab);
 }
 
@@ -36,12 +41,24 @@ void ast_addto_pending(AstObject* ab)
 {
 	list_add_tail(&ab->a_pending,&pending_ast_object);
 }
-void ast_init(AstObject* ab,int type,char* name ,struct ast_object_ops* ops)
+
+inline void ast_init(AstObject* ab,struct ast_node_type* node_type)
 {
-	ab->a_type=type;
-	ab->a_name=name;
-	ab->a_ops=ops;
+	ab->a_type=node_type;
 	INIT_LIST_HEAD(&ab->a_pending);
 }
+
+void* __ast_node_new(ssize_t size,struct ast_node_type* node_type)
+{
+	AstObject* ab=(AstObject*)ry_malloc(size);
+	if(ab==NULL)
+	{
+		ryerr_nomemory();
+		return NULL;
+	}
+	ast_init(ab,node_type);
+	return ab;
+}
+
 
 

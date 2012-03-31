@@ -10,7 +10,8 @@ struct  robject
 typedef struct robject Robject;
 #define INHERIT_ROBJECT struct robject r_base 
 #define TO_ROBJECT(x) ((Robject*)x)
-#define robject_new(TYPE,type_ops) ((TYPE*)__robject_new(sizeof(TYPE),type_ops))
+#define robject_new(TYPE,type_ops) \
+	((TYPE*)__robject_new(sizeof(TYPE),type_ops))
 
 void* __robject_new(ssize_t size,TypeObject* t);
 void robject_init(Robject* r,TypeObject* t);
@@ -24,8 +25,8 @@ static inline const char* robject_name(Robject* r)
 {
 	return r->r_type->t_name;
 }
-TypeObject* robject_type(Robject* r);
-int robject_typeid(Robject* r);
+static inline TypeObject* robject_type(Robject* r){return r->r_type;}
+static inline int robject_typeid(Robject* r){return r->r_type->t_type;}
 
 /* robject expr */
 /*unary expr*/
@@ -48,14 +49,14 @@ Robject* robject_lshift(Robject* x,Robject* y);
 Robject* robject_rshift(Robject* x,Robject* y);
 
 /*relational_expr*/
-Robject* robject_lt(Robject* x,Robject* y);
-Robject* robject_le(Robject* x,Robject* y);
-Robject* robject_gt(Robject* x,Robject* y);
-Robject* robject_ge(Robject* x,Robject* y);
+int robject_lt(Robject* x,Robject* y);
+int robject_le(Robject* x,Robject* y);
+int robject_gt(Robject* x,Robject* y);
+int robject_ge(Robject* x,Robject* y);
 
 /*equal_expr*/
-Robject* robject_ne(Robject* x,Robject* y);
-Robject* robject_eq(Robject* x,Robject* y);
+int robject_ne(Robject* x,Robject* y);
+int robject_eq(Robject* x,Robject* y);
 
 /*bitwise_expr*/
 Robject* robject_or(Robject* x,Robject* y);
@@ -64,7 +65,6 @@ Robject* robject_xor(Robject* x,Robject* y);
 
 /*logic_expr*/
 int robject_bool(Robject* rt);
-void robject_print(Robject* rt,FILE* f,int flags);
 
 ssize_t robject_hash(Robject* rt);
 #define CMP_LT  0  /*<*/
@@ -83,5 +83,8 @@ ssize_t robject_hash(Robject* rt);
  */
 int robject_richcmp(Robject* x,Robject* y,int op);
 
+/* print flags*/
+#define PRINT_FLAGS_NEWLINE 0x1
+void robject_print(Robject* rt,FILE* f,int flags);
 #endif 
 

@@ -12,6 +12,7 @@ struct type_object
 	struct object_ops* t_object_funcs;
 	int (*t_rich_cmp)(struct robject*,struct robject* ,int);
 	ssize_t (*t_hash)(struct robject*);
+	int (*t_print)(struct robject*,FILE* f,int flags);
 };
 typedef struct type_object TypeObject;
 
@@ -65,10 +66,6 @@ struct expr_ops
 	/*logic and ,logic_or */
 	int (*ro_bool)(struct robject*);
 
-	/*used for print sentence */
-	int (*ro_print)(struct robject*,FILE* f,int flags);
-
-	/*get iterator */
 	struct robject* (*ro_iter)(struct robject*);
 };
 

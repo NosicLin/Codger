@@ -1,7 +1,6 @@
-#include"ast_node_stmts.h"
-#include<stdlib.h>
+#include"node_stmts.h"
 #include"ast_machine.h"
-#include<vm/except.h>
+#include<rstd/redy_std.h>
 
 static void stmts_free(AstObject* ab)
 {
@@ -16,8 +15,13 @@ static void stmts_free(AstObject* ab)
 		p=list_entry(cur,AstNodeStmt,s_sibling);
 		ast_free(STMT_TO_AST(p));
 	}
-	free(stmts);
+	ry_free(stmts);
 			
+}
+static void stmts_free_self(AstObject* ab)
+{
+	AstNodeStmts* stmts=AST_TO_STMTS(ab);
+	ry_free(stmts);
 }
 
 #ifdef AST_MACHINE 
@@ -43,20 +47,21 @@ static int stmts_execute(AstObject* ab)
 }
 #endif /*AST_MACHINE*/
 
-static struct ast_object_ops stmts_ops=
+static AstNodeType node_stmts=
 {
-	.ao_free=stmts_free,
+	.n_type=ATN_STMTS,
+	.n_name="Stmts",
+	.n_free=stmts_free,
+	.n_free_node=stmts_free_self,
 #ifdef AST_MACHINE
-	.ao_execute=stmts_execute,
+	.n_execute=stmts_execute,
 #endif 
 };
 
 AstNodeStmts* ast_create_stmts()
 {
-	AstNodeStmts* node=(AstNodeStmts*) malloc(sizeof(*node));
+	AstNodeStmts* node=ast_node_new(AstNodeStmts,&node_stmts);
 	INIT_LIST_HEAD(&node->s_chirldren);
-	AstObject* base=AST_BASE(node);
-	ast_init(base,ATN_STMTS,"AstNodeStmts",&stmts_ops);
 	return node;
 }
 	

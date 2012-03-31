@@ -8,6 +8,7 @@
 #include"bt_float.h"
 #include"bt_string.h"
 #include"bt_long.h"
+#include"bt_bool.h"
 
 /* this func don't check error */
 /* please be sure the str  is valid value */
@@ -255,23 +256,29 @@ int btint_cmp(BtInt* x,BtInt* y,int op)
 		case CMP_GT :
 			return btint_gt(x,y);
 	}
-	BUG("Error cmpare op(%d)",op);
+	BUG("Error compare op(%d)",op);
 	return -1;
 }
 int btint_bool(BtInt* bi)
 {
-	if(bi->i_value==0)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
+	return bi->i_value!=0;
 }
 inline ssize_t btint_hash(BtInt* bi)
 {
-	return  bi->i_value;
+	int value=bi->i_value;
+
+	return value==-1?-2:value;
+}
+
+inline int btint_print(BtInt* bi,FILE* f,int flags)
+{
+	printf("%d",bi->i_value);
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
+	return 0;
+
 }
 
 
@@ -889,7 +896,8 @@ static ssize_t bi_hash(Robject* bt)
 /* print operator */
 static int bi_print(Robject* bt,FILE* f,int flags)
 {
-	printf("%d",R_TO_I(bt)->i_value);
+	BtInt* bi=R_TO_I(bt);
+	btint_print(bi,NULL,flags);
 	return 1;
 }
 
@@ -930,9 +938,6 @@ static struct  expr_ops bi_expr_ops=
 	/* logic operator and or not */
 	.ro_bool=bi_bool,
 
-	/*print */
-	.ro_print=bi_print,
-
 };
 
 static void bi_free(Robject* bt)
@@ -952,6 +957,7 @@ static TypeObject type_int=
 	.t_object_funcs=&int_object_ops,
 	.t_rich_cmp=&bi_rich_cmp,
 	.t_hash=bi_hash,
+	.t_print=bi_print,
 };
 
 inline BtInt* btint_malloc()
@@ -965,5 +971,97 @@ BtInt* btint_create(int value)
 	ret->i_value=value;
 	return ret;
 }
+
+
+
+
+
+
+
+/* bt_bool part */
+static int bl_false_print(Robject* r,FILE* f,int flags)
+{
+	printf("false");
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
+	return 0;
+}
+static int bl_true_print(Robject* r,FILE* f,int flags)
+{
+	printf("true");
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
+	return 0;
+}
+static void bb_free(Robject* r)
+{
+	BUG("Free Bool Object");
+}
+static struct object_ops bool_object_ops=
+{
+	.ro_free=bb_free,
+};
+
+static TypeObject type_bool_false=
+{
+	.t_name="Bool",
+	.t_type=RT_INT,
+	.t_expr_funcs=&bi_expr_ops,
+	.t_object_funcs=&bool_object_ops,
+	.t_rich_cmp=&bi_rich_cmp,
+	.t_hash=bi_hash,
+	.t_print=bl_false_print,
+};
+static TypeObject type_bool_true=
+{
+	.t_name="Bool",
+	.t_type=RT_INT,
+	.t_expr_funcs=&bi_expr_ops,
+	.t_object_funcs=&bool_object_ops,
+	.t_rich_cmp=&bi_rich_cmp,
+	.t_hash=bi_hash,
+	.t_print=bl_true_print,
+};
+
+static BtInt bool_object_false=
+{
+	{.r_ref=1, .r_type=&type_bool_false,},
+	0,
+};
+
+static BtInt bool_object_true=
+{
+	{.r_ref=1, .r_type=&type_bool_true,},
+	1,
+};
+
+BtBool* btbool_create(int value)
+{
+	BtBool* ret=value?&bool_object_true:&bool_object_false;
+	robject_addref(B_TO_R(ret));
+	return ret;
+}
+
+BtBool* btbool_false()
+{
+	robject_addref(B_TO_R(&bool_object_false));
+	return &bool_object_false;
+}
+BtBool* btbool_true()
+{
+	robject_addref(B_TO_R(&bool_object_true));
+	return &bool_object_true;
+}
+int btbool_bool(BtBool* bb)
+{
+	return bb->i_value!=0;
+}
+
+
+
 
 

@@ -1,7 +1,7 @@
 #ifndef _REDY_SYNTAX_AST_NODE_LITERAL_H_
 #define _REDY_SYNTAX_AST_NODE_LITERAL_H_
 #include"node_type.h"
-#include<rtype/robject.h>
+#include<object/robject.h>
 /* literal */
 struct ast_node_literal
 {

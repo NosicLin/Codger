@@ -81,5 +81,5 @@ AstNode##Ml* ast_create_##Ll(AstObject* sub_node) \
 
 UEXPR_METHOD(POSITIVE,Positive,positive);
 UEXPR_METHOD(NEGATIVE,Negative,negative);
-UEXPR_METHOD(BIT_NEGATED,BitNegated,bit_negated);
+UEXPR_METHOD(NEGATED,Negated,negated);
 

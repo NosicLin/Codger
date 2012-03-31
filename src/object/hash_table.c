@@ -1,4 +1,4 @@
-#include"hash_object.h"
+#include"hash_table.h"
 #include<rstd/redy_std.h>
 #include<string.h>
 #include<assert.h>
@@ -44,7 +44,31 @@ static inline void ht_set_print(HashTable* h)
 
 static HashTable* s_htable_cache[HASH_MAX_CACHE];
 static int s_cache_free=0;
-static Robject* dummy=NULL;
+
+/*dummy object*/
+static void dummy_free(Robject* dummy)
+{
+	BUG("free dummy");
+}
+static struct object_ops dummy_object_ops=
+{
+	.ro_free=dummy_free,
+};
+static TypeObject type_dummy=
+{
+	.t_name="dummy",
+	.t_object_funcs=&dummy_object_ops,
+	.t_type=TYPE_UNKOWN,
+};
+static Robject __dummy=
+{
+	.r_ref=1,
+	.r_type=&type_dummy,
+};
+static Robject* dummy=&__dummy;
+
+
+
 TypeObject hash_type;
 HashTable* hash_new()
 {
@@ -139,8 +163,16 @@ static HashEntry* ht_look_up(HashTable* h,Robject* key,ssize_t hash)
 
 	for(perturb=hash;;perturb>>=DEFALULT_PERTURB_SHIFT)
 	{
+		
 		i=(i<<2)+i+1+perturb;
 		p=&table[i&mask];
+
+		/*
+		printf("cur pos=%d\n",i&mask);
+		printf("fill=%d\n",h->t_fill);
+		printf("used=%d\n",h->t_used);
+		*/
+
 		if(p->e_key==NULL)
 		{
 			return freeslot==NULL?p:freeslot;
@@ -189,12 +221,16 @@ static int ht_insert(HashTable* h,Robject* key,ssize_t hash,Robject* value)
 		robject_release(dummy);
 		assert(p->e_value==NULL);
 		p->e_key=NULL;
-		h->t_used++;
 	}
-	else if(p->e_key!=NULL)
+	if(p->e_key!=NULL)
 	{
 		robject_release(p->e_key);
+		assert(p->e_value);
 		robject_release(p->e_value);
+	}
+	else
+	{
+		h->t_used++;
 	}
 	p->e_key=key;
 	p->e_value=value;
@@ -388,6 +424,7 @@ inline int hash_bool(HashTable* h)
 
 int hash_print(HashTable* h,FILE* f,int flags)
 {
+	flags=flags&~PRINT_FLAGS_NEWLINE;
 	ssize_t i=h->t_used;
 	HashEntry* table=h->t_table;
 	HashEntry* p=&table[0];
@@ -405,6 +442,7 @@ int hash_print(HashTable* h,FILE* f,int flags)
 	{
 		ht_set_print(h);
 	}
+	printf("{");
 
 	int print_first=0;
 	while(!print_first)
@@ -412,6 +450,7 @@ int hash_print(HashTable* h,FILE* f,int flags)
 		if(p->e_key==NULL||p->e_key==dummy)
 		{
 			continue;
+			p++;
 		}
 		i--;
 		robject_print(p->e_key,f,flags);
@@ -419,11 +458,13 @@ int hash_print(HashTable* h,FILE* f,int flags)
 		assert(p->e_value);
 		robject_print(p->e_value,f,flags);
 		print_first=1;
+		p++;
 	}
 	while(i>0)
 	{
 		if(p->e_key==NULL||p->e_key==dummy)
 		{
+			p++;
 			continue;
 		}
 		i--;
@@ -432,7 +473,9 @@ int hash_print(HashTable* h,FILE* f,int flags)
 		printf("->");
 		assert(p->e_value);
 		robject_print(p->e_value,f,flags);
+		p++;
 	}
+	printf("}");
 
 	ht_clr_print(h);
 	return 0;
@@ -507,7 +550,6 @@ struct expr_ops ht_expr_ops=
 {
 	.ro_get_item=ht_get_item,
 	.ro_set_item=ht_set_item,
-	.ro_print=ht_print,
 	.ro_bool=ht_bool,
 	.ro_iter=ht_iter,
 };
@@ -523,7 +565,8 @@ struct type_object hash_type=
 	.t_type=TYPE_HASH,
 	.t_expr_funcs=&ht_expr_ops,
 	.t_object_funcs=&hash_object_ops,
-//	.t_rich_cmp=0,
+	//	.t_rich_cmp=0,
+	.t_print=ht_print,
 };
 
 

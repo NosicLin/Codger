@@ -73,12 +73,15 @@
 #include"yylex.h"
 #include"ast_nodes.h"
 #include"parser.h"
-#include<rtype/rtype.h>
+#include<rtype/bt_int.h>
+#include<rtype/bt_string.h>
+#include<rtype/bt_float.h>
+#include<rtype/bt_long.h>
 #define YYSTYPE  AstObject* 
 
 
 /* Line 189 of yacc.c  */
-#line 82 "grammar.tab.c"
+#line 85 "grammar.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -194,7 +197,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 198 "grammar.tab.c"
+#line 201 "grammar.tab.c"
 
 #ifdef short
 # undef short
@@ -485,8 +488,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    36,    41,    45,    46,    49,    57,    65,
-      71,    78
+       0,    36,    36,    39,    44,    48,    49,    52,    60,    68,
+      74,    81
 };
 #endif
 
@@ -1411,36 +1414,36 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 33 "grammar.y"
+#line 36 "grammar.y"
     {printf("paser success\n");;}
     break;
 
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 36 "grammar.y"
+#line 39 "grammar.y"
     {
 	 Robject* r=ast_literal_get_value(AST_TO_LITERAL((yyvsp[(1) - (1)])));
-	 robject_print(r);
+	 robject_print(r,NULL,0);
 	 robject_release(r); ;}
     break;
 
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 41 "grammar.y"
+#line 44 "grammar.y"
     {
 	 Robject* r=ast_literal_get_value(AST_TO_LITERAL((yyvsp[(2) - (2)])));
-	 robject_print(r);
+	 robject_print(r,NULL,0);
 	 robject_release(r); ;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 50 "grammar.y"
+#line 53 "grammar.y"
     {
-		BtInt* bi=bt_int_from_str(yl_cur_string());
+		BtInt* bi=btint_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(I_TO_R(bi));
@@ -1450,9 +1453,9 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 58 "grammar.y"
+#line 61 "grammar.y"
     {
-		BtLong* bl=bt_long_from_str(yl_cur_string());
+		BtLong* bl=btlong_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(bl);
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
@@ -1462,9 +1465,9 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 65 "grammar.y"
+#line 68 "grammar.y"
     {
-		BtFloat* bf=bt_float_from_str(yl_cur_string());
+		BtFloat* bf=btfloat_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(F_TO_R(bf));
@@ -1474,9 +1477,9 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 71 "grammar.y"
+#line 74 "grammar.y"
     {
-		BtString* bs=bt_string_create(yl_cur_string());
+		BtString* bs=btstring_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));
@@ -1486,7 +1489,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1490 "grammar.tab.c"
+#line 1493 "grammar.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
