@@ -5,7 +5,6 @@
 
 struct ast_node_type;
 
-
 struct ast_object
 {
 	struct list_head a_pending;

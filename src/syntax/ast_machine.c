@@ -19,11 +19,11 @@ int ast_machine_exit()
 int ast_execute(AstObject* ab)
 {
 //	printf("execute AstObject(%s)\n",ab->a_name);
-	if(ab->a_ops)
+	if(ab->a_type)
 	{
-		if(ab->a_ops->ao_execute)
+		if(ab->a_type->n_execute)
 		{
-			return ab->a_ops->ao_execute(ab);
+			return ab->a_type->n_execute(ab);
 		}
 	}
 	return AST_EXE_NO_FUNC;

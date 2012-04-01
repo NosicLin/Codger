@@ -1,5 +1,6 @@
 #include"node_stmts.h"
 #include"ast_machine.h"
+#include"vm/except.h"
 #include<rstd/redy_std.h>
 
 static void stmts_free(AstObject* ab)

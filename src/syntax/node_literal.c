@@ -3,6 +3,7 @@
 #ifdef AST_MACHINE 
 #include "ast_machine.h"
 #endif /* AST_MACHINE */
+#include"ast_object.h"
 
 static void literal_free(AstObject* ab)
 {
@@ -28,7 +29,7 @@ static AstNodeType node_literal=
 	.n_type=ATN_LITERAL,
 	.n_name="Literal",
 	.n_free=literal_free,
-	.n_free_node=literal_free
+	.n_free_node=literal_free,
 #ifdef AST_MACHINE 
 	.n_execute=literal_execute,
 #endif /*AST_MACHINE*/

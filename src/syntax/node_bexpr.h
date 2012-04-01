@@ -1,14 +1,15 @@
 #ifndef _REDY_SYNTAX_AST_NODE_BINARY_EXPR_H_
 #define _REDY_SYNTAX_AST_NODE_BINARY_EXPR_H_
 #include"node_type.h"
+#include"ast_object.h"
 
 struct ast_binary_expr
 {
-	BASE_AST_OBJECT;
+	INHERIT_AST_OBJECT;
 	struct ast_object* b_left;
 	struct ast_object* b_right;
 };
-typedef struct ast_binary_expr AstBinaryExpr;
+typedef struct ast_binary_expr AstNodeBExpr;
 
 /*multiply_expr*/
 typedef struct ast_binary_expr AstNodeMul; 
@@ -55,11 +56,11 @@ static inline void ast_bexpr_set_right(AstBinaryExpr* ab,AstObject* value)
 	ab->b_right=value;
 }
 */
-static inline  AstObject* ast_bexpr_get_left(AstBinaryExpr* ab)
+static inline  AstObject* ast_bexpr_get_left(AstNodeBExpr* ab)
 {
 	return  ab->b_left;
 }
-static inline  AstObject* ast_bexpr_get_right(AstBinaryExpr* ab)
+static inline  AstObject* ast_bexpr_get_right(AstNodeBExpr* ab)
 {
 	return  ab->b_right;
 }

@@ -2,7 +2,6 @@
 #define _REDY_SYNTAX_NODE_TYPE_H_ 
 #include<assert.h>
 struct ast_object;
-
 struct ast_node_type
 {
 	int n_type;
@@ -10,7 +9,7 @@ struct ast_node_type
 	void (*n_free)(struct ast_object*);
 	void (*n_free_node)(struct ast_object*);
 #ifdef AST_MACHINE
-	void (*n_execute)(struct ast_object*);
+	int (*n_execute)(struct ast_object*);
 #endif 
 };
 

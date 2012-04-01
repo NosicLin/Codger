@@ -1,9 +1,11 @@
 #ifndef _REDY_SYNTAX_AST_UNARY_EXPR_H_
+#define _REDY_SYNTAX_AST_UNARY_EXPR_H_
+
 #include"ast_object.h"
 #include"node_type.h"
 struct ast_unary_expr
 {
-	BASE_AST_OBJECT;
+	INHERIT_AST_OBJECT;
 	struct ast_object* u_value;
 };
 
