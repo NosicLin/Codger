@@ -8,6 +8,7 @@ struct bt_string
 {
 	INHERIT_ROBJECT;	
 	int s_length;
+	ssize_t s_hash;
 	char s_value[0];
 };
 typedef struct bt_string BtString;
@@ -39,6 +40,7 @@ BtString* btstring_malloc(int length);
 BtString* btstring_create(char* str);
 BtString* btstring_create_empty();
 BtString* btstring_from_char(char c);
+BtString* btstring_create_no_esc(char* str);
 
 /* expr*/
 BtString* btstring_get_item(BtString* bs,int index);
@@ -75,6 +77,11 @@ static inline int btstring_bool(BtString* bs)
 	return bs->s_length!=0;
 }
 
+static inline ssize_t btstring_hash(BtString* bs)
+{
+	ssize_t ret=bs->s_hash;
+	return ret==-1?-2:ret;
+}
 int btstring_print(BtString* bs,FILE* f,int flags);
 
 

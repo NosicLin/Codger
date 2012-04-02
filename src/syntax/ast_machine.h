@@ -2,6 +2,7 @@
 #define _REDY_SYNTAX_AST_MACHINE_H_
 #include"ast_object.h"
 #include<object/robject.h>
+#include"symbol_table.h"
 #ifdef AST_MACHINE
 
 enum AST_EXE_INFO

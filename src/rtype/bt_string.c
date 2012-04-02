@@ -6,6 +6,22 @@
 #include"bt_int.h"
 #include"bt_float.h"
 
+/*FIXME  find this hash function  from google ,
+ * so i'm not sure whether it is good or not. 
+ * only kown js use it 
+ */
+static size_t __string_hash(char* str)
+{
+	size_t hash = 1315423911;
+	while (*str)
+	{
+		hash ^= ((hash << 5) + (*str++) + (hash >> 2));
+	}
+	return hash ;
+}	
+
+
+
 BtString* btstring_get_item(BtString* bs,int index)
 {
 	if(index>=bs->s_length)
@@ -40,6 +56,7 @@ BtString* btstring_plus(BtString* x,BtString* y)
 	{
 		new_str[i+l_length]=c_y[i];
 	}
+	new_bs->s_hash=__string_hash(new_bs->s_value);
 	return new_bs;
 }
 
@@ -172,6 +189,12 @@ static int bs_print(Robject* bt,FILE* f,int flags)
 	return 0;
 }
 
+static ssize_t bs_hash(Robject* bt)
+{
+	BtString* bs=R_TO_S(bt);
+	return btstring_hash(bs);
+}
+	
 static struct expr_ops bs_expr_ops=
 {
 	.ro_get_item=bs_get_item,
@@ -204,7 +227,9 @@ static TypeObject type_string=
 	.t_object_funcs=&string_object_ops,
 	.t_rich_cmp=bs_rich_cmp,
 	.t_print=bs_print,
+	.t_hash=bs_hash,
 };
+
 
 
 
@@ -236,6 +261,19 @@ BtString* btstring_create(char* str)
 		return NULL;
 	}
 	memcpy(bs->s_value,str+1,length-2);
+	bs->s_hash=__string_hash(bs->s_value);
+	return bs;
+}
+BtString* btstring_create_no_esc(char* str)
+{
+	int length=strlen(str);
+	BtString* bs=btstring_malloc(length);
+	if(bs==NULL)
+	{
+		return NULL;
+	}
+	memcpy(bs->s_value,str,length);
+	bs->s_hash=__string_hash(bs->s_value);
 	return bs;
 }
 
@@ -247,6 +285,7 @@ BtString* btstring_from_char(char c)
 		return NULL;
 	}
 	bs->s_value[0]=c;
+	bs->s_hash=__string_hash(bs->s_value);
 	return bs;
 }
 

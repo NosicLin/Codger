@@ -18,12 +18,6 @@ static int stmt_execute(AstObject* ab)
 {
 	AstNodeStmt* stmt=AST_TO_STMT(ab);
 	int ret=ast_execute(stmt->s_sub_node);
-	if(ret>=0)
-	{
-		Robject* r=get_reg0();
-		robject_print(r,NULL,PRINT_FLAGS_NEWLINE);
-		robject_release(r);
-	}
 	return ret;
 }
 #endif /*AST_MACHINE */

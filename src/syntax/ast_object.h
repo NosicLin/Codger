@@ -19,6 +19,7 @@ typedef struct ast_object AstObject;
 
 /*interface*/
 
+static inline void ast_destory(AstObject* ab){} /*TODO*/
 void ast_free(AstObject* ab);
 void ast_init(AstObject* ab,struct ast_node_type* node_type);
 void* __ast_node_new(ssize_t size,struct ast_node_type* node_type);

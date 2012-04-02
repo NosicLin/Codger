@@ -25,6 +25,7 @@ typedef struct hash_table HashTable;
  * else return 0
  */
 HashTable* hash_new();
+int hash_init(HashTable* h); /*TODO*/
 void hash_free(HashTable* h);
 
 /* return 0 sucess 

@@ -5,6 +5,9 @@
 #include"node_uexpr.h"
 #include"node_bexpr.h"
 #include"node_stmts.h"
+#include"node_var.h"
+#include"node_assign.h"
+#include"node_print.h"
 
 
 #endif  /*_REDY_SYNTAX_AST_NODE_H_*/

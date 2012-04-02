@@ -1,19 +1,22 @@
 #include"ast_machine.h"
 #include<stdio.h>
 #include<object/null_object.h>
+#include"symbol_table.h"
 #ifdef AST_MACHINE 
 Robject* cup_reg0=0;
 int ast_machine_init()
 {
 	robject_addref(NullObject);
 	cup_reg0=NullObject;
-	return 1;
+	symbol_init();
+	return 0;
 }
 int ast_machine_exit()
 {
 	robject_release(cup_reg0);
 	cup_reg0=0;
-	return 1;
+	symbol_exit();
+	return 0;
 }
 
 int ast_execute(AstObject* ab)

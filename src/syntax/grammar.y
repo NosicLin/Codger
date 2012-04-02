@@ -64,79 +64,112 @@ stmts: stmt  tNEWLINE
 
 stmt: stmt_expr
 	{
-	AstNodeStmt* node=ast_create_stmt($1);
-	ast_addto_pending(STMT_TO_AST(node));
-	$$=STMT_TO_AST(node);
+		AstNodeStmt* node=ast_create_stmt($1);
+		ast_addto_pending(STMT_TO_AST(node));
+		$$=STMT_TO_AST(node);
+	}
+	|stmt_assign
+	{
+		AstNodeStmt* node=ast_create_stmt($1);
+		ast_addto_pending(STMT_TO_AST(node));
+		$$=STMT_TO_AST(node);
+	}
+	|stmt_print
+	{ 
+		AstNodeStmt* node=ast_create_stmt($1);
+		ast_addto_pending(STMT_TO_AST(node));
+		$$=STMT_TO_AST(node);
 	}
 	 ;
 literal: tINTEGER 
-	   {
+   {
 		BtInt* bi=btint_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(I_TO_R(bi));
-		$$=LITERAL_TO_AST(t); }
+		$$=LITERAL_TO_AST(t); 
+	}
 
-		| tLONG
-		{
+	| tLONG
+	{
 		BtLong* bl=btlong_from_str(yl_cur_string());
 	    AstNodeLiteral* t=ast_create_literal(L_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(L_TO_R(bl));
-		$$=LITERAL_TO_AST(t);}
+		$$=LITERAL_TO_AST(t);
+	}
 
-		| tFLAOT{
+	| tFLAOT
+	{
 		BtFloat* bf=btfloat_from_str(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(F_TO_R(bf));
-		$$=LITERAL_TO_AST(t);}
-		| tSTRING{
+		$$=LITERAL_TO_AST(t);
+	}
+	| tSTRING
+	{
 		BtString* bs=btstring_create(yl_cur_string());
 	   	AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
 		ast_addto_pending(LITERAL_TO_AST(t));
 		robject_release(S_TO_R(bs));
-		$$=LITERAL_TO_AST(t);}
-		| kFALSE{
+		$$=LITERAL_TO_AST(t);
+	}
+	| kFALSE
+	{
 		BtBool* bl=btbool_create(0);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
 		$$=LITERAL_TO_AST(node);
-		}
-		| kTRUE{
+	}
+	| kTRUE
+	{
 		BtBool* bl=btbool_create(1);
 		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
 		ast_addto_pending(LITERAL_TO_AST(node));
    		robject_release(B_TO_R(bl));
 		$$=LITERAL_TO_AST(node);
-		}
-;
+	}
+	;
+identifier:tID
+	{
+		BtString* bs=btstring_create_no_esc(yl_cur_string());
+		AstNodeVar* node=ast_create_var(bs);
+		ast_addto_pending(VAR_TO_AST(node));
+		robject_release(S_TO_R(bs));
+		$$=VAR_TO_AST(node);
+	}
+	;
+		
 primary_expr: literal {$$=$1;}
-			|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
-			;
+	|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
+	|identifier{$$=$1}
+;
 
 unary_expr:primary_expr{$$=$1;}
-		  	|tPLUS unary_expr {    /*eg. +4*/
-			AstNodePositive* node=ast_create_positive($2);
-			AstObject* ab=POSITIVE_TO_AST(node);
-			ast_addto_pending(ab);
-			$$=ab;
-			}   
-			|tMINUS unary_expr{   /*eg. -4*/
-			AstNodeNegative* node=ast_create_negative($2);
-			AstObject* ab=NEGATIVE_TO_AST(node);
-			ast_addto_pending(ab);
-			$$=ab;
-
-			}   
-			|tNegated unary_expr{  /*eg. ~4*/
-			AstNodeNegated* node=ast_create_negated($2);
-			AstObject* ab=NEGATED_TO_AST(node);
-			ast_addto_pending(ab);
-			$$=ab;
-			} 
-			;
+  	|tPLUS unary_expr 
+	{  
+		AstNodePositive* node=ast_create_positive($2);
+		AstObject* ab=POSITIVE_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}   
+	|tMINUS unary_expr
+	{ 
+		AstNodeNegative* node=ast_create_negative($2);
+		AstObject* ab=NEGATIVE_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	}   
+	|tNegated unary_expr
+	{  
+		AstNodeNegated* node=ast_create_negated($2);
+		AstObject* ab=NEGATED_TO_AST(node);
+		ast_addto_pending(ab);
+		$$=ab;
+	} 
+	;
 
 multiply_expr: unary_expr{
 			 $$=$1;
@@ -281,5 +314,37 @@ logic_or_expr:logic_and_expr{$$=$1;}
 	;
 expr :logic_or_expr{$$=$1;}
 	;
+		   ;
+
 stmt_expr:expr {$$=$1;}
 		 ;
+
+stmt_assign:identifier tASSIGN expr
+	{
+		AstNodeAssign* node=ast_create_assign(AST_TO_VAR($1),$3);
+		ast_addto_pending(ASSIGN_TO_AST(node));
+		$$=ASSIGN_TO_AST(node);
+	}
+	;
+		
+stmt_print:kPRINT expr
+	{
+		AstNodePrint* node=ast_create_print($2);
+		ast_addto_pending(PRINT_TO_AST(node));
+		$$=PRINT_TO_AST(node);
+	}
+	;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
