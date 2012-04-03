@@ -144,7 +144,7 @@ static int cmp_execute(AstNodeBExpr* node,cmp_func func)
 		goto error;
 	}
 	assert(ret>=0);
-	Robject* real_ret=B_TO_R(btbool_create(ret));
+	Robject* real_ret=B_TO_R(btbool_create(ret_value));
 	set_reg0(real_ret);
 	robject_release(real_ret);
 error:

@@ -8,6 +8,7 @@
 #include"node_var.h"
 #include"node_assign.h"
 #include"node_print.h"
+#include"node_while.h"
 
 
 #endif  /*_REDY_SYNTAX_AST_NODE_H_*/

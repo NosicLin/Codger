@@ -1,12 +1,12 @@
 PROJECT=syntax
 SRC= ast_object.c node_literal.c node_stmt.c node_stmts.c \
 	 node_uexpr.c node_bexpr.c node_var.c \
-	 node_assign.c node_print.c \
+	 node_assign.c node_print.c node_while.c \
 	 parser.c yylex.c grammar.tab.c ast_machine.c \
 	 symbol_table.c 
 
 DEBUG=
-BIN=test_literal.c redy.c
+BIN=test_literal.c redy.c gcheck.c
 
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h  -D AST_MACHINE

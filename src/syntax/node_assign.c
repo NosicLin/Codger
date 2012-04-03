@@ -11,13 +11,13 @@ void assign_free(AstObject* ab)
 	AstNodeAssign* node=AST_TO_ASSIGN(ab);
 	ast_free((AstObject*)node->a_var);
 	ast_free(node->a_expr);
-	ast_destory(ab);
+	ast_destroy(ab);
 	ry_free(node);
 }
 void assign_free_self(AstObject* ab)
 {
 	AstNodeAssign* node=AST_TO_ASSIGN(ab);
-	ast_destory(ab);
+	ast_destroy(ab);
 	ry_free(node);
 }
 #ifdef AST_MACHINE

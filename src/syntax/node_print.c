@@ -11,14 +11,14 @@ static void print_free(AstObject* ab)
 {
 	AstNodePrint* node=AST_TO_PRINT(ab);
 	ast_free(node->p_expr);
-	ast_destory(ab);
+	ast_destroy(ab);
 	ry_free(node);
 }
 static void print_free_self(AstObject* ab)
 {
 	AstNodePrint* node=AST_TO_PRINT(ab); /* type check*/
 
-	ast_destory(ab);
+	ast_destroy(ab);
 	ry_free(node);
 }
 #ifdef AST_MACHINE
