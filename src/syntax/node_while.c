@@ -58,6 +58,25 @@ static int while_execute(AstObject* ab)
 			break;
 		}
 		exe_info=ast_execute(stmts);
+		if(exe_info<0)
+		{
+			ret=exe_info;
+			break;
+		}
+		if(exe_info==AST_EXE_BREAK)
+		{
+			ret=AST_EXE_SUCCESS;
+			break;
+		}
+		if(exe_info==AST_EXE_CONTINUE)
+		{
+			continue;
+		}
+		if(exe_info==AST_EXE_RETURN)
+		{
+			ret=AST_EXE_RETURN;
+			break;
+		}
 	}
 	return ret;
 }

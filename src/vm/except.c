@@ -146,4 +146,19 @@ void except_name_err_format(const char* s,...)
 	except_flags=1;
 	printf("NameErr:%s\n",s_format_buf);
 }
+void except_syntax_err_format(const char* s,...)
+{
+	int n;
+	va_list ap;
+	va_start(ap,s);
+	n=vsnprintf(s_format_buf,FORMAT_BUF_SIZE,s,ap);
+	va_end(ap);
+	if(n>=FORMAT_BUF_SIZE||n<0)
+	{
+		WARN("format message failed(%d)",n);
+		s_format_buf[0]='\0';
+	}
+	except_flags=1;
+	printf("SyntaxErr:%s\n",s_format_buf);
+}
 

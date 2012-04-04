@@ -35,13 +35,9 @@ static int stmts_execute(AstObject* ab)
 	list_for_each_entry(p,head,s_sibling)
 	{
 		ret=ast_execute(STMT_TO_AST(p));
-		if(ret<0)
+		if(ret!=AST_EXE_SUCCESS)
 		{
-			if(vm_except_happened())
-			{
-				vm_clear_except();
-			}
-//			break;
+			break;
 		}
 	}
 	return ret;

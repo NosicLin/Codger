@@ -65,6 +65,8 @@ enum AST_NODE_TYPE
 	ATN_STMTS,
 	ATN_PRINT,
 	ATN_WHILE,
+	ATN_IF,
+	ATN_IF_SUB,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

@@ -54,6 +54,12 @@ pretty_stmts: stmts {$$=$1;}
 		ast_stmts_add(stmts,node);
 		$$=STMTS_TO_AST(stmts);
 	}
+	| 
+	{
+		AstNodeStmts* stmts=ast_create_stmts();
+		ast_addto_pending(STMTS_TO_AST(stmts));
+		$$=STMTS_TO_AST(stmts);
+	}
 	;		
 
 stmts: pretty_stmt
@@ -107,6 +113,12 @@ stmt: stmt_expr
 		$$=STMT_TO_AST(node);
 	}
 	|stmt_while
+	{
+		AstNodeStmt* node=ast_create_stmt($1);
+		ast_addto_pending(STMT_TO_AST(node));
+		$$=STMT_TO_AST(node);
+	}
+	|stmt_if
 	{
 		AstNodeStmt* node=ast_create_stmt($1);
 		ast_addto_pending(STMT_TO_AST(node));
@@ -374,11 +386,58 @@ stmt_while: kWHILE  expr while_delimter pretty_stmts kEND
 		$$=WHILE_TO_AST(node);
 	}
 	;
-
 while_delimter: tNEWLINE
 	|kDO
 	|tSEMI
 	;	
+
+
+stmt_if:if_pre kEND {$$=$1;}
+	|if_pre else_part kEND
+	{
+		ast_if_add(AST_TO_IF($1),AST_TO_IF_SUB($2));
+		$$=$1;
+	}
+	;
+
+if_pre:if_part 
+	{
+		AstNodeIf* node=ast_create_if();
+		ast_addto_pending(IF_TO_AST(node));
+		ast_if_add(node,AST_TO_IF_SUB($1));
+		$$=IF_TO_AST(node);
+	}
+	|if_pre elif_part
+	{
+		ast_if_add(AST_TO_IF($1),AST_TO_IF_SUB($2));
+		$$=$1;
+	}
+	;
+if_part: kIF expr if_delimter pretty_stmts 
+	{
+		AstNodeIfSub* node=ast_create_if_sub($2,$4);
+		ast_addto_pending(IF_SUB_TO_AST(node));
+		$$=IF_SUB_TO_AST(node);
+	}
+	;
+elif_part: kELIF expr if_delimter pretty_stmts
+	{
+		AstNodeIfSub* node=ast_create_if_sub($2,$4);
+		ast_addto_pending(IF_SUB_TO_AST(node));
+		$$=IF_SUB_TO_AST(node);
+	}
+	;
+else_part: kELSE if_delimter pretty_stmts
+	{
+		AstNodeIfSub* node=ast_create_if_sub(NULL,$3);
+		ast_addto_pending(IF_SUB_TO_AST(node));
+		$$=IF_SUB_TO_AST(node);
+	}
+	;
+
+if_delimter:tNEWLINE|kTHEN|tSEMI;
+	
+
 
 
 

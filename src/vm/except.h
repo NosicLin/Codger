@@ -14,6 +14,7 @@ void except_index_err_format(const char* s,...);
 void except_key_err_format(const char* s,...);
 void except_unkown_err_format(const char* s,...);
 void except_name_err_format(const char* s,...);
+void except_syntax_err_format(const char* s,...);
 
 #endif /*_REDY_VM_EXCEPT_H_*/
 
