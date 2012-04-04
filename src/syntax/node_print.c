@@ -25,16 +25,23 @@ static void print_free_self(AstObject* ab)
 static int print_execute(AstObject* ab)
 {
 	AstNodePrint* node=AST_TO_PRINT(ab);
-	int exe_info=ast_execute(node->p_expr);
-	if(exe_info<0)
+	struct list_head* head=&node->p_expr->a_chirldren;
+	AstObject* p;
+	list_for_each_entry(p,head,a_sibling)
 	{
-		return exe_info;
-	}
 
-	Robject* value=get_reg0();
-	
-	robject_print(value,NULL,PRINT_FLAGS_NEWLINE);
-	robject_release(value);
+		int exe_info=ast_execute(p);
+		if(exe_info<0)
+		{
+			return exe_info;
+		}
+
+		Robject* value=get_reg0();
+		robject_print(value,NULL,0);
+		printf(" ");
+		robject_release(value);
+	}
+	printf("\n");
 
 	return AST_EXE_SUCCESS;
 }

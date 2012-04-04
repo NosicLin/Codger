@@ -7,6 +7,12 @@ struct ast_node_type;
 
 struct ast_object
 {
+	/* the two attribute provide a simple way 
+	 * to organize synatx tree structure
+	 * if sub class don't used it ,just ignore
+	 */
+	struct list_head a_chirldren;
+	struct list_head a_sibling;
 	struct list_head a_pending;
 	struct ast_node_type* a_type;
 };
@@ -32,6 +38,20 @@ static inline int ast_typeid(AstObject* ab)
 {
 	return ab->a_type->n_type;
 }
+
+AstObject* ast_create_object();
+static inline void ast_node_add(AstObject* father,AstObject* chirld)
+{
+	list_add_tail(&chirld->a_sibling,&father->a_chirldren);
+}
+static inline void ast_node_del(AstObject* father,AstObject* chirld)
+{
+	list_del(&chirld->a_sibling);
+}
+void ast_node_free(AstObject* node);
+void ast_node_free_self(AstObject* node);
+
+
 
 
 /* we use LR(1) grammar to parse redy source code

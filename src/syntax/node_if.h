@@ -2,16 +2,12 @@
 #define _REYD_SYNTAX_NODE_IF_H_
 #include"ast_object.h"
 #include<utility_c/list_head.h>
-struct  ast_node_if
-{
-	INHERIT_AST_OBJECT;
-	struct list_head i_chirdren;
-};
-typedef struct ast_node_if AstNodeIf;
+
+typedef struct ast_object AstNodeIf;
+
 struct ast_node_if_sub
 {
 	INHERIT_AST_OBJECT;
-	struct list_head s_sibling;
 	AstObject* s_expr;
 	AstObject* s_stmts;
 };
@@ -23,7 +19,7 @@ AST_TYPE_CAST(IF_SUB,IfSub,ATN_IF_SUB);
 AstNodeIf* ast_create_if();
 static inline void ast_if_add(AstNodeIf* n,AstNodeIfSub* s_n)
 {
-	list_add_tail(&s_n->s_sibling,&n->i_chirdren);
+	ast_node_add(IF_TO_AST(n),IF_SUB_TO_AST(s_n));
 }
 
 AstNodeIfSub* ast_create_if_sub(AstObject* expr,AstObject* stmts);

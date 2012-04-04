@@ -1,31 +1,42 @@
 #include"rtype.h"
-#include<stdlib.h>
+#include"bt_array.h"
+#include<assert.h>
+#include<rstd/redy_std.h>
 #include<stdio.h>
 #include<utility_c/marocs.h>
-#define ARRAY_DEFAULT_CAP 8 
+#include<object/null_object.h>
+#include"bt_int.h"
+#include"bt_long.h"
 
-static void bt_array_enlarge(BtArray* ba,int size)
+static BtArray* ba_malloc(ssize_t cap);
+static int ba_enlarge(BtArray* ba,ssize_t size)
 {
-	if(size<ARRAY_DEFAULT_CAP)
+	if(size<SMALL_ARRAY_SIZE)
 	{
-		size=ARRAY_DEFAULT_CAP;
+		size=SMALL_ARRAY_SIZE;
 	}
-	Robject** new_obs=(Robject**)malloc(sizeof(*new_obs)*size);
+
+	Robject** new_obs=(Robject**)ry_malloc(sizeof(*new_obs)*size);
+	if(new_obs==NULL)
+	{
+		ryerr_nomemory();
+		return -1;
+	}
+		
 	Robject** old_obs=ba->a_objects;
-	if(old_obs)
+	assert(old_obs);
+	int i;
+	for(i=0;i<ba->a_size;i++)
 	{
-		int i;
-		for(i=0;i<ba->a_size;i++)
-		{
-			new_obs[i]=old_obs[i];
-		}
-		free(old_obs);
+		new_obs[i]=old_obs[i];
 	}
+	ry_free(old_obs);
 	ba->a_objects=new_obs;
 	ba->a_cap=size;
+	return 0;
 }
 
-int ba_outof_range(BtArray* ba,int index)
+static inline int ba_outof_range(BtArray* ba,ssize_t index)
 {
 	if(index<0||index>=ba->a_size)
 	{
@@ -37,202 +48,145 @@ int ba_outof_range(BtArray* ba,int index)
 	}
 }
 
-
-
-
-static void ba_set_item(Robject* bt,Robject* index,Robject* item)
+static int ba_set_item(Robject* ro,Robject* index,Robject* item)
 {
-	BtArray* ba=R_TO_A(bt);
-	int pos=0;
-	int index_type=rt_type(index);
-	if(index_type==RT_INT)
+	int type=rt_type(index);
+	BtArray* ba=R_TO_A(ro);
+	int pos;
+	if(type==RT_INT)
 	{
-		pos=bt_int_get(R_TO_I(index));
+		pos=btint_get(R_TO_I(index));
+		return btarray_set_item(ba,pos,item);
 	}
-	else if (index_type==RT_LONG)
+	if(type==RT_LONG)
 	{
-		if(bt_long_overflow_int(R_TO_L(index)))
+		if(btlong_over_int(R_TO_L(index)))
 		{
-			rt_raise_overflow(MSG_LONG_OVERFLOW);
-			goto error;
+			except_index_err_format("cannot fix long to int");
+			return -1;
 		}
-		pos=bt_long_to_int(R_TO_L(index));
-	}
-	else
-	{
-		rt_raise_index_error(MSG_ARRAY_INDEX_TYPE(robject_name(index)));
-		goto error;
+		pos=btlong_to_int(R_TO_L(index));
+		return btarray_set_item(ba,pos,item);
 	}
 
-	if(ba_outof_range(ba,pos))
-	{
-		rt_raise_index_error(MSG_ARRAY_OUT_OF_RANGE);
-		goto error;
-	}
-	
-	Robject* old_item=ba->a_objects[pos];
-	robject_addref(item);
-	robject_release(old_item);
-	ba->a_objects[pos]=item;
-	return ;
-error:
-	return ;
+	except_index_err_format("array index must integer,not '%s'",
+							robject_name(index));
+	return -1;
 }
-static Robject* ba_get_item(Robject* bt,Robject* index)
+static Robject* ba_get_item(Robject* ro,Robject* index)
 {
-	BtArray* ba=R_TO_A(bt);
+	int type=rt_type(index);
 	int pos=0;
-	int index_type=rt_type(index);
-	if(index_type==RT_INT)
+	BtArray* ba=R_TO_A(ro);
+	if(type==RT_INT)
 	{
-		pos=bt_int_get(R_TO_I(index));
+		pos=btint_get(R_TO_I(index));
+		return btarray_get_item(ba,pos);
 	}
-	else if (index_type==RT_LONG)
+	if(type==RT_LONG)
 	{
-		if(bt_long_overflow_int(R_TO_L(index)))
+		if(btlong_over_int(R_TO_L(index)))
 		{
-			rt_raise_overflow(MSG_LONG_OVERFLOW);
-			goto error;
+			except_index_err_format("cannot fix long to int");
+			return NULL;
 		}
-		pos=bt_long_to_int(R_TO_L(index));
-	}
-	else
-	{
-		rt_raise_index_error(MSG_ARRAY_INDEX_TYPE(robject_name(index)));
-		goto error;
+		pos=btlong_to_int(R_TO_L(index));
+		return btarray_get_item(ba,pos);
 	}
 
-	if(ba_outof_range(ba,pos))
-	{
-		rt_raise_index_error(MSG_ARRAY_OUT_OF_RANGE);
-		goto error;
-	}
-	Robject* ro=ba->a_objects[pos];
-	robject_addref(ro);
-	return ro;
-error:
-	robject_addref(robject_null);
-	return robject_null;
+	except_index_err_format("array index must integer,not '%s'",
+							robject_name(index));
+	return NULL;
 }
 
-static Robject* ba_plus(Robject* left,Robject* right)
+static Robject* ba_plus(Robject* l,Robject* r)
 {
-	int type=rt_type(right);
+	int type=rt_type(r);
 	if(type!=RT_ARRAY)
 	{
-		rt_raise_type_error(MSG_OPER(robject_name(left),robject_name(right),OPER_PLUS));
-		goto error;
+		except_type_err_format("cannot concatenate array and '%s'",
+								robject_name(r));
+		return NULL;
 	}
-	BtArray* con=bt_array_merge(R_TO_A(left),R_TO_A(right));
-	return A_TO_R(con);
-error:
-	robject_addref(robject_null);
-	return robject_null;
-}
 
-static Robject* ba_bool(Robject* bt)
+	BtArray* ret= btarray_plus(R_TO_A(l),R_TO_A(r));
+	return ret==NULL?NULL:A_TO_R(ret);
+}
+static int ba_bool(Robject* ro)
 {
-	int size=R_TO_A(bt)->a_size;
-	BtBoolean* ret=0;
-	if(size)
-	{
-		ret=bt_boolean_create(1);
-	}
-	else
-	{
-		ret=bt_boolean_create(0);
-	}
-	return B_TO_R(ret);
+	BtArray* ba=R_TO_A(ro);
+	return btarray_bool(ba);
 }
-
-static void ba_print(Robject* bt)
+static int ba_print(Robject* ro,FILE* f,int flags)
 {
-	BtArray* ba=R_TO_A(bt);
-	
-	int size=ba->a_size;
-	Robject** obs=ba->a_objects;
-	
-	if(size==0)
-	{
-		printf("[]");
-		return ;
-	}
-	printf("[");
-	int i=0;
-	robject_print(obs[0]);
-	i++;
-	for(;i<size;i++)
-	{
-		printf(",");
-		robject_print(obs[i]);
-	}
-	printf("]");
+	BtArray* ba=R_TO_A(ro);
+	return btarray_print(ba,f,flags);
 }
 
-static struct rexpr_ops ba_expr_ops=
+
+
+
+static struct expr_ops ba_expr_ops=
 {
 	.ro_get_item=ba_get_item,
 	.ro_set_item=ba_set_item,
 	.ro_plus=ba_plus,
 	.ro_bool=ba_bool,
-	.ro_print=ba_print,
 };
 
-static void ba_free(Robject* bt)
+static void ba_free(Robject* ro)
 {
-	bt_array_free(R_TO_A(bt));
+	BtArray* ba=R_TO_A(ro);
+	btarray_free(ba);
 }
-static struct robject_ops ba_ops=
+static struct object_ops array_object_ops=
 {
 	.ro_free=ba_free,
 };
-	
-BtArray* bt_array_malloc(int cap)
-{
-	if(cap<ARRAY_DEFAULT_CAP)
-	{
-		cap=ARRAY_DEFAULT_CAP;
-	}
-	BtArray* ret=(BtArray*)malloc(sizeof(*ret));
-	Robject** obs=(Robject**)malloc(sizeof(*obs)*cap);
-	ret->a_cap=cap;
-	ret->a_size=0;
-	ret->a_objects=obs;
 
-	Robject* base=&ret->a_base;
-	base->r_expr_ops=&ba_expr_ops;
-	base->r_name="Array";
-	base->r_ops=&ba_ops;
-	base->r_ref=1;
-	base->r_type=RT_ARRAY;
-	return ret;
-}
-BtArray* bt_array_create()
+static TypeObject type_array=
 {
-	return bt_array_malloc(ARRAY_DEFAULT_CAP);
-}
-void bt_array_free(BtArray* ba)
+	.t_name="Array",
+	.t_type=RT_ARRAY,
+	.t_expr_funcs=&ba_expr_ops,
+	.t_object_funcs=&array_object_ops,
+	.t_print=ba_print,
+};
+
+
+
+void btarray_free(BtArray* ba)
 {
-	if(ba->a_objects!=NULL)
+	assert(ba->a_objects!=NULL);
+	int i=0;
+	for(;i<ba->a_size;i++)
 	{
-		int i=0;
-		for(;i<ba->a_size;i++)
-		{
-			robject_release(ba->a_objects[i]);
-		}
-		free(ba->a_objects);
+		robject_release(ba->a_objects[i]);
+	}
+	if(ba->a_objects!=ba->a_small_objects)
+	{
+		ry_free(ba->a_objects);
 		ba->a_objects=NULL;
 	}
-	free(ba);
+	ry_free(ba);
 }
 
-void bt_array_insert(BtArray* ba,int index,Robject* item)
+int btarray_insert(BtArray* ba,ssize_t index ,Robject* item)
 {
-	BUG_ON(index<0||index>=ba->a_size,"Access OutOF Pos");
+	if(ba_outof_range(ba,index))
+	{
+		except_index_err_format("array index out of range");
+		return -1;
+	}
+	int ret;
 	if(ba->a_size==ba->a_cap)
 	{
 		int enlarged=ba->a_cap*2;
-		bt_array_enlarge( ba,enlarged);
+		ret=ba_enlarge( ba,enlarged);
+		if(ret<0)
+		{
+			return -1;
+		}
 		ba->a_cap=enlarged;
 	}
 	int i;
@@ -244,37 +198,57 @@ void bt_array_insert(BtArray* ba,int index,Robject* item)
 	robject_addref(item);
 	obs[index]=item;
 	ba->a_size++;
+	return 0;
 }
-void bt_array_set_item(BtArray* ba,int index,Robject* item)
+int btarray_set_item(BtArray* ba,ssize_t index,Robject* item)
 {
-	BUG_ON(index<0||index>=ba->a_size,"Access OutOF Pos");
+	if(ba_outof_range(ba,index))
+	{
+		except_index_err_format("array index out of range");
+		return -1;
+	}
 	robject_addref(item);
 	robject_release(ba->a_objects[index]);
 	ba->a_objects[index]=item;
+	return 0;
 }
 
-void bt_array_push_back(BtArray* ba,Robject* item)
+int btarray_push_back(BtArray* ba,Robject* item)
 {
+	int ret;
 	if(ba->a_size==ba->a_cap)
 	{
 		int enlarged=ba->a_cap*2;
-		bt_array_enlarge( ba,enlarged);
+		ret=ba_enlarge(ba,enlarged);
+		if(ret<0)
+		{
+			return -1;
+		}
 		ba->a_cap=enlarged;
 	}
 	robject_addref(item);
 	ba->a_objects[ba->a_size++]=item;
+	return 0;
 }
 
-Robject* bt_array_get_item(BtArray* ba,int index)
+Robject* btarray_get_item(BtArray* ba,int index)
 {
-	BUG_ON(index<0||index>=ba->a_size,"Access OutOF Pos");
+	if(ba_outof_range(ba,index))
+	{
+		except_index_err_format("array index out of range");
+		return NULL;
+	}
 	Robject* item=ba->a_objects[index];
 	robject_addref(item);
 	return item;
 }
-void bt_array_remove(BtArray* ba ,int index)
+int btarray_remove(BtArray* ba ,ssize_t index)
 {
-	BUG_ON(index<0||index>=ba->a_size,"Access OutOF Pos");
+	if(ba_outof_range(ba,index))
+	{
+		except_index_err_format("array index out of range");
+		return -1;
+	}
 	Robject* item=ba->a_objects[index];
 	robject_release(item);
 	int i=index;
@@ -284,15 +258,20 @@ void bt_array_remove(BtArray* ba ,int index)
 	{
 		obs[i]=obs[i+1];
 	}
+	return 0;
 }
-BtArray* bt_array_merge(BtArray* l,BtArray* r)
+BtArray* btarray_plus(BtArray* l,BtArray* r)
 {
 	int l_size=l->a_size;
 	Robject** l_obs=l->a_objects;
 	int r_size=r->a_size;
 	Robject** r_obs=r->a_objects;
 	int m_size=l_size+r_size;
-	BtArray* m=bt_array_malloc(m_size);
+	BtArray* m=ba_malloc(m_size);
+	if(m==NULL)
+	{
+		return NULL;
+	}
 	Robject** m_obs=m->a_objects;
 
 	int i;
@@ -309,4 +288,89 @@ BtArray* bt_array_merge(BtArray* l,BtArray* r)
 	m->a_size=m_size;
 	return m;
 }
+int btarray_print(BtArray* ba,FILE* f,int flags)
+{
+	if(ba->a_flags&ARRAY_FLAG_PRINT)
+	{
+		printf("[...]");
+		goto over;
+	}
+	ba->a_flags|=ARRAY_FLAG_PRINT;
+	if(ba->a_size==0)
+	{
+		printf("[ ]");
+		goto over;
+	}
+	ssize_t size=ba->a_size;
+	Robject** obs=ba->a_objects;
+	printf("[");
+	robject_print(obs[0],f,flags&(~PRINT_FLAGS_NEWLINE));
+	ssize_t i=1;
+	for(;i<size;i++)
+	{
+		printf(",");
+		robject_print(obs[i],f,flags&(~PRINT_FLAGS_NEWLINE));
+	}
 
+	printf("]");
+over:
+	if(flags&PRINT_FLAGS_NEWLINE)
+	{
+		printf("\n");
+	}
+	ba->a_flags&=(~ARRAY_FLAG_PRINT);
+	return 0;
+}
+
+static BtArray* ba_malloc(ssize_t cap)
+{
+	BtArray* ret=ry_malloc(sizeof(*ret));
+	if(ret==NULL)
+	{
+		ryerr_nomemory();
+		return NULL;
+	}
+	if(cap<=SMALL_ARRAY_SIZE)
+	{
+		ret->a_objects=ret->a_small_objects;
+	}
+	else
+	{
+		Robject** array=ry_malloc(sizeof(Robject*)*cap);
+		if(array==NULL)
+		{
+			ry_free(ret);
+			ryerr_nomemory();
+			return NULL;
+		}
+		ret->a_objects=array;
+	}
+	robject_init((Robject*)ret,&type_array);
+	ret->a_cap=cap;
+	ret->a_size=0;
+	ret->a_flags=0;
+	return ret;
+}
+BtArray* btarray_create_size(ssize_t size)
+{
+	BtArray* ret=ba_malloc(size);
+	if(ret==NULL)
+	{
+		return NULL;
+	}
+	int i=0;
+	Robject** ro=ret->a_objects;
+	for(;i<size;i++)
+	{
+		robject_addref(NullObject);
+		ro[i]=NullObject;
+	}
+	ret->a_size=size;
+	return ret;
+}
+
+
+BtArray* btarray_create()
+{
+	return ba_malloc(0);
+}

@@ -1,13 +1,16 @@
 #ifndef _REDY_RTYPE_ARRAY_H_
 #define _REDY_RTYPE_ARRAY_H_ 
-#include"robject.h"
-
+#include<object/robject.h>
+#define SMALL_ARRAY_SIZE 8
+#define ARRAY_FLAG_PRINT 0x1
 struct  bt_array 
 {
-	struct robject a_base;
-	int a_cap;
-	int a_size;
+	INHERIT_ROBJECT;
+	ssize_t a_cap;
+	ssize_t a_size;
+	int a_flags;
 	struct robject** a_objects;
+	struct robject* a_small_objects[SMALL_ARRAY_SIZE];
 };
 
 typedef struct bt_array BtArray;
@@ -32,19 +35,25 @@ static inline Robject* A_TO_R(BtArray* bt)
 #endif 
 
 /* constructor */
-BtArray* bt_array_malloc(int cap);
-BtArray* bt_array_create();
+BtArray* btarray_create();
+BtArray* btarray_create_size(ssize_t size);
 
 /* destructor */
-void bt_array_free(BtArray* ba);
+void btarray_free(BtArray* ba);
 
 /* interface */
-void bt_array_insert(BtArray* ba,int index,Robject* item);
-void bt_array_set_item(BtArray* ba,int index,Robject* item);
-void bt_array_push_back(BtArray* ba,Robject* item);
-Robject* bt_array_get_item(BtArray* ba,int index);
-void bt_array_remove(BtArray* ba ,int index);
-BtArray* bt_array_merge(BtArray* l,BtArray* r);
+int btarray_insert(BtArray* ba,ssize_t index,Robject* item);
+int btarray_set_item(BtArray* ba,ssize_t index,Robject* item);
+int btarray_push_back(BtArray* ba,Robject* item);
+Robject* btarray_get_item(BtArray* ba,ssize_t index);
+int btarray_remove(BtArray* ba ,ssize_t index);
+BtArray* btarray_plus(BtArray* l,BtArray* r);
+
+static inline int btarray_bool(BtArray* ba)
+{
+	return ba->a_size!=0;
+}
+int btarray_print(BtArray* ba,FILE* f,int flags);
 
 
 #endif 

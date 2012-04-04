@@ -1,7 +1,9 @@
 PROJECT=rtype
-SRC=bt_int.c bt_float.c bt_long.c bt_string.c  big_integer.c
+SRC=bt_int.c bt_float.c bt_long.c bt_string.c  big_integer.c \
+	bt_array.c
 DEBUG=
-BIN=rtype_unit_test.c rtype_unit_test2.c
+BIN=rtype_unit_test.c rtype_unit_test2.c test_array.c
+
 #SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
 	rtype.c robject.c except_msg.c   bt_string.c bt_array.c
 #DEBUG=gen_lib.c 
@@ -32,7 +34,7 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall  -Werror
+FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 	-L../lib/ -lvm  -lobject -lrstd

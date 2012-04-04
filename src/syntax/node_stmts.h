@@ -1,26 +1,22 @@
 #ifndef _REDY_SYNTAX_AST_NODE_STMTS_H_
 #define _REDY_SYNTAX_AST_NODE_STMTS_H_
 #include"node_type.h"
-#include"node_stmt.h"
+#include"ast_object.h"
 #include<utility_c/list_head.h>
 
-struct ast_node_stmts
-{
-	INHERIT_AST_OBJECT;
-	struct list_head s_chirldren;
-};
-typedef struct ast_node_stmts AstNodeStmts;
+typedef struct ast_object AstNodeStmts;
+
 AST_TYPE_CAST(STMTS,Stmts,ATN_STMTS);
 
 AstNodeStmts* ast_create_stmts();
 
-static inline void ast_stmts_add(AstNodeStmts* stmts,AstNodeStmt* node)
+static inline void ast_stmts_add(AstNodeStmts* father,AstObject* chirld)
 {
-	list_add_tail(&node->s_sibling,&stmts->s_chirldren);
+	ast_node_add(STMTS_TO_AST(father),chirld);
 }
-static inline void ast_stmts_remove(AstNodeStmt* node)
+static inline void ast_stmts_remove(AstNodeStmts* father,AstObject* chirld)
 {
-	list_del(&node->s_sibling);
+	ast_node_del(STMTS_TO_AST(father),chirld);
 }
 
 #endif  /*_REDY_SYNTAX_AST_NODE_STMTS_H_*/

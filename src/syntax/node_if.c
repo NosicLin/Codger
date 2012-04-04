@@ -2,31 +2,10 @@
 #include<rstd/redy_std.h>
 #include<vm/except.h>
 
-
 #ifdef AST_MACHINE
 #include"ast_machine.h"
 #endif 
 
-static void if_free_self(AstObject* ab)
-{
-	AstNodeIf* node=AST_TO_IF(ab);
-	ry_free(node);
-}
-static void if_free(AstObject* ab)
-{
-	AstNodeIf* node=AST_TO_IF(ab);
-	struct list_head* head=&node->i_chirdren;
-	AstNodeIfSub* p;
-	struct list_head* cur;
-	while(!list_empty(head))
-	{
-		cur=head->next;
-		list_del(cur);
-		p=list_entry(cur,AstNodeIfSub,s_sibling);
-		ast_free(IF_SUB_TO_AST(p));
-	}
-	ry_free(node);
-}
 
 static void if_sub_free_self(AstObject* ab)
 {
@@ -46,13 +25,12 @@ static void  if_sub_free(AstObject* ab)
 #ifdef AST_MACHINE
 static int if_execute(AstObject* ab)
 {
-	AstNodeIf* node=AST_TO_IF(ab);
-	struct list_head* head=&node->i_chirdren;
-	AstNodeIfSub* p;
+	struct list_head* head=&ab->a_chirldren;
+	AstObject* p;
 	int ret=AST_EXE_SUCCESS;
-	list_for_each_entry(p,head,s_sibling)
+	list_for_each_entry(p,head,a_sibling)
 	{
-		ret=ast_execute(IF_SUB_TO_AST(p));
+		ret=ast_execute(p);
 		if(ret<0)
 		{
 			break;
@@ -144,8 +122,8 @@ static AstNodeType node_if=
 {
 	.n_name="If",
 	.n_type=ATN_IF,
-	.n_free=if_free,
-	.n_free_node=if_free_self,
+	.n_free=ast_node_free,
+	.n_free_node=ast_node_free_self,
 #ifdef AST_MACHINE
 	.n_execute=if_execute,
 #endif 
@@ -168,7 +146,6 @@ AstNodeIf* ast_create_if()
 	{
 		return NULL;
 	}
-	INIT_LIST_HEAD(&node->i_chirdren);
 	return node;
 }
 

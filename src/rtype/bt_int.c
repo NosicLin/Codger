@@ -945,7 +945,7 @@ static void bi_free(Robject* bt)
 	free(R_TO_I(bt));
 }
 
-struct object_ops int_object_ops=
+static struct object_ops int_object_ops=
 {
 	.ro_free=bi_free,
 };

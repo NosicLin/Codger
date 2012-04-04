@@ -113,7 +113,8 @@ int robject_richcmp(Robject* x,Robject* y,int op)
 void robject_release(Robject* r)
 {
 	r->r_ref--;
-	assert(r->r_ref>=0);
+	BUG_ON(r->r_ref<0," Object '%s'  Release Error,RefNum=%d",
+						robject_name(r),r->r_ref);
 	if(r->r_ref==0)
 	{
 		if(!r->r_type->t_object_funcs)
@@ -147,7 +148,11 @@ void robject_print(Robject* rt,FILE* f,int flags)
 	}
 	return ;
 default_action:
-	printf("Object At %ld\n",(long)rt);
+	printf("Object At %ld",(long)rt);
+	if(print_set_newline(flags))
+	{
+		printf("\n");
+	}
 	return ;
 
 }
