@@ -67,6 +67,8 @@ enum AST_NODE_TYPE
 	ATN_WHILE,
 	ATN_IF,
 	ATN_IF_SUB,
+	ATN_ARRAY,
+	ATN_GET_ITEM,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

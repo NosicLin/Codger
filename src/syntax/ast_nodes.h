@@ -9,6 +9,8 @@
 #include"node_print.h"
 #include"node_while.h"
 #include"node_if.h"
+#include"node_array.h"
+#include"node_get_item.h"
 
 
 #endif  /*_REDY_SYNTAX_AST_NODE_H_*/

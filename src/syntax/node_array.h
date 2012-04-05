@@ -4,7 +4,7 @@
 #include "node_type.h"
 struct ast_node_array
 {
-	INHERIT_AST_OBEJCT;
+	INHERIT_AST_OBJECT;
 	struct ast_object* a_exprs;
 };
 typedef struct ast_node_array AstNodeArray;

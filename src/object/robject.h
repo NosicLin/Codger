@@ -29,6 +29,7 @@ static inline TypeObject* robject_type(Robject* r){return r->r_type;}
 static inline int robject_typeid(Robject* r){return r->r_type->t_type;}
 
 /* robject expr */
+Robject* robject_get_item(Robject* r,Robject* index);
 /*unary expr*/
 Robject* robject_positive(Robject* r);
 Robject* robject_negative(Robject* r);

@@ -175,16 +175,30 @@ expr_list: expr
 	}
 	;
 
-array:tL_SB expr tR_SB 
-
+array:tL_SB expr_list tR_SB
+	{
+		AstNodeArray* node=ast_create_array($2);
+		ast_addto_pending(ARRAY_TO_AST(node));
+		$$=ARRAY_TO_AST(node);
+	}
+		
 primary_expr: literal {$$=$1;}
 	|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
-	|identifier{$$=$1}
-	|array
+	|identifier{$$=$1;}
+	|array {$$=$1;}
 	;
 
-unary_expr:primary_expr{$$=$1;}
-		  |tPLUS unary_expr 
+postfix_expr: primary_expr{$$=$1;}
+	|postfix_expr tL_SB expr tR_SB
+	{
+		AstNodeGetItem* node=ast_create_get_item($1,$3);
+		ast_addto_pending(GET_ITEM_TO_AST(node));
+		$$=GET_ITEM_TO_AST(node);
+	}
+	;
+
+unary_expr:postfix_expr{$$=$1;}
+	|tPLUS unary_expr 
 	{  
 		AstNodePositive* node=ast_create_positive($2);
 		AstObject* ab=POSITIVE_TO_AST(node);

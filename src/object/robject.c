@@ -26,6 +26,7 @@
 #define OPER_NAME_NEGATIVE "-"
 #define OPER_NAME_NEGATED "~"
 #define OPER_NAME_POSITIVE "+"
+#define OPER_NAME_GET_ITEM "[ ]"
 
 static inline char* EXPR_NAME_CMP(int op)
 {
@@ -162,7 +163,12 @@ default_action:
 ssize_t robject_hash(Robject* rt)
 {
 	TypeObject* t=rt->r_type;
-	assert(rt);
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("TypeObject Not Find");
+		return -1;
+	}
 	if(!t->t_hash)
 		goto default_action;
 
@@ -173,21 +179,67 @@ default_action:
 	return -1;
 }
 
+Robject* robject_get_item(Robject* r,Robject* index)
+{
+	TypeObject* t=r->r_type;
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("TypeObject Not Find");
+		return NULL;
+	}
+	if(!t->t_expr_funcs)
+		goto default_action;
+	if(!t->t_expr_funcs->ro_get_item)
+		goto default_action;
+
+	Robject* ret=t->t_expr_funcs->ro_get_item(r,index);
+	if(ret==NULL)
+	{
+		if(!vm_except_happened())
+		{
+			except_unkown_err_format("Bug Interal");
+		}
+	}
+	return ret;
+default_action:
+
+	except_type_err_format("unsupport operand([]) for '%s'",
+							robject_name(r));
+	return NULL;
+}
+
+
+
 #define ROBJECT_UNARY(H,l) \
 Robject* robject_##l(Robject* r)  \
 { \
 	TypeObject* t=r->r_type; \
-	assert(t); \
+	if(t==NULL) \
+	{ \
+		BUG("TypeObject Error"); \
+		goto error; \
+	} \
 	if(!t->t_expr_funcs)  \
 		goto default_action; \
 	if(!t->t_expr_funcs->ro_##l) \
 		goto default_action;  \
 	Robject* ret=t->t_expr_funcs->ro_##l(r); \
+	if(ret==NULL) \
+	{ \
+		if(!vm_except_happened()) \
+		{ \
+			except_unkown_err_format("Bug Interal"); \
+		} \
+	} \
 	return ret;  \
 default_action:  \
 	except_type_err_format("unsupport operand(%s) for '%s'", \
 					OPER_NAME_##H,robject_name(r));  \
 	return NULL;  \
+error: \
+	except_unkown_err_format("Not Find TypeObject"); \
+	return NULL; \
 }
 
 ROBJECT_UNARY(POSITIVE,positive);
