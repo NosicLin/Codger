@@ -13,6 +13,8 @@ static int ba_enlarge(BtArray* ba,ssize_t size)
 {
 	if(size<SMALL_ARRAY_SIZE)
 	{
+		BUG("Array Enlarged Size Will Larger Than %d But is %d)",
+											SMALL_ARRAY_SIZE,size);
 		size=SMALL_ARRAY_SIZE;
 	}
 
@@ -30,7 +32,10 @@ static int ba_enlarge(BtArray* ba,ssize_t size)
 	{
 		new_obs[i]=old_obs[i];
 	}
-	ry_free(old_obs);
+	if(old_obs!=ba->a_small_objects)
+	{
+		ry_free(old_obs);
+	}
 	ba->a_objects=new_obs;
 	ba->a_cap=size;
 	return 0;
@@ -173,7 +178,7 @@ void btarray_free(BtArray* ba)
 
 int btarray_insert(BtArray* ba,ssize_t index ,Robject* item)
 {
-	if(ba_outof_range(ba,index))
+	if(index<0||index>ba->a_size)
 	{
 		except_index_err_format("array index out of range");
 		return -1;
@@ -187,7 +192,6 @@ int btarray_insert(BtArray* ba,ssize_t index ,Robject* item)
 		{
 			return -1;
 		}
-		ba->a_cap=enlarged;
 	}
 	int i;
 	Robject** obs=ba->a_objects;
@@ -224,7 +228,6 @@ int btarray_push_back(BtArray* ba,Robject* item)
 		{
 			return -1;
 		}
-		ba->a_cap=enlarged;
 	}
 	robject_addref(item);
 	ba->a_objects[ba->a_size++]=item;
@@ -258,6 +261,7 @@ int btarray_remove(BtArray* ba ,ssize_t index)
 	{
 		obs[i]=obs[i+1];
 	}
+	ba->a_size--;
 	return 0;
 }
 BtArray* btarray_plus(BtArray* l,BtArray* r)
@@ -346,7 +350,7 @@ static BtArray* ba_malloc(ssize_t cap)
 		ret->a_objects=array;
 	}
 	robject_init((Robject*)ret,&type_array);
-	ret->a_cap=cap;
+	ret->a_cap=cap<=SMALL_ARRAY_SIZE?SMALL_ARRAY_SIZE:cap;
 	ret->a_size=0;
 	ret->a_flags=0;
 	return ret;

@@ -41,6 +41,9 @@ BtArray* btarray_create_size(ssize_t size);
 /* destructor */
 void btarray_free(BtArray* ba);
 
+/* if return type is int mean:success(0) failed(-1) */
+/* if return type is pointer mean:success(Not NULL) falied(NULL) */
+
 /* interface */
 int btarray_insert(BtArray* ba,ssize_t index,Robject* item);
 int btarray_set_item(BtArray* ba,ssize_t index,Robject* item);
@@ -48,6 +51,7 @@ int btarray_push_back(BtArray* ba,Robject* item);
 Robject* btarray_get_item(BtArray* ba,ssize_t index);
 int btarray_remove(BtArray* ba ,ssize_t index);
 BtArray* btarray_plus(BtArray* l,BtArray* r);
+static inline ssize_t btarray_size(BtArray* ba) { return ba->a_size; }
 
 static inline int btarray_bool(BtArray* ba)
 {

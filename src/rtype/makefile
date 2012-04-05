@@ -2,7 +2,7 @@ PROJECT=rtype
 SRC=bt_int.c bt_float.c bt_long.c bt_string.c  big_integer.c \
 	bt_array.c
 DEBUG=
-BIN=rtype_unit_test.c rtype_unit_test2.c test_array.c
+BIN=rtype_unit_test.c rtype_unit_test2.c test_array.c unit_array.c
 
 #SRC=big_integer.c bt_int.c bt_float.c bt_long.c bt_common.c \
 	rtype.c robject.c except_msg.c   bt_string.c bt_array.c
