@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_AST_NODE_H_
-#define _REDY_SYNTAX_AST_NODE_H_
+#ifndef _CODGER_SYNTAX_AST_NODE_H_
+#define _CODGER_SYNTAX_AST_NODE_H_
 #include"node_literal.h"
 #include"node_uexpr.h"
 #include"node_bexpr.h"
@@ -13,6 +13,6 @@
 #include"node_get_item.h"
 
 
-#endif  /*_REDY_SYNTAX_AST_NODE_H_*/
+#endif  /*_CODGER_SYNTAX_AST_NODE_H_*/
 
 

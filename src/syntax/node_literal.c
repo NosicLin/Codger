@@ -5,11 +5,10 @@
 #endif /* AST_MACHINE */
 #include"ast_object.h"
 
-static void literal_free(AstObject* ab)
+static void literal_destruct(AstObject* ab)
 {
 	AstNodeLiteral* node=AST_TO_LITERAL(ab);
 	robject_release(node->l_value);
-	ry_free(node);
 }
 #ifdef AST_MACHINE 
 static int literal_execute(AstObject* ab)
@@ -28,8 +27,8 @@ static AstNodeType node_literal=
 {
 	.n_type=ATN_LITERAL,
 	.n_name="Literal",
-	.n_free=literal_free,
-	.n_free_node=literal_free,
+	.n_belong=ANF_LITERAL,
+	.n_destruct=literal_destruct,
 #ifdef AST_MACHINE 
 	.n_execute=literal_execute,
 #endif /*AST_MACHINE*/

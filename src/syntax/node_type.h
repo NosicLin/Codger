@@ -1,19 +1,33 @@
-#ifndef _REDY_SYNTAX_NODE_TYPE_H_
-#define _REDY_SYNTAX_NODE_TYPE_H_ 
+#ifndef _CODGER_SYNTAX_NODE_TYPE_H_
+#define _CODGER_SYNTAX_NODE_TYPE_H_ 
 #include<assert.h>
 struct ast_object;
 struct ast_node_type
 {
 	int n_type;
-	const char* n_name;
-	void (*n_free)(struct ast_object*);
-	void (*n_free_node)(struct ast_object*);
+	const char* n_name; /* node name */
+
+	/*  attribute n_belong  used to cache*/
+	int n_belong;
+
+	/* destruct node */
+	void (*n_destruct)(struct ast_object*);
+
 #ifdef AST_MACHINE
 	int (*n_execute)(struct ast_object*);
 #endif 
 };
 
 typedef struct ast_node_type AstNodeType;
+
+enum AST_NODE_FAMILY
+{
+	ANF_UNKOWN=1,
+	ANF_LITERAL,
+	ANF_NORMAL,
+	ANF_UNARY,
+	ANF_BINARY,
+};
 
 enum AST_NODE_TYPE
 {
@@ -83,4 +97,4 @@ enum AST_NODE_TYPE
 		return (AstObject*) n; \
 	}
 
-#endif /*_REDY_SYNTAX_NODE_TYPE_H_*/
+#endif /*_CODGER_SYNTAX_NODE_TYPE_H_*/

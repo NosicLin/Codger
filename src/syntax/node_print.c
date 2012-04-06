@@ -7,20 +7,6 @@
 #include"ast_machine.h"
 #endif 
 
-static void print_free(AstObject* ab)
-{
-	AstNodePrint* node=AST_TO_PRINT(ab);
-	ast_free(node->p_expr);
-	ast_destroy(ab);
-	ry_free(node);
-}
-static void print_free_self(AstObject* ab)
-{
-	AstNodePrint* node=AST_TO_PRINT(ab); /* type check*/
-
-	ast_destroy(ab);
-	ry_free(node);
-}
 #ifdef AST_MACHINE
 static int print_execute(AstObject* ab)
 {
@@ -51,8 +37,7 @@ static AstNodeType node_print=
 {
 	.n_type=ATN_PRINT,
 	.n_name="Print",
-	.n_free=print_free,
-	.n_free_node=print_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=print_execute,
 #endif 

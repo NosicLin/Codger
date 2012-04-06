@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_AST_NODE_STMTS_H_
-#define _REDY_SYNTAX_AST_NODE_STMTS_H_
+#ifndef _CODGER_SYNTAX_AST_NODE_STMTS_H_
+#define _CODGER_SYNTAX_AST_NODE_STMTS_H_
 #include"node_type.h"
 #include"ast_object.h"
 #include<utility_c/list_head.h>
@@ -19,5 +19,5 @@ static inline void ast_stmts_remove(AstNodeStmts* father,AstObject* chirld)
 	ast_node_del(STMTS_TO_AST(father),chirld);
 }
 
-#endif  /*_REDY_SYNTAX_AST_NODE_STMTS_H_*/
+#endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/
 

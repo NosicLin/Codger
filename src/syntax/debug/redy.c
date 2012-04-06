@@ -25,21 +25,21 @@ int main(int argc ,char** argv)
 	if(ret!=0)
 	{
 		printf("parse <%s> failed\n",argv[1]);
+
 		goto error;
 	}
-	else
-	{
-		printf("parse <%s> success\n",argv[1]);
-		root=parser_get_root();
-		ast_execute(root);
-	}
-	
+	ast_clear_pending();
+	printf("parse <%s> success\n",argv[1]);
+	root=parser_get_root();
+	ast_execute(root);
+
+	ast_tree_free(root);
 	sc_destory(sc);
 	ast_machine_exit();
-	ast_free(root);
 	return 0;
 
 error:
+	ast_free_pending();
 	sc_destory(sc);
 	ast_machine_exit();
 	return -1;

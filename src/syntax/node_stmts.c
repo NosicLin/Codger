@@ -27,8 +27,7 @@ static AstNodeType node_stmts=
 {
 	.n_type=ATN_STMTS,
 	.n_name="Stmts",
-	.n_free=ast_node_free,
-	.n_free_node=ast_node_free_self,
+	.n_belong=ANF_NORMAL,
 #ifdef AST_MACHINE
 	.n_execute=stmts_execute,
 #endif 

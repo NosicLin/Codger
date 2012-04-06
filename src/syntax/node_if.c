@@ -7,21 +7,6 @@
 #endif 
 
 
-static void if_sub_free_self(AstObject* ab)
-{
-	AstNodeIfSub* node=AST_TO_IF_SUB(ab);
-	ry_free(node);
-}
-static void  if_sub_free(AstObject* ab)
-{
-	AstNodeIfSub* node=AST_TO_IF_SUB(ab);
-	ast_free(node->s_stmts);
-	if(node->s_expr)
-	{
-		ast_free(node->s_expr);
-	}
-	ry_free(node);
-}
 #ifdef AST_MACHINE
 static int if_execute(AstObject* ab)
 {
@@ -122,8 +107,7 @@ static AstNodeType node_if=
 {
 	.n_name="If",
 	.n_type=ATN_IF,
-	.n_free=ast_node_free,
-	.n_free_node=ast_node_free_self,
+	.n_belong=ANF_NORMAL,
 #ifdef AST_MACHINE
 	.n_execute=if_execute,
 #endif 
@@ -132,8 +116,7 @@ static AstNodeType node_if_sub=
 {
 	.n_name="IfSub",
 	.n_type=ATN_IF_SUB,
-	.n_free=if_sub_free,
-	.n_free_node=if_sub_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=if_sub_execute,
 #endif

@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_AST_MACHINE_H_
-#define _REDY_SYNTAX_AST_MACHINE_H_
+#ifndef _CODGER_SYNTAX_AST_MACHINE_H_
+#define _CODGER_SYNTAX_AST_MACHINE_H_
 #include"ast_object.h"
 #include<object/robject.h>
 #include"symbol_table.h"
@@ -44,5 +44,5 @@ static inline Robject* get_reg0()
 
 
 #endif  /*AST_MACHINE*/
-#endif /*_REDY_SYNTAX_AST_MACHINE_H_*/
+#endif /*_CODGER_SYNTAX_AST_MACHINE_H_*/
 

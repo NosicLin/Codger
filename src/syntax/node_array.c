@@ -7,17 +7,6 @@
 #include"ast_machine.h"
 #endif 
 
-static void array_free(AstObject* ab)
-{
-	AstNodeArray* node=AST_TO_ARRAY(ab);
-	ast_free(node->a_exprs);
-	ry_free(node);
-}
-static void array_free_self(AstObject* ab)
-{
-	AstNodeArray* node=AST_TO_ARRAY(ab);
-	ry_free(node);
-}
 #ifdef AST_MACHINE
 static int array_execute(AstObject* ab)
 {
@@ -63,8 +52,7 @@ static AstNodeType node_array=
 {
 	.n_name="Array",
 	.n_type=ATN_ARRAY,
-	.n_free=array_free,
-	.n_free_node=array_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=array_execute,
 #endif 

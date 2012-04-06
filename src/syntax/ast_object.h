@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_AST_OBJECT_H_
-#define _REDY_SYNTAX_AST_OBJECT_H_
+#ifndef _CODGER_SYNTAX_AST_OBJECT_H_
+#define _CODGER_SYNTAX_AST_OBJECT_H_
 #include<utility_c/list_head.h>
 #include"node_type.h"
 
@@ -13,7 +13,10 @@ struct ast_object
 	 */
 	struct list_head a_chirldren;
 	struct list_head a_sibling;
-	struct list_head a_pending;
+	/* attribute a_link used to link  all node together*/
+	struct list_head a_link;
+
+	/* node type */
 	struct ast_node_type* a_type;
 };
 typedef struct ast_object AstObject;
@@ -24,9 +27,8 @@ typedef struct ast_object AstObject;
    	((TYPE*)__ast_node_new(sizeof(TYPE),type_object))
 
 /*interface*/
-
-static inline void ast_destroy(AstObject* ab){} /*TODO*/
-void ast_free(AstObject* ab);
+void ast_tree_free(AstObject* root);
+void ast_node_free(AstObject* node);
 void ast_init(AstObject* ab,struct ast_node_type* node_type);
 void* __ast_node_new(ssize_t size,struct ast_node_type* node_type);
 
@@ -48,8 +50,6 @@ static inline void ast_node_del(AstObject* father,AstObject* chirld)
 {
 	list_del(&chirld->a_sibling);
 }
-void ast_node_free(AstObject* node);
-void ast_node_free_self(AstObject* node);
 
 
 

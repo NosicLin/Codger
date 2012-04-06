@@ -1,5 +1,5 @@
-#ifndef _REYD_SYNTAX_NODE_IF_H_
-#define _REYD_SYNTAX_NODE_IF_H_
+#ifndef _CODGER_SYNTAX_NODE_IF_H_
+#define _CODGER_SYNTAX_NODE_IF_H_
 #include"ast_object.h"
 #include<utility_c/list_head.h>
 
@@ -27,4 +27,4 @@ AstNodeIfSub* ast_create_if_sub(AstObject* expr,AstObject* stmts);
 
 
 	
-#endif /*_REYD_SYNTAX_NODE_IF_H_*/
+#endif /*_CODGER_SYNTAX_NODE_IF_H_*/

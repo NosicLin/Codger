@@ -5,17 +5,6 @@
 #include"ast_machine.h"
 #endif /*AST_MACHINE*/
 #include"object/robject.h"
-static void unary_expr_free(AstObject* ab)
-{
-	AstNodeUExpr* uexpr=(AstNodeUExpr*)ab;
-	ast_free(uexpr->u_value);
-	ry_free(uexpr);
-}
-static void unary_expr_free_self(AstObject* ab)
-{
-	AstNodeUExpr* uexpr=(AstNodeUExpr*)ab;
-	ry_free(uexpr);
-}
 
 typedef Robject* (*unary_func)(Robject*);
 #ifdef AST_MACHINE
@@ -74,8 +63,7 @@ static AstNodeType node_positive=
 {
 	.n_type=ATN_POSITIVE,
 	.n_name="Positive",
-	.n_free=unary_expr_free,
-	.n_free_node=unary_expr_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=positive_execute,
 #endif 
@@ -84,8 +72,7 @@ static AstNodeType node_negative=
 {
 	.n_type=ATN_NEGATIVE,
 	.n_name="Negative",
-	.n_free=unary_expr_free,
-	.n_free_node=unary_expr_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=negative_execute,
 #endif
@@ -94,8 +81,7 @@ static AstNodeType node_negated=
 {
 	.n_type=ATN_NEGATED,
 	.n_name="Negated",
-	.n_free=unary_expr_free,
-	.n_free_node=unary_expr_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=negated_execute,
 #endif
@@ -165,8 +151,7 @@ static AstNodeType node_logic_not=
 {
 	.n_name="LogicNot",
 	.n_type=ATN_LOGIC_NOT,
-	.n_free=unary_expr_free,
-	.n_free_node=unary_expr_free_self,
+	.n_belong=ANF_UNARY,
 #ifdef AST_MACHINE
 	.n_execute=logic_not_execute,
 #endif 

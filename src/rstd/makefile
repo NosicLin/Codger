@@ -1,6 +1,6 @@
 PROJECT=rstd
 
-SRC=redy_std.c
+SRC=redy_std.c gr_std.c
 
 DEBUG=
 BIN=

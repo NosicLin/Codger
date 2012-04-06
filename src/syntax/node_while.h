@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_NODE_WHILE_H_
-#define _REDY_SYNTAX_NODE_WHILE_H_
+#ifndef _CODGER_SYNTAX_NODE_WHILE_H_
+#define _CODGER_SYNTAX_NODE_WHILE_H_
 #include"ast_object.h"
 struct ast_node_while
 {

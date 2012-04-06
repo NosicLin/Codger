@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_NODE_ARRAY_H_
-#define _REDY_SYNTAX_NODE_ARRAY_H_
+#ifndef _CODGER_SYNTAX_NODE_ARRAY_H_
+#define _CODGER_SYNTAX_NODE_ARRAY_H_
 #include "ast_object.h"
 #include "node_type.h"
 struct ast_node_array

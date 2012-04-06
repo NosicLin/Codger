@@ -6,26 +6,12 @@
 #include"ast_machine.h"
 #endif 
 
-void assign_free(AstObject* ab)
-{
-	AstNodeAssign* node=AST_TO_ASSIGN(ab);
-	ast_free((AstObject*)node->a_var);
-	ast_free(node->a_expr);
-	ast_destroy(ab);
-	ry_free(node);
-}
-void assign_free_self(AstObject* ab)
-{
-	AstNodeAssign* node=AST_TO_ASSIGN(ab);
-	ast_destroy(ab);
-	ry_free(node);
-}
 #ifdef AST_MACHINE
 static int assign_execute(AstObject* ab)
 {
 	AstNodeAssign* node=AST_TO_ASSIGN(ab);
 	assert(node->a_var);
-	BtString* var=node->a_var->i_value;
+	BtString* var=AST_TO_VAR(node->a_var)->i_value;
 	Robject* key=S_TO_R(var);
 	int exe_info=ast_execute(node->a_expr);
 	if(exe_info<0)
@@ -49,14 +35,13 @@ static AstNodeType node_assign=
 {
 	.n_type=ATN_ASSIGN,
 	.n_name="Assign",
-	.n_free=assign_free,
-	.n_free_node=assign_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=assign_execute,
 #endif 
 };
 
-AstNodeAssign* ast_create_assign(AstNodeVar* var,AstObject* expr)
+AstNodeAssign* ast_create_assign(AstObject* var,AstObject* expr)
 {
 	AstNodeAssign* ret=ast_node_new(AstNodeAssign,&node_assign);
 	if(ret==NULL)

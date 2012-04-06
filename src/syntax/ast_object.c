@@ -1,30 +1,31 @@
 #include"ast_object.h"
 #include<stdlib.h>
 #include<utility_c/marocs.h>
-#include<rstd/redy_std.h>
+#include<rstd/gr_std.h>
 #include<vm/except.h>
 #ifdef AST_MACHINE
 #include"ast_machine.h"
 #endif 
 
 static LIST_HEAD(pending_ast_object);
+static inline void __cache_free(AstObject* ab)
+{
+	gr_free(ab);
+}
+static inline AstObject* __cache_alloc(ssize_t size,int family)
+{
+	return gr_malloc(size);
+}
 
-void ast_free(AstObject* ab)
+inline void ast_node_free(AstObject* ab)
 {
 	AstNodeType* t=ab->a_type;
-	if(t==NULL)
+	BUG_ON(t==NULL,"Error AstObject");
+	if(t->n_destruct)
 	{
-		BUG("Error AstObject");
-		goto error;
+		t->n_destruct(ab);
 	}
-	if(t->n_free)
-	{
-		t->n_free(ab);
-		return ;
-	}
-	WARN("AstObject No Free Func");
-error:
-	free(ab);
+	__cache_free(ab);
 }
 
 void ast_clear_pending()
@@ -33,55 +34,60 @@ void ast_clear_pending()
 }
 void ast_free_pending()
 {
-	AstObject* p;
-	list_for_each_entry(p,&pending_ast_object,a_pending)
+	AstObject* p=0;
+	struct list_head* cur=0;
+	while(!list_empty(&pending_ast_object))
 	{
-		ast_free(p);
+		cur=pending_ast_object.next;
+		list_del(cur);
+		p=list_entry(cur,AstObject,a_sibling);
+		ast_node_free(p);
 	}
-	ast_clear_pending();
 }
 
-void ast_addto_pending(AstObject* ab)
+inline void ast_addto_pending(AstObject* ab)
 {
-	list_add_tail(&ab->a_pending,&pending_ast_object);
+	list_add_tail(&ab->a_link,&pending_ast_object);
 }
 
 inline void ast_init(AstObject* ab,struct ast_node_type* node_type)
 {
+	BUG_ON(node_type->n_belong==ANF_UNKOWN,
+			"NodeType(%s) n_belong attr Not Init",node_type->n_name);
 	ab->a_type=node_type;
-	INIT_LIST_HEAD(&ab->a_pending);
-	INIT_LIST_HEAD(&ab->a_chirldren);
 	INIT_LIST_HEAD(&ab->a_sibling);
+	INIT_LIST_HEAD(&ab->a_chirldren);
+	INIT_LIST_HEAD(&ab->a_link);
+	ast_addto_pending(ab);
 }
 
 void* __ast_node_new(ssize_t size,struct ast_node_type* node_type)
 {
-	AstObject* ab=(AstObject*)ry_malloc(size);
+	int family=node_type->n_belong;
+	BUG_ON(node_type->n_belong==ANF_UNKOWN,
+			"NodeType(%s) n_belong attr Not Init",node_type->n_name);
+
+	AstObject* ab=__cache_alloc(size,family);
 	if(ab==NULL)
 	{
-		ryerr_nomemory();
 		return NULL;
 	}
 	ast_init(ab,node_type);
 	return ab;
 }
-void ast_node_free(AstObject* node)
+void ast_tree_free(AstObject* node)
 {
-	struct list_head* head=&node->a_chirldren;
+	struct list_head* head=&node->a_link;
 	AstObject* p;
 	struct list_head* cur;
 	while(!list_empty(head))
 	{
 		cur=head->next;
 		list_del(cur);
-		p=list_entry(cur,AstObject,a_sibling);
-		ast_free(p);
+		p=list_entry(cur,AstObject,a_link);
+		ast_node_free(p);
 	}
-	ry_free(node);
-}
-void ast_node_free_self(AstObject* node)
-{
-	ry_free(node);
+	ast_node_free(node);
 }
 
 
@@ -97,8 +103,6 @@ static AstNodeType node_object=
 {
 	.n_name="NormalNode",
 	.n_type=ATN_UNKOWN,
-	.n_free=ast_node_free,
-	.n_free_node=ast_node_free_self,
 #ifdef AST_MACHINE
 	.n_execute=ast_node_execute,
 #endif 

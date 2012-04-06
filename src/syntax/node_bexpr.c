@@ -1,22 +1,8 @@
 #include<vm/except.h>
 #include<rtype/bt_bool.h>
-#include<rstd/redy_std.h>
 #include"node_bexpr.h"
 #include"object/robject.h"
 #include"ast_machine.h"
-
-static void binary_expr_free(AstObject* ab)
-{
-	AstNodeBExpr* bexpr=(AstNodeBExpr*) ab;
-	ast_free(bexpr->b_left);
-	ast_free(bexpr->b_right);
-	ry_free(bexpr);
-}
-static void binary_expr_free_self(AstObject* ab)
-{
-	AstNodeBExpr* bexpr=(AstNodeBExpr*) ab;
-	ry_free(bexpr);
-}
 
 
 typedef Robject* (*binary_func)(Robject*,Robject*);
@@ -82,8 +68,7 @@ static AstNodeType node_##L= \
 { \
 	.n_type=ATN_##H, \
 	.n_name=#M, \
-	.n_free=binary_expr_free, \
-	.n_free_node=binary_expr_free_self, \
+	.n_belong=ANF_BINARY, \
 	.n_execute=L##_execute, \
 }; \
 BINARY_EXECUTE(H,M,L)
@@ -96,8 +81,7 @@ static AstNodeType node_##L= \
 { \
 	.n_type=ATN_##H, \
 	.n_name=#M, \
-	.n_free=binary_expr_free, \
-	.n_free_node=binary_expr_free_self, \
+	.n_belong=ATN_BINARY, \
 }; \
 BINARY_EXECUTE(H,M,L)
 #endif 
@@ -178,8 +162,7 @@ static AstNodeType node_##L= \
 { \
 	.n_type=ATN_##H, \
 	.n_name=#M, \
-	.n_free=binary_expr_free, \
-	.n_free_node=binary_expr_free_self, \
+	.n_belong=ANF_BINARY, \
 	.n_execute=L##_execute, \
 }; \
 CMP_EXECUTE(H,M,L)
@@ -192,8 +175,7 @@ static AstNodeType node_##L= \
 { \
 	.n_type=ATN_##H, \
 	.n_name=#M, \
-	.n_free=binary_expr_free, \
-	.n_free_node=binary_expr_free_self, \
+	.n_belong=ANF_BINARY, \
 }; \
 CMP_EXECUTE(H,M,L)
 #endif 
@@ -308,8 +290,7 @@ static AstNodeType node_logic_or=
 {
 	.n_name="LogicOr",
 	.n_type=ATN_LOGIC_OR,
-	.n_free=binary_expr_free,
-	.n_free_node=binary_expr_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=logic_or_execute,
 #endif 
@@ -318,8 +299,7 @@ static AstNodeType node_logic_and=
 {
 	.n_name="LogicAnd",
 	.n_type=ATN_LOGIC_AND,
-	.n_free=binary_expr_free,
-	.n_free_node=binary_expr_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=logic_and_execute,
 #endif 

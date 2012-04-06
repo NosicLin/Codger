@@ -6,20 +6,6 @@
 #include"ast_machine.h"
 #endif 
 
-static void  while_free(AstObject* ab)
-{
-	AstNodeWhile* node=AST_TO_WHILE(ab);
-	ast_free(node->w_expr);
-	ast_free(node->w_stmts);
-	ast_destroy(ab);
-	ry_free(ab);
-}
-static void while_free_self(AstObject* ab)
-{
-	AstNodeWhile* node=AST_TO_WHILE(ab);
-	ast_destroy(ab);
-	ry_free(node);
-}
 
 #ifdef AST_MACHINE
 static int while_execute(AstObject* ab)
@@ -86,8 +72,7 @@ static  AstNodeType node_while=
 {
 	.n_name="While",
 	.n_type=ATN_WHILE,
-	.n_free=while_free,
-	.n_free_node=while_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=while_execute,
 #endif 

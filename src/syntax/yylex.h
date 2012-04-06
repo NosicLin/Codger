@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_YYLEX_H_
-#define _REDY_SYNTAX_YYLEX_H_
+#ifndef _CODGER_SYNTAX_YYLEX_H_
+#define _CODGER_SYNTAX_YYLEX_H_
 #include<lexical/scanner.h>
 void yl_set_scanner(struct scanner* sc);
 struct scanner* yl_get_scanner();

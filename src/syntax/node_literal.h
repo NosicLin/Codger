@@ -1,5 +1,5 @@
-#ifndef _REDY_SYNTAX_AST_NODE_LITERAL_H_
-#define _REDY_SYNTAX_AST_NODE_LITERAL_H_
+#ifndef _CODGER_SYNTAX_AST_NODE_LITERAL_H_
+#define _CODGER_SYNTAX_AST_NODE_LITERAL_H_
 #include"node_type.h"
 #include"ast_object.h"
 #include<object/robject.h>

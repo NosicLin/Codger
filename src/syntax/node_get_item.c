@@ -1,6 +1,5 @@
 #include"node_get_item.h"
 #include<object/robject.h>
-#include<rstd/redy_std.h>
 #include<vm/except.h>
 #include<rtype/bt_string.h>
 #include"node_var.h"
@@ -9,19 +8,6 @@
 #include"ast_machine.h"
 #endif 
 
-static void get_item_free(AstObject* ab)
-{
-	AstNodeGetItem* node=AST_TO_GET_ITEM(ab);
-	ast_free(node->i_host);
-	ast_free(node->i_index);
-	ry_free(node);
-}
-
-static void get_item_free_self(AstObject* ab)
-{
-	AstNodeGetItem* node=AST_TO_GET_ITEM(ab);
-	ry_free(node);
-}
 
 #ifdef AST_MACHINE
 static int get_item_execute(AstObject* ab)
@@ -71,8 +57,7 @@ static AstNodeType  node_get_item=
 {
 	.n_type=ATN_GET_ITEM,
 	.n_name="GetItem",
-	.n_free=get_item_free,
-	.n_free_node=get_item_free_self,
+	.n_belong=ANF_BINARY,
 #ifdef AST_MACHINE
 	.n_execute=get_item_execute,
 #endif

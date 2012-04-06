@@ -1,16 +1,14 @@
 #include"node_var.h"
-#include<rstd/redy_std.h>
 #include<vm/except.h>
 #ifdef AST_MACHINE
 #include"ast_machine.h"
 #include"symbol_table.h"
 #endif 
 
-static void var_free(AstObject* ab)
+static void var_destruct(AstObject* ab)
 {
 	AstNodeVar* node=AST_TO_VAR(ab);
 	robject_release(S_TO_R(node->i_value));
-	ry_free(node);
 }
 
 #ifdef AST_MACHINE
@@ -35,8 +33,8 @@ static AstNodeType node_var=
 {
 	.n_type=ATN_VAR,
 	.n_name="Var",
-	.n_free=var_free,
-	.n_free_node=var_free,
+	.n_belong=ANF_LITERAL,
+	.n_destruct=var_destruct,
 #ifdef AST_MACHINE
 	.n_execute=var_execute,
 #endif 
