@@ -208,6 +208,34 @@ default_action:
 							robject_name(r));
 	return NULL;
 }
+int robject_set_item(Robject* r,Robject* index,Robject* value)
+{
+	TypeObject* t=r->r_type;
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("TypeObject Not Find");
+		return -1;
+	}
+	if(!t->t_expr_funcs)
+		goto default_action;
+	if(!t->t_expr_funcs->ro_set_item)
+		goto default_action;
+
+	int ret=t->t_expr_funcs->ro_set_item(r,index,value);
+	if(ret<0)
+	{
+		if(!vm_except_happened())
+		{
+			except_unkown_err_format("Bug Interal");
+		}
+	}
+	return ret;
+default_action:
+	except_type_err_format("unsupport item set for '%s'",
+						robject_name(r));
+	return -1;
+}
 
 
 

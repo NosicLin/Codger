@@ -27,6 +27,7 @@ enum AST_NODE_FAMILY
 	ANF_NORMAL,
 	ANF_UNARY,
 	ANF_BINARY,
+	ANF_TRIPLE,
 };
 
 enum AST_NODE_TYPE
@@ -83,6 +84,7 @@ enum AST_NODE_TYPE
 	ATN_IF_SUB,
 	ATN_ARRAY,
 	ATN_GET_ITEM,
+	ATN_SET_ITEM,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

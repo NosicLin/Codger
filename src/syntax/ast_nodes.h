@@ -11,6 +11,7 @@
 #include"node_if.h"
 #include"node_array.h"
 #include"node_get_item.h"
+#include"node_set_item.h"
 
 
 #endif  /*_CODGER_SYNTAX_AST_NODE_H_*/

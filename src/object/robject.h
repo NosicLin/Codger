@@ -30,6 +30,7 @@ static inline int robject_typeid(Robject* r){return r->r_type->t_type;}
 
 /* robject expr */
 Robject* robject_get_item(Robject* r,Robject* index);
+int robject_set_item(Robject* r,Robject* index,Robject* value);
 /*unary expr*/
 Robject* robject_positive(Robject* r);
 Robject* robject_negative(Robject* r);

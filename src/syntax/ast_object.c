@@ -14,7 +14,13 @@ static inline void __cache_free(AstObject* ab)
 }
 static inline AstObject* __cache_alloc(ssize_t size,int family)
 {
-	return gr_malloc(size);
+	assert(size>=sizeof(AstObject));
+	AstObject* ao=(AstObject*)gr_malloc(size);
+	if(ao==NULL)
+	{
+		grerr_nomemory();
+	}
+	return ao;
 }
 
 inline void ast_node_free(AstObject* ab)
@@ -40,7 +46,7 @@ void ast_free_pending()
 	{
 		cur=pending_ast_object.next;
 		list_del(cur);
-		p=list_entry(cur,AstObject,a_sibling);
+		p=list_entry(cur,AstObject,a_link);
 		ast_node_free(p);
 	}
 }

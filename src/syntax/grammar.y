@@ -89,6 +89,7 @@ pseudo_stmt: stmt_delimiter {$$=NULL;}
 
 stmt:stmt_expr {$$=$1;}
 	|stmt_assign {$$=$1;}
+	|stmt_set_item{$$=$1;}
 	|stmt_print {$$=$1;}
 	|stmt_while {$$=$1;}
 	|stmt_if  {$$=$1;}
@@ -335,9 +336,15 @@ stmt_expr:expr {$$=$1;}
 		 ;
 
 stmt_assign:identifier tASSIGN expr
-   {
+	{
 		AstNodeAssign* node=ast_create_assign($1,$3);
 		$$=ASSIGN_TO_AST(node);
+	}
+	;
+stmt_set_item:identifier tL_SB expr tR_SB tASSIGN expr 
+	{
+		AstNodeSetItem* node=ast_create_set_item($1,$3,$6);
+		$$=SET_ITEM_TO_AST(node);
 	}
 	;
 
