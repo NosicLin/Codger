@@ -32,6 +32,17 @@ int ast_execute(AstObject* ab)
 	return AST_EXE_NO_FUNC;
 }
 
+int ast_set_value(AstObject* ab,Robject* value)
+{
+	if(ab->a_type)
+	{
+		if(ab->a_type->n_set_value)
+		{
+			return ab->a_type->n_set_value(ab,value);
+		}
+	}
+	return AST_EXE_NO_FUNC;
+}
 
 #endif /*AST_MACHINE*/
 

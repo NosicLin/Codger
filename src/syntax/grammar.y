@@ -89,12 +89,11 @@ pseudo_stmt: stmt_delimiter {$$=NULL;}
 
 stmt:stmt_expr {$$=$1;}
 	|stmt_assign {$$=$1;}
-	|stmt_set_item{$$=$1;}
 	|stmt_print {$$=$1;}
 	|stmt_while {$$=$1;}
 	|stmt_if  {$$=$1;}
-		
-	 ;
+	|stmt_for {$$=$1;}
+	;
 literal: tINTEGER 
 	{
 		BtInt* bi=btint_from_str(yl_cur_string());
@@ -143,7 +142,7 @@ literal: tINTEGER
 identifier:tID
 	{
 		BtString* bs=btstring_create_no_esc(yl_cur_string());
-		AstNodeVar* node=ast_create_var(bs);
+		AstNodeVar* node=ast_create_var(S_TO_R(bs));
 		robject_release(S_TO_R(bs));
 		$$=VAR_TO_AST(node);
 	}
@@ -181,10 +180,11 @@ primary_expr: literal {$$=$1;}
 postfix_expr: primary_expr{$$=$1;}
 	|postfix_expr tL_SB expr tR_SB
 	{
-		AstNodeGetItem* node=ast_create_get_item($1,$3);
-		$$=GET_ITEM_TO_AST(node);
+		AstNodeSquare* node=ast_create_square($1,$3);
+		$$=SQUARE_TO_AST(node);
 	}
 	;
+symbols:postfix_expr{$$=$1;}
 
 unary_expr:postfix_expr{$$=$1;}
 	|tPLUS unary_expr 
@@ -335,16 +335,17 @@ expr :logic_or_expr{$$=$1;}
 stmt_expr:expr {$$=$1;}
 		 ;
 
-stmt_assign:identifier tASSIGN expr
+stmt_assign: symbols tASSIGN expr
 	{
+		char* msg=NULL;	
+		msg=ast_check_can_assign($1);
+		if(msg!=NULL)
+		{	
+			yyerror(msg);
+			return -1;
+		}
 		AstNodeAssign* node=ast_create_assign($1,$3);
 		$$=ASSIGN_TO_AST(node);
-	}
-	;
-stmt_set_item:identifier tL_SB expr tR_SB tASSIGN expr 
-	{
-		AstNodeSetItem* node=ast_create_set_item($1,$3,$6);
-		$$=SET_ITEM_TO_AST(node);
 	}
 	;
 
@@ -360,10 +361,7 @@ stmt_while: kWHILE  expr while_delimter pretty_stmts kEND
 		$$=WHILE_TO_AST(node);
 	}
 	;
-while_delimter: tNEWLINE
-	|kDO
-	|tSEMI
-	;	
+while_delimter: tNEWLINE |kDO |tSEMI ;	
 
 
 stmt_if:if_pre kEND {$$=$1;}
@@ -407,7 +405,19 @@ else_part: kELSE if_delimter pretty_stmts
 
 if_delimter:tNEWLINE|kTHEN|tSEMI;
 	
-
+stmt_for: kFOR symbols kIN expr for_delimter pretty_stmts kEND
+	{
+		char* msg=NULL;	
+		msg=ast_check_can_assign($2);
+		if(msg!=NULL)
+		{	
+			yyerror(msg);
+			return -1;
+		}
+		AstNodeFor* node=ast_create_for($2,$4,$6);
+		$$=FOR_TO_AST(node);
+	}
+for_delimter: tNEWLINE|kDO|tSEMI;
 
 
 

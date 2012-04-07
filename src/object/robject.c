@@ -375,6 +375,7 @@ int robject_bool(Robject* rt)
 	if(t==NULL)
 	{
 		BUG("TypeObject Error"); 
+		except_unkown_err_format("Not Find TypeObject"); 
 		goto error; 
 	}
 	if(!t->t_expr_funcs)
@@ -398,8 +399,67 @@ int robject_bool(Robject* rt)
 default_action:
 	return 1;
 error:
-	except_unkown_err_format("Not Find TypeObject"); 
 	return -1; 
+}
+
+
+Robject* robject_iter(Robject* r)
+{
+	TypeObject* t=r->r_type;
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("Not Find TypeObject"); 
+		goto error; 
+	}
+	if(!t->t_iter)
+	{
+		goto default_action;
+	}
+	Robject* ret=t->t_iter(r);
+	if(ret==NULL)
+	{
+		if(!vm_except_happened())
+		{
+			except_unkown_err_format("Internal Bug");
+		}
+	}
+	return ret;
+default_action:
+	except_iter_err_format("'%s' object cann't iterate",robject_name(r));
+	return NULL;
+error:
+	return NULL;
+}
+
+
+Robject* robject_next(Robject* r)
+{
+	TypeObject* t=r->r_type;
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("Not Find TypeObject");
+		goto error;
+	}
+	if(!t->t_iter_next)
+	{
+		goto default_action;
+	}
+	Robject* next=t->t_iter_next(r);
+	if(next==NULL)
+	{
+		if(!vm_except_happened())
+		{
+			except_unkown_err_format("Internal Bug");
+		}
+	}
+	return next;
+default_action:
+	except_iter_err_format("'%s' object cann't iterate next",robject_name(r));
+	return NULL;
+error:
+	return NULL;
 }
 
 

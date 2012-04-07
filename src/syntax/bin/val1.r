@@ -9,3 +9,5 @@ a=a+3.4*3+4
 
 a=1;b=2;c=3
 print a;print b ;print c
+
+a[3][3][3]=3

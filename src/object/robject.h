@@ -68,6 +68,10 @@ Robject* robject_xor(Robject* x,Robject* y);
 /*logic_expr*/
 int robject_bool(Robject* rt);
 
+/*iter expr*/
+Robject* robject_iter(Robject* r);
+Robject* robject_next(Robject* r);
+
 ssize_t robject_hash(Robject* rt);
 #define CMP_LT  0  /*<*/
 #define CMP_LE  1  /*<=*/

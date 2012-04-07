@@ -2,6 +2,7 @@
 #define _CODGER_SYNTAX_NODE_TYPE_H_ 
 #include<assert.h>
 struct ast_object;
+struct robject;
 struct ast_node_type
 {
 	int n_type;
@@ -15,6 +16,7 @@ struct ast_node_type
 
 #ifdef AST_MACHINE
 	int (*n_execute)(struct ast_object*);
+	int (*n_set_value)(struct ast_object*,struct robject * value);
 #endif 
 };
 
@@ -28,6 +30,7 @@ enum AST_NODE_FAMILY
 	ANF_UNARY,
 	ANF_BINARY,
 	ANF_TRIPLE,
+	ANF_FOR,
 };
 
 enum AST_NODE_TYPE
@@ -83,8 +86,8 @@ enum AST_NODE_TYPE
 	ATN_IF,
 	ATN_IF_SUB,
 	ATN_ARRAY,
-	ATN_GET_ITEM,
-	ATN_SET_ITEM,
+	ATN_SQUARE,
+	ATN_FOR,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

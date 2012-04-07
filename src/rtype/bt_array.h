@@ -15,6 +15,14 @@ struct  bt_array
 
 typedef struct bt_array BtArray;
 
+struct bt_array_iter
+{
+	INHERIT_ROBJECT;
+	BtArray* i_array;
+	ssize_t i_cur_pos;
+};
+typedef struct bt_array_iter BtArrayIter;
+
 #ifdef RTYPE_DEBUG 
 
 static inline BtArray* R_TO_A(Robject* rt)
@@ -58,6 +66,16 @@ static inline int btarray_bool(BtArray* ba)
 	return ba->a_size!=0;
 }
 int btarray_print(BtArray* ba,FILE* f,int flags);
+
+BtArrayIter* btarray_iter_create(BtArray* ba);
+
+static inline BtArrayIter* btarray_iter(BtArray* ba)
+{
+	return btarray_iter_create(ba);
+}
+
+Robject* btarray_iter_next(BtArrayIter* iter);
+
 
 
 #endif 

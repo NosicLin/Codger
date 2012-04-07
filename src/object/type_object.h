@@ -13,6 +13,8 @@ struct type_object
 	int (*t_rich_cmp)(struct robject*,struct robject* ,int);
 	ssize_t (*t_hash)(struct robject*);
 	int (*t_print)(struct robject*,FILE* f,int flags);
+	struct robject* (*t_iter)(struct robject*);
+	struct robject* (*t_iter_next)(struct robject*);
 };
 typedef struct type_object TypeObject;
 
@@ -66,7 +68,6 @@ struct expr_ops
 	/*logic and ,logic_or */
 	int (*ro_bool)(struct robject*);
 
-	struct robject* (*ro_iter)(struct robject*);
 };
 
 enum KnowObjectType

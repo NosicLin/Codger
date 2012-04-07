@@ -128,6 +128,13 @@ static int ba_print(Robject* ro,FILE* f,int flags)
 	return btarray_print(ba,f,flags);
 }
 
+static Robject* ba_iter(Robject* ro)
+{
+	BtArray* ba=R_TO_A(ro);
+	BtArrayIter* iter=btarray_iter_create(ba);
+	return (Robject*)iter;
+}
+
 
 
 
@@ -156,6 +163,7 @@ static TypeObject type_array=
 	.t_expr_funcs=&ba_expr_ops,
 	.t_object_funcs=&array_object_ops,
 	.t_print=ba_print,
+	.t_iter=ba_iter,
 };
 
 
@@ -378,3 +386,61 @@ BtArray* btarray_create()
 {
 	return ba_malloc(0);
 }
+
+
+
+/* array iterator */
+inline Robject* btarray_iter_next(BtArrayIter* iter)
+{
+	BtArray* array=iter->i_array;
+	ssize_t size=array->a_size;
+	ssize_t cur=iter->i_cur_pos;
+	if(cur>=size)
+	{
+		except_iter_stop();
+		return NULL;
+	}
+	Robject* ret=array->a_objects[cur];
+	robject_addref(ret);
+	iter->i_cur_pos++;
+	return ret;
+}
+static Robject* iter_next(Robject* iter)
+{
+	return btarray_iter_next((BtArrayIter*)iter);
+}
+
+static void iter_free(Robject* ba)
+{
+	BtArrayIter* iter=(BtArrayIter*)ba;
+	robject_release(A_TO_R(iter->i_array));
+	ry_free(iter);
+}
+
+static struct object_ops array_iter_object_ops=
+{
+	.ro_free=iter_free,
+};
+
+static TypeObject type_array_iter=
+{
+	.t_name="ArrayIter",
+	.t_type=RT_ITER,
+	.t_object_funcs=&array_iter_object_ops,
+	.t_iter_next=iter_next,
+};
+
+BtArrayIter* btarray_iter_create(BtArray* ba)
+{
+	BtArrayIter* iter=robject_new(BtArrayIter,&type_array_iter);
+	if(iter==NULL)
+	{
+		return NULL;
+	}
+	robject_addref(A_TO_R(ba));
+	iter->i_array=ba;
+	iter->i_cur_pos=0;
+	return iter;
+}
+
+

@@ -10,8 +10,8 @@
 #include"node_while.h"
 #include"node_if.h"
 #include"node_array.h"
-#include"node_get_item.h"
-#include"node_set_item.h"
+#include"node_square.h"
+#include"node_for.h"
 
 
 #endif  /*_CODGER_SYNTAX_AST_NODE_H_*/

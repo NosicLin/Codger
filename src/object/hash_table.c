@@ -551,7 +551,6 @@ struct expr_ops ht_expr_ops=
 	.ro_get_item=ht_get_item,
 	.ro_set_item=ht_set_item,
 	.ro_bool=ht_bool,
-	.ro_iter=ht_iter,
 };
 
 struct object_ops hash_object_ops=
@@ -567,6 +566,7 @@ struct type_object hash_type=
 	.t_object_funcs=&hash_object_ops,
 	//	.t_rich_cmp=0,
 	.t_print=ht_print,
+	.t_iter=ht_iter,
 };
 
 

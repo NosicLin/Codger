@@ -27,6 +27,8 @@ int ast_machine_init();
 /* exit the ast machine system */
 int ast_machine_exit();
 
+int ast_set_value(AstObject* ab,Robject* value);
+
 /* general register used to save result*/
 extern Robject* cup_reg0;
 
