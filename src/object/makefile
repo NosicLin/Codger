@@ -1,5 +1,5 @@
 PROJECT=object
-SRC=hash_table.c robject.c null_object.c 
+SRC=hash_table.c robject.c null_object.c  func_object.c
 DEBUG=
 BIN=test_hash.c
 

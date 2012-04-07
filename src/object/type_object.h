@@ -1,5 +1,5 @@
-#ifndef _REDY_OBJECT_TYPE_OBJECT_H_
-#define _REDY_OBJECT_TYPE_OBJECT_H_
+#ifndef _CODGER_OBJECT_TYPE_OBJECT_H_
+#define _CODGER_OBJECT_TYPE_OBJECT_H_
 #include<stdio.h>
 struct robject;
 struct expr_ops;
@@ -81,7 +81,9 @@ enum KnowObjectType
 	TYPE_ITER,
 	TYPE_NULL,
 	TYPE_HASH,
+	TYPE_FUNC,
+	TYPE_MODUL,
 };
 
 
-#endif /*_REDY_OBJECT_TYPE_OBJECT_H_*/
+#endif /*_CODGER_OBJECT_TYPE_OBJECT_H_*/

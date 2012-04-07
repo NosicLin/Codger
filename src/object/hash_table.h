@@ -1,5 +1,5 @@
-#ifndef _REDY_OBJECT_HASH_OBJECT_H_
-#define _REDY_OBJECT_HASH_OBJECT_H_
+#ifndef _CODGER_OBJECT_HASH_OBJECT_H_
+#define _CODGER_OBJECT_HASH_OBJECT_H_
 #include"robject.h"
 #define HASH_TABLE_SMALL_TABLE 8
 struct hash_entry
@@ -69,6 +69,6 @@ static inline HashTable* R_TO_HASH(Robject* r)
 #define R_TO_HASH(r) ((HashTable*)r)
 #endif /*ROBJECT_CAST_DEBUG*/
 
-#endif /*_REDY_OBJECT_HASH_OBJECT_H_*/
+#endif /*_CODGER_OBJECT_HASH_OBJECT_H_*/
 
 

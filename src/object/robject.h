@@ -1,10 +1,15 @@
-#ifndef _REDY_RTYPE_ROBJECT_H_
-#define _REDY_RTYPE_ROBJECT_H_
+#ifndef _CODGER_OBJECT_ROBJECT_H_
+#define _CODGER_OBJECT_ROBJECT_H_
 #include"type_object.h"
 #include<stdio.h>
+#include<assert.h>
+
+#define ROBJECT_DEBUG
+struct hash_object;
 struct  robject 
 {
 	ssize_t r_ref;
+	struct hash_object* r_table;
 	struct type_object* r_type;
 };
 typedef struct robject Robject;
@@ -93,4 +98,36 @@ int robject_richcmp(Robject* x,Robject* y,int op);
 #define PRINT_FLAGS_NEWLINE 0x1
 void robject_print(Robject* rt,FILE* f,int flags);
 #endif 
+
+
+#ifdef ROBJECT_DEBUG
+#define ROBJECT_TYPE_CAST(name,type_id,type) \
+	static inline Robject* name_##_TO_R(type* o) \
+	{ \
+		assert(((Robject*)o)->r_type->t_type==type_id); \
+		return (Robject*)o; \
+	} \
+	static inline type* R_TO_##name(Robject* r) \
+	{ \
+		assert(r->r_type->t_type==type_id); \
+		return (type*)r; \
+	} \
+
+#else 
+#define ROBJECT_TYPE_CAST(name,type_id,type) \
+	static inline Robject* name_##_TO_R(type* o) \
+	{ \
+		return (Robject*)o; \
+	} \
+	static inline type* R_TO_##name(Robject* r) \
+	{ \
+		return (type*)r; \
+	} \
+#endif /*ROBJECT_DEBUG*/
+	
+#endif /*_CODGER_OBJECT_ROBJECT_H_*/
+
+
+
+
 
