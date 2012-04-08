@@ -7,18 +7,17 @@
 struct ast_node_literal
 {
 	INHERIT_AST_OBJECT;
-	struct robject* l_value;
+	unsigned long l_id;
 };
 
 typedef struct ast_node_literal AstNodeLiteral;
 
-AstNodeLiteral* ast_create_literal(Robject*);
+AstNodeLiteral* ast_create_literal(int id);
 
 /*getter and setter */
-static inline Robject* ast_literal_get_value(AstNodeLiteral* node)
+static inline unsigned long ast_literal_id(AstNodeLiteral* node)
 {
-	robject_addref(node->l_value);
-	return node->l_value;
+	return node->l_id;
 }
 
 AST_TYPE_CAST(LITERAL,Literal,ATN_LITERAL);

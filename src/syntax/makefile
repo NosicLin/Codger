@@ -1,5 +1,5 @@
 PROJECT=syntax
-SRC= ast_object.c node_literal.c  node_stmts.c \
+#SRC= ast_object.c node_literal.c  node_stmts.c \
 	 node_uexpr.c node_bexpr.c node_var.c \
 	 node_assign.c node_print.c node_while.c \
 	 node_if.c node_array.c node_square.c \
@@ -7,8 +7,10 @@ SRC= ast_object.c node_literal.c  node_stmts.c \
 	 parser.c yylex.c grammar.tab.c ast_machine.c \
 	 symbol_table.c 
 
+SRC= ast_object.c node_literal.c
 DEBUG=
-BIN=test_literal.c codger.c gcheck.c
+#BIN=test_literal.c codger.c gcheck.c
+BIN=
 
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h  -D AST_MACHINE

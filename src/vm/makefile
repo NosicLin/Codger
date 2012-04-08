@@ -1,6 +1,6 @@
 PROJECT=vm
 
-SRC=except.c
+SRC=except.c op_code.c stack_frame.c
 DEBUG=
 BIN=
 
@@ -24,10 +24,10 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall  -Werror
-INCLUDE=-I. -I./debug   -I../
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
-	-L../lib/  -lvm
+FLAGS=-g -Wall  -Werror -include sys/types.h
+INCLUDE=-I. -I./debug   -I../  
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  \
+	-L../lib/  -lvm -lutility_c
 
 
 

@@ -2,36 +2,24 @@
 #define _CODGER_SYNTAX_NODE_TYPE_H_ 
 #include<assert.h>
 struct ast_object;
-struct robject;
+#include<vm/op_code.h>
+#include<object/robject.h>
+#include<object/module_object.h>
 struct ast_node_type
 {
 	int n_type;
 	const char* n_name; /* node name */
-
-	/*  attribute n_belong  used to cache*/
-	int n_belong;
-
 	/* destruct node */
 	void (*n_destruct)(struct ast_object*);
 
-#ifdef AST_MACHINE
-	int (*n_execute)(struct ast_object*);
-	int (*n_set_value)(struct ast_object*,struct robject * value);
-#endif 
+	/* translate syntax tree to op_code*/
+	int (*n_to_opcode)(struct ast_object* ab,
+						struct module_object* md,
+						struct op_code* op);
 };
 
 typedef struct ast_node_type AstNodeType;
 
-enum AST_NODE_FAMILY
-{
-	ANF_UNKOWN=1,
-	ANF_LITERAL,
-	ANF_NORMAL,
-	ANF_UNARY,
-	ANF_BINARY,
-	ANF_TRIPLE,
-	ANF_FOR,
-};
 
 enum AST_NODE_TYPE
 {

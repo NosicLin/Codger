@@ -1,7 +1,8 @@
 #ifndef _CODGER_SYNTAX_AST_OBJECT_H_
 #define _CODGER_SYNTAX_AST_OBJECT_H_
 #include<utility_c/list_head.h>
-#include"node_type.h"
+#include<vm/op_code.h>
+#include<object/module_object.h>
 
 struct ast_node_type;
 
@@ -20,6 +21,8 @@ struct ast_object
 	struct ast_node_type* a_type;
 };
 typedef struct ast_object AstObject;
+#include"node_type.h"
+
 #define INHERIT_AST_OBJECT struct ast_object ast_base
 #define TO_ASTOBJECT(node) ((AstObject*)node)
 
@@ -51,7 +54,8 @@ static inline void ast_node_del(AstObject* father,AstObject* chirld)
 	list_del(&chirld->a_sibling);
 }
 
-
+struct module_object;
+struct module_object* ast_to_module(AstObject* root);
 
 
 /* we use LR(1) grammar to parse redy source code

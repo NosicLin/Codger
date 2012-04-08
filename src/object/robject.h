@@ -1,6 +1,5 @@
 #ifndef _CODGER_OBJECT_ROBJECT_H_
 #define _CODGER_OBJECT_ROBJECT_H_
-#include"type_object.h"
 #include<stdio.h>
 #include<assert.h>
 
@@ -13,6 +12,9 @@ struct  robject
 	struct type_object* r_type;
 };
 typedef struct robject Robject;
+
+#include"type_object.h"
+
 #define INHERIT_ROBJECT struct robject r_base 
 #define TO_ROBJECT(x) ((Robject*)x)
 #define robject_new(TYPE,type_ops) \
@@ -102,7 +104,7 @@ void robject_print(Robject* rt,FILE* f,int flags);
 
 #ifdef ROBJECT_DEBUG
 #define ROBJECT_TYPE_CAST(name,type_id,type) \
-	static inline Robject* name_##_TO_R(type* o) \
+	static inline Robject* name##_TO_R(type* o) \
 	{ \
 		assert(((Robject*)o)->r_type->t_type==type_id); \
 		return (Robject*)o; \
@@ -115,7 +117,7 @@ void robject_print(Robject* rt,FILE* f,int flags);
 
 #else 
 #define ROBJECT_TYPE_CAST(name,type_id,type) \
-	static inline Robject* name_##_TO_R(type* o) \
+	static inline Robject* name##_TO_R(type* o) \
 	{ \
 		return (Robject*)o; \
 	} \

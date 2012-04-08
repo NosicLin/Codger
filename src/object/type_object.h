@@ -12,10 +12,16 @@ struct type_object
 	struct object_ops* t_object_funcs;
 	int (*t_rich_cmp)(struct robject*,struct robject* ,int);
 	ssize_t (*t_hash)(struct robject*);
-	int (*t_print)(struct robject*,FILE* f,int flags);
+
 	struct robject* (*t_iter)(struct robject*);
 	struct robject* (*t_iter_next)(struct robject*);
+
+	int (*t_set_attr)(struct robject* symbol,struct robject* value);
+	Robject* (*t_get_attr)(struct robject* symbol);
+
+	int (*t_print)(struct robject*,FILE* f,int flags);
 };
+
 typedef struct type_object TypeObject;
 
 struct object_ops
@@ -24,8 +30,11 @@ struct object_ops
 	void (*ro_init)(struct robject*);
 };
 
+struct bt_array;
 struct expr_ops
 {
+	/* opertor () */
+	struct robject* (*ro_call)(struct robject*,struct bt_array* args);
 	/*posifix operator '[]' */
 	struct robject* (*ro_get_item)(struct robject*,struct robject* );
 	int (*ro_set_item)(struct robject*,struct robject* index,struct robject* item);
@@ -82,7 +91,7 @@ enum KnowObjectType
 	TYPE_NULL,
 	TYPE_HASH,
 	TYPE_FUNC,
-	TYPE_MODUL,
+	TYPE_MODULE,
 };
 
 

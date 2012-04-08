@@ -5,44 +5,41 @@
 #endif /* AST_MACHINE */
 #include"ast_object.h"
 
-static void literal_destruct(AstObject* ab)
+static int literal_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 {
 	AstNodeLiteral* node=AST_TO_LITERAL(ab);
-	robject_release(node->l_value);
+	int ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+	unsigned long id=node->l_id;
+	if(id>(0x1<<16))
+	{
+		op_code_push5(op,OP_CONST2,id);
+	}
+	else
+	{
+		op_code_push3(op,OP_CONST,id);
+	}
+	return 0;
 }
-#ifdef AST_MACHINE 
-static int literal_execute(AstObject* ab)
-{
-	AstNodeLiteral* node=AST_TO_LITERAL(ab);
-	Robject* value=node->l_value;
-	set_reg0(value);
-	return AST_EXE_SUCCESS;
-}
-#endif /*AST_MACHINE*/
-
-	
-
 
 static AstNodeType node_literal=
 {
 	.n_type=ATN_LITERAL,
 	.n_name="Literal",
-	.n_belong=ANF_LITERAL,
-	.n_destruct=literal_destruct,
-#ifdef AST_MACHINE 
-	.n_execute=literal_execute,
-#endif /*AST_MACHINE*/
+	.n_to_opcode=literal_to_opcode,
 };
 
-AstNodeLiteral* ast_create_literal(Robject* r)
+AstNodeLiteral* ast_create_literal(id)
 {
 	AstNodeLiteral* node=ast_node_new(AstNodeLiteral,&node_literal);
 	if(node==NULL)
 	{
 		return NULL;
 	}
-	robject_addref(r);
-	node->l_value=r;
+	node->l_id=id;
 	return node;
 }
 

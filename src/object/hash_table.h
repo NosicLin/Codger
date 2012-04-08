@@ -28,6 +28,7 @@ HashTable* hash_new();
 int hash_init(HashTable* h); /*TODO*/
 void hash_free(HashTable* h);
 
+void hash_clear_cache();
 /* return 0 sucess 
  * failed return -1
  */
