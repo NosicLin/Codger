@@ -143,7 +143,11 @@ void robject_print(Robject* rt,FILE* f,int flags)
 		goto default_action;
 	}
 	t->t_print(rt,f,flags&~PRINT_FLAGS_NEWLINE);
-	if(print_set_newline(flags))
+	if(flags&PRINT_FLAGS_SPACE)
+	{
+		printf(" ");
+	}
+	if(flags&PRINT_FLAGS_NEWLINE)
 	{
 		printf("\n");
 	}

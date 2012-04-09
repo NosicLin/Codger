@@ -27,9 +27,9 @@ inline void ast_node_free(AstObject* ab)
 {
 	AstNodeType* t=ab->a_type;
 	BUG_ON(t==NULL,"Error AstObject");
-	if(t->n_destruct)
+	if(t->t_destruct)
 	{
-		t->n_destruct(ab);
+		t->t_destruct(ab);
 	}
 	__cache_free(ab);
 }
@@ -58,6 +58,7 @@ inline void ast_addto_pending(AstObject* ab)
 
 inline void ast_init(AstObject* ab,struct ast_node_type* node_type)
 {
+	ab->a_flags=0;
 	ab->a_type=node_type;
 	INIT_LIST_HEAD(&ab->a_sibling);
 	INIT_LIST_HEAD(&ab->a_chirldren);
@@ -92,21 +93,37 @@ void ast_tree_free(AstObject* node)
 
 
 
-static AstNodeType node_object=
+AstNodeType node_normal=
 {
-	.n_name="NormalNode",
+	.t_type=ATN_NORMAL,
+	.t_name="NormalNode",
 };
 
-AstObject* ast_create_object()
-{
-	return ast_node_new(AstObject,&node_object);
-}
 
 
-static int __ast_to_module(AstObject* ab,ModuleObject* md,OpCode* op)
+int ast_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 {
-	assert(ab->a_type->n_to_opcode);
-	int ret=ab->a_type->n_to_opcode(ab,md,op);
+	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
+	{
+		BUG("Synatx Tree Maybe Error");
+		return -1;
+	}
+
+	if(ab->a_type==NULL)
+	{
+		BUG("AstNodeType Not Find");
+		return -1;
+	}
+	if(ab->a_type->t_to_opcode==NULL)
+	{
+		BUG("No To OpCode Func");
+		return -1;
+	}
+
+	ab->a_flags|=AST_FLAGS_TO_OPCODE;
+	int ret=ab->a_type->t_to_opcode(ab,md,op);
+	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
+
 	return ret;
 }
 
@@ -121,11 +138,12 @@ ModuleObject*  ast_to_module(AstObject* root)
 	{
 		goto error;
 	}
-	ret=__ast_to_module(root,md,op);
+	ret=ast_to_opcode(root,md,op);
 	if(ret<0)
 	{
 		goto error;
 	}
+	op_code_push(op,OP_RETURN);
 	module_set_opcode(md,op);
 	return md;
 error:

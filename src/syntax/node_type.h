@@ -7,13 +7,13 @@ struct ast_object;
 #include<object/module_object.h>
 struct ast_node_type
 {
-	int n_type;
-	const char* n_name; /* node name */
+	int t_type;
+	const char* t_name; /* node name */
 	/* destruct node */
-	void (*n_destruct)(struct ast_object*);
+	void (*t_destruct)(struct ast_object*);
 
 	/* translate syntax tree to op_code*/
-	int (*n_to_opcode)(struct ast_object* ab,
+	int (*t_to_opcode)(struct ast_object* ab,
 						struct module_object* md,
 						struct op_code* op);
 };
@@ -24,6 +24,7 @@ typedef struct ast_node_type AstNodeType;
 enum AST_NODE_TYPE
 {
 	ATN_UNKOWN=0,
+	ATN_NORMAL,
 
 #define ATN_NODE_EXPR_BEGIN ATN_POSITVIE
 	ATN_POSITIVE,
@@ -81,12 +82,12 @@ enum AST_NODE_TYPE
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \
 	static inline AstNode##Ll* AST_TO_##Hl(AstObject* ab) \
 	{ \
-		assert(ab->a_type->n_type==ast_type); \
+		assert(ab->a_type->t_type==ast_type); \
 		return (AstNode##Ll*) ab; \
 	} \
 	static inline AstObject* Hl##_TO_AST(AstNode##Ll* n) \
 	{ \
-		assert(((AstObject*)n)->a_type->n_type==ast_type); \
+		assert(((AstObject*)n)->a_type->t_type==ast_type); \
 		return (AstObject*) n; \
 	}
 

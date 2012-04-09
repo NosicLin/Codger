@@ -12,6 +12,9 @@ BtBool* btbool_false();
 BtBool* btbool_true();
 int  btbool_bool(BtBool* bb);
 
+BtBool* ObjectFalse;
+BtBool* ObjectTrue;
+
 
 #endif 
 

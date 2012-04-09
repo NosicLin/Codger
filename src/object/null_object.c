@@ -43,5 +43,5 @@ static Robject __robject_null=
 	.r_type=&type_null,
 };
 
-Robject* NullObject=&__robject_null;
+Robject* ObjectNull=&__robject_null;
 

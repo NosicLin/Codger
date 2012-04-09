@@ -374,8 +374,8 @@ BtArray* btarray_create_size(ssize_t size)
 	Robject** ro=ret->a_objects;
 	for(;i<size;i++)
 	{
-		robject_addref(NullObject);
-		ro[i]=NullObject;
+		robject_addref(ObjectNull);
+		ro[i]=ObjectNull;
 	}
 	ret->a_size=size;
 	return ret;

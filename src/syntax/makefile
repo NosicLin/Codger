@@ -1,13 +1,7 @@
 PROJECT=syntax
-#SRC= ast_object.c node_literal.c  node_stmts.c \
-	 node_uexpr.c node_bexpr.c node_var.c \
-	 node_assign.c node_print.c node_while.c \
-	 node_if.c node_array.c node_square.c \
-	 node_for.c \
-	 parser.c yylex.c grammar.tab.c ast_machine.c \
-	 symbol_table.c 
 
-SRC= ast_object.c node_literal.c
+SRC=ast_object.c  parser.c yylex.c grammar.tab.c \
+	node_expr.c node_stmts.c
 DEBUG=
 #BIN=test_literal.c codger.c gcheck.c
 BIN=

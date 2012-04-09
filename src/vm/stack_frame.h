@@ -16,8 +16,14 @@ struct stack_frame
 
 	HashTable* sf_symbols;
 
+
 	OpCode* sf_codes;
+
+	/* program counter */
 	ssize_t sf_pc;
+
+	/* stack register */
+	ssize_t sf_sp;
 };
 
 typedef struct stack_frame StackFrame;

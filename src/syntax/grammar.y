@@ -8,10 +8,18 @@
 #include<rtype/bt_int.c>
 #include<rtype/bt_float.h>
 #include<rtype/bt_long.h>
-#define YYSTYPE  AstObject* 
+/* I don't want to use void* for default symbol type
+ * but if not,i will give every symbol a type,
+ * so awfull 
+ * FIXME wish someday, someone tell me  how to give part of symbols 
+ * a default type 
+ */
+#define YYSTYPE void*  
 %}
 
-/* redy token follow enum REDY_TOKEN from lexical/token.h */
+
+
+/* codger token follow enum REDY_TOKEN from lexical/token.h */
 
 %token tUNKOWN tERR 
 /*base type */
@@ -21,7 +29,7 @@
 /*expr operator and assign */
 %token tASSIGN tAMUL tADIV tAMOD tAPLUS tAMINUS tALS tARS tAAND tAOR tAXOR
 /* expr operator */
-%token tMUL  tDIV  tMOD tPLUS tMINUS tLS tRS tAND tOR tXOR tNegated 
+%token tMUL  tDIV  tMOD tPLUS tMINUS tLS tRS tAND tOR tXOR tNEGATED
 %token tLT tLE tNE tEQ tGE tGT
 /* sentence break*/
 %token tSEMI tNEWLINE 
@@ -32,6 +40,7 @@
 %token kINHRIT kNOT kOR kPRINT kRETURN kTHEN kTO KTRY kVFUNC kWHILE 
 %token kTRUE kFALSE 
 
+
 %start AstTree
 %%
 
@@ -40,42 +49,35 @@ AstTree : pretty_stmts{parser_set_root($1);}
 pretty_stmts: stmts {$$=$1;}
 	|stmts stmt
 	{
-		AstNodeStmts* stmts=AST_TO_STMTS($1);
-		assert($2);
-		ast_stmts_add(stmts,$2);
-		$$=STMTS_TO_AST(stmts);
+		ast_node_add($1,$2);
+		$$=$1;
 	}
 	|stmt
 	{
-		AstNodeStmts* stmts=ast_create_stmts();
-		ast_stmts_add(stmts,$1);
-		$$=STMTS_TO_AST(stmts);
+		AstObject* node=ast_node_new(&node_stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		$$=node;
 	}
 	| 
 	{
-		AstNodeStmts* stmts=ast_create_stmts();
-		$$=STMTS_TO_AST(stmts);
+		AstObject* node=ast_node_new(&node_stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;		
 
 stmts: pretty_stmt
 	 {
-		AstNodeStmts* stmts=ast_create_stmts();
-		if($1!=NULL)
-		{
-			ast_stmts_add(stmts,$1);
-		}
-		$$=STMTS_TO_AST(stmts);
+		AstObject* node=ast_node_new(&node_stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		if($1!=NULL) ast_node_add(node,$1);
+		$$=node;
 	 }
 	 | stmts pretty_stmt
 	 {
-		AstNodeStmts* stmts=AST_TO_STMTS($1);
-		if($2!=NULL)
-		{
-			ast_stmts_add(stmts,$2);
-		}
-		$$=STMTS_TO_AST(stmts);
-		
+		if($2!=NULL) ast_node_add($1,$2);
+		$$=$1;
 	 }
 	;
 
@@ -97,59 +99,40 @@ stmt:stmt_expr {$$=$1;}
 literal: tINTEGER 
 	{
 		BtInt* bi=btint_from_str(yl_cur_string());
-		AstNodeLiteral* t=ast_create_literal(I_TO_R(bi));
-		robject_release(I_TO_R(bi));
-		$$=LITERAL_TO_AST(t); 
+		if(bi==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_literal(I_TO_R(bi));
+		if(node==NULL)
+		{
+			robject_release(I_TO_R(bi));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
+		
 	}
-
 	| tLONG
 	{
-		BtLong* bl=btlong_from_str(yl_cur_string());
-		AstNodeLiteral* t=ast_create_literal(L_TO_R(bl));
-		robject_release(L_TO_R(bl));
-		$$=LITERAL_TO_AST(t);
 	}
-
 	| tFLAOT
 	{
-		BtFloat* bf=btfloat_from_str(yl_cur_string());
-		AstNodeLiteral* t=ast_create_literal(F_TO_R(bf));
-		robject_release(F_TO_R(bf));
-		$$=LITERAL_TO_AST(t);
 	}
 	| tSTRING
 	{
-		BtString* bs=btstring_create(yl_cur_string());
-		AstNodeLiteral* t=ast_create_literal(S_TO_R(bs));
-		robject_release(S_TO_R(bs));
-		$$=LITERAL_TO_AST(t);
 	}
 	| kFALSE
 	{
-		BtBool* bl=btbool_create(0);
-		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
-		robject_release(B_TO_R(bl));
-		$$=LITERAL_TO_AST(node);
 	}
 	| kTRUE
 	{
-		BtBool* bl=btbool_create(1);
-		AstNodeLiteral* node=ast_create_literal(B_TO_R(bl));
-		robject_release(B_TO_R(bl));
-		$$=LITERAL_TO_AST(node);
 	}
 	;
 identifier:tID
 	{
-		BtString* bs=btstring_create_no_esc(yl_cur_string());
-		AstNodeVar* node=ast_create_var(S_TO_R(bs));
-		robject_release(S_TO_R(bs));
-		$$=VAR_TO_AST(node);
 	}
 	;
 expr_list: expr 
 	{
-		AstObject* node=ast_create_object();
+		AstObject* node=ast_node_new(&node_normal);
+		if(node==NULL) return AST_MEM_FAILED;
 		ast_node_add(node,$1);
 		$$=node;
 	}
@@ -160,15 +143,14 @@ expr_list: expr
 	}
 	| 
 	{
-		AstObject* node=ast_create_object();
+		AstObject* node=ast_node_new(&node_normal);
+		if(node==NULL) return AST_MEM_FAILED;
 		$$=node;
 	}
 	;
 
 array:tL_SB expr_list tR_SB
 	{
-		AstNodeArray* node=ast_create_array($2);
-		$$=ARRAY_TO_AST(node);
 	}
 		
 primary_expr: literal {$$=$1;}
@@ -180,185 +162,148 @@ primary_expr: literal {$$=$1;}
 postfix_expr: primary_expr{$$=$1;}
 	|postfix_expr tL_SB expr tR_SB
 	{
-		AstNodeSquare* node=ast_create_square($1,$3);
-		$$=SQUARE_TO_AST(node);
 	}
 	;
 symbols:postfix_expr{$$=$1;}
 
 unary_expr:postfix_expr{$$=$1;}
-	|tPLUS unary_expr 
+	|unary_operator unary_expr 
 	{  
-		AstNodePositive* node=ast_create_positive($2);
-		AstObject* ab=POSITIVE_TO_AST(node);
-		$$=ab;
+		AstObject* node=ast_node_new($1);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
 	}   
-	|tMINUS unary_expr
-	{ 
-		AstNodeNegative* node=ast_create_negative($2);
-		AstObject* ab=NEGATIVE_TO_AST(node);
-		$$=ab;
-	}   
-	|tNegated unary_expr
-	{  
-		AstNodeNegated* node=ast_create_negated($2);
-		AstObject* ab=NEGATED_TO_AST(node);
-		$$=ab;
-	} 
+	;
+unary_operator:tPLUS{$$=&node_positive;}
+	|tMINUS{$$=&node_negative;}
+	|tNEGATED{$$=&node_negated;}
 	;
 
-multiply_expr: unary_expr{
-			 $$=$1;
-			}
-	|multiply_expr tMUL unary_expr{
-			AstNodeMul* t=ast_create_mul($1,$3);
-			AstObject* ab=MUL_TO_AST(t);
-			$$=ab;
-	}
-	| multiply_expr tDIV unary_expr{
-			AstNodeDiv* t=ast_create_div($1,$3);
-			AstObject* ab=DIV_TO_AST(t);
-			$$=ab;
-	}
-	| multiply_expr tMOD unary_expr{
-			AstNodeDiv* t=ast_create_mod($1,$3);
-			AstObject* ab=MOD_TO_AST(t);
-			$$=ab;
-	}
-;
-additive_expr:multiply_expr{$$=$1;}
-			 |additive_expr tPLUS multiply_expr{
-		AstNodePlus* node=ast_create_plus($1,$3);
-		AstObject* ab=PLUS_TO_AST(node);
-		$$=ab;
-	}
-	|additive_expr tMINUS multiply_expr{
-		AstNodeMinus* node=ast_create_minus($1,$3);
-		AstObject* ab=MINUS_TO_AST(node);
-		$$=ab;
+multiply_expr: unary_expr {$$=$1;}
+	|multiply_expr multiply_operator unary_expr
+	{
+		AstObject* node=ast_node_new($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
 	;
+multiply_operator:tMUL{$$=&node_mul;}
+	|tDIV {$$=&node_div;}
+	|tMOD {$$=&node_mod;}
+	;
+
+additive_expr:multiply_expr{$$=$1;}
+	|additive_expr additive_operator multiply_expr
+	{
+		AstObject* node=ast_node_new($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
+	;
+additive_operator:tPLUS {$$=&node_plus;}
+	|tMINUS{$$=&node_minus;}
+	;
+
 shift_expr:additive_expr{$$=$1;}
-		  |shift_expr tLS additive_expr{   /*left shift*/
-		AstNodeLShift* node=ast_create_lshift($1,$3);
-		AstObject* ab=LSHIFT_TO_AST(node);
-		$$=ab;
+	|shift_expr shift_operator additive_expr
+	{
+		AstObject* node=ast_node_new($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
-	|shift_expr tRS additive_expr{  /* right shift */
-		AstNodeRShift* node=ast_create_rshift($1,$3);
-		AstObject* ab=RSHIFT_TO_AST(node);
-		$$=ab;
-	}
-;
+	;
+shift_operator:tLS{$$=&node_lshift;}
+	|tRS{$$=&node_rshift;}
+	;
+
 
 bit_and_expr:shift_expr{$$=$1;}
 	|bit_and_expr tAND shift_expr{
-		AstNodeAnd* node=ast_create_and($1,$3);
-		AstObject* ab=AND_TO_AST(node);
-		$$=ab;
+		AstObject* node=ast_node_new(&node_and);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
 	;
 bit_xor_expr:bit_and_expr{$$=$1;}
-	|bit_xor_expr tXOR bit_and_expr{
-		AstNodeXor* node=ast_create_xor($1,$3);
-		AstObject* ab=XOR_TO_AST(node);
-		$$=ab;
+	|bit_xor_expr tXOR bit_and_expr
+	{
+		AstObject* node=ast_node_new(&node_xor);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
 	;
 bit_or_expr:bit_xor_expr{$$=$1;}
-   |bit_or_expr tOR bit_xor_expr{
-		AstNodeOr* node=ast_create_or($1,$3);
-		AstObject* ab=OR_TO_AST(node);
-		$$=ab;
+	|bit_or_expr tOR bit_xor_expr
+	{
+		AstObject* node=ast_node_new(&node_or);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
 	;
+
 
 relational_expr:bit_or_expr{$$=$1;} 
-   |relational_expr tLT bit_or_expr{
-		AstNodeLt* node =ast_create_lt($1,$3);
-		AstObject* ab=LT_TO_AST(node);
-		$$=ab;
-	}
-	|relational_expr tLE bit_or_expr{
-		AstNodeLe* node=ast_create_le($1,$3);
-		AstObject* ab=LE_TO_AST(node);
-		$$=ab;
-	}
-	|relational_expr tGE bit_or_expr{
-		AstNodeGe* node=ast_create_ge($1,$3);
-		AstObject* ab=GE_TO_AST(node);
-		$$=ab;
-	}	
-	|relational_expr tGT bit_or_expr{
-		AstNodeGt* node=ast_create_gt($1,$3);
-		AstObject* ab=GT_TO_AST(node);
-		$$=ab;
-	}
+	|relational_expr relational_operator bit_or_expr
+	;	
+relational_operator:tLE{$$=&node_normal;}
+	|tLT{$$=&node_normal;}
+	|tGE{$$=&node_normal;}
+	|tGT{$$=&node_normal;}
 	;
 
+
 equal_expr:relational_expr{$$=$1;}
-  |equal_expr tEQ relational_expr{
-		AstNodeEq* node=ast_create_eq($1,$3);
-		AstObject* ab=EQ_TO_AST(node);
-		$$=ab;
-	}
-	|equal_expr tNE relational_expr{
-		AstNodeNe* node=ast_create_ne($1,$3);
-		AstObject* ab=NE_TO_AST(node);
-		$$=ab;
-	}
+	|equal_expr equal_operator relational_expr
 	;
+equal_operator:tEQ{$$=&node_normal;}
+	|tNE {$$=&node_normal;}
+	;
+
+
+
 logic_not_expr:equal_expr{$$=$1;}
-	|kNOT logic_not_expr{
-		AstNodeLogicNot* node=ast_create_logic_not($2);
-		AstObject* ab=LOGIC_NOT_TO_AST(node);
-		$$=ab;
-	}
+	|kNOT logic_not_expr
 	;
 logic_and_expr:logic_not_expr{$$=$1;}
-	|logic_and_expr kAND logic_not_expr{
-		AstNodeLogicAnd* node=ast_create_logic_and($1,$3);
-		AstObject* ab=LOGIC_AND_TO_AST(node);
-		$$=ab;
-	}
+	|logic_and_expr kAND logic_not_expr
 	;	
 logic_or_expr:logic_and_expr{$$=$1;}
-	|logic_or_expr kOR logic_and_expr{
-		AstNodeLogicOr* node=ast_create_logic_or($1,$3);
-		AstObject* ab=LOGIC_OR_TO_AST(node);
-		$$=ab;
-	}
+	|logic_or_expr kOR logic_and_expr
 	;
 expr :logic_or_expr{$$=$1;}
-	 ;
+	;
 
 stmt_expr:expr {$$=$1;}
 		 ;
 
 stmt_assign: symbols tASSIGN expr
 	{
-		char* msg=NULL;	
-		msg=ast_check_can_assign($1);
-		if(msg!=NULL)
-		{	
-			yyerror(msg);
-			return -1;
-		}
-		AstNodeAssign* node=ast_create_assign($1,$3);
-		$$=ASSIGN_TO_AST(node);
 	}
 	;
 
 stmt_print:kPRINT expr_list
 	{
-		AstNodePrint* node=ast_create_print($2);
-		$$=PRINT_TO_AST(node);
+		AstObject* node=ast_node_new(&node_print);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
 	}
 	;
 stmt_while: kWHILE  expr while_delimter pretty_stmts kEND 
 	{
-		AstNodeWhile* node=ast_create_while($2,$4);
-		$$=WHILE_TO_AST(node);
 	}
 	;
 while_delimter: tNEWLINE |kDO |tSEMI ;	
@@ -367,39 +312,26 @@ while_delimter: tNEWLINE |kDO |tSEMI ;
 stmt_if:if_pre kEND {$$=$1;}
 	|if_pre else_part kEND
 	{
-		ast_if_add(AST_TO_IF($1),AST_TO_IF_SUB($2));
-		$$=$1;
 	}
 	;
 
 if_pre:if_part 
 	{
-		AstNodeIf* node=ast_create_if();
-		ast_if_add(node,AST_TO_IF_SUB($1));
-		$$=IF_TO_AST(node);
 	}
 	|if_pre elif_part
 	{
-		ast_if_add(AST_TO_IF($1),AST_TO_IF_SUB($2));
-		$$=$1;
 	}
 	;
 if_part: kIF expr if_delimter pretty_stmts 
 	{
-		AstNodeIfSub* node=ast_create_if_sub($2,$4);
-		$$=IF_SUB_TO_AST(node);
 	}
 	;
 elif_part: kELIF expr if_delimter pretty_stmts
 	{
-		AstNodeIfSub* node=ast_create_if_sub($2,$4);
-		$$=IF_SUB_TO_AST(node);
 	}
 	;
 else_part: kELSE if_delimter pretty_stmts
 	{
-		AstNodeIfSub* node=ast_create_if_sub(NULL,$3);
-		$$=IF_SUB_TO_AST(node);
 	}
 	;
 
@@ -407,15 +339,6 @@ if_delimter:tNEWLINE|kTHEN|tSEMI;
 	
 stmt_for: kFOR symbols kIN expr for_delimter pretty_stmts kEND
 	{
-		char* msg=NULL;	
-		msg=ast_check_can_assign($2);
-		if(msg!=NULL)
-		{	
-			yyerror(msg);
-			return -1;
-		}
-		AstNodeFor* node=ast_create_for($2,$4,$6);
-		$$=FOR_TO_AST(node);
 	}
 for_delimter: tNEWLINE|kDO|tSEMI;
 

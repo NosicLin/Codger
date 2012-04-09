@@ -144,8 +144,8 @@ TypeObject _type_other=
 };
 Robject _other=
 {
-	1,
-	&_type_other,
+	.r_ref=1,
+	.r_type=&_type_other,
 };
 Robject*  other=&_other;
 

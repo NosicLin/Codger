@@ -4,20 +4,11 @@
 #include"ast_object.h"
 #include<utility_c/list_head.h>
 
-typedef struct ast_object AstNodeStmts;
-
-AST_TYPE_CAST(STMTS,Stmts,ATN_STMTS);
-
-AstNodeStmts* ast_create_stmts();
-
-static inline void ast_stmts_add(AstNodeStmts* father,AstObject* chirld)
-{
-	ast_node_add(STMTS_TO_AST(father),chirld);
-}
-static inline void ast_stmts_remove(AstNodeStmts* father,AstObject* chirld)
-{
-	ast_node_del(STMTS_TO_AST(father),chirld);
-}
+AstNodeType node_stmts;
+AstNodeType node_print;
+AstNodeType node_for;
+AstNodeType node_if;
+AstNodeType node_while;
 
 #endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/
 

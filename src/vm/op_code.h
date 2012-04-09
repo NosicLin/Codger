@@ -43,6 +43,7 @@ enum OP_CODES
 	OP_BOOL,
 	/* op_normal */
 	OP_PRINT,
+	OP_PRINT_LN,
 	
 	/* Data op */
 	OP_STORE,  /* move reg0 to symbol<id> */
@@ -50,8 +51,12 @@ enum OP_CODES
 	OP_GET_ATTR,
 	OP_SET_ATTR,
 	OP_SYMBOL, /* load symbol<id> to reg0 */
-	OP_CONST,  /* load const<id> to reg0,sizeof(id)=2 */
-	OP_CONST2,  /* load const<id> to reg0,sizeof(id)=4 */
+	OP_LOAD_CONST,  /* load const<id> to reg0,sizeof(id)=2 */
+	OP_LOAD_CONST2,  /* load const<id> to reg0,sizeof(id)=4 */
+
+	/* flow control op */
+	OP_BREAK,
+	OP_RETURN,
 
 	/* engine op */
 	OP_EXIT,

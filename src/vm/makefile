@@ -1,8 +1,8 @@
 PROJECT=vm
 
-SRC=except.c op_code.c stack_frame.c
+SRC=except.c op_code.c stack_frame.c engine.c
 DEBUG=
-BIN=
+BIN=codger.c
 
 
 
@@ -27,7 +27,8 @@ CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../  
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  \
-	-L../lib/  -lvm -lutility_c
+	-L../lib/  -lutility_c -lobject -lsyntax \
+	-llexical  -lrtype -lrstd
 
 
 
@@ -44,7 +45,7 @@ lib/lib$(PROJECT)debug.a:$(DEBUG_OBJ_NAME_WITH_PATH)
 
 
 bin/%.exe:obj/%.o lib/lib$(PROJECT).a lib/lib$(PROJECT)debug.a 
-	$(CC) $(FLAGS) -o $@ $< $(LIB)
+	$(CC) $(FLAGS) -o $@ $< -Xlinker "-(" $(LIB) -Xlinker "-)"
 
 obj/%.o:%.c
 	$(CC) $(FLAGS) -c -o $@ $< $(INCLUDE) 

@@ -1062,6 +1062,8 @@ int btbool_bool(BtBool* bb)
 }
 
 
+BtBool* ObjectFalse=&bool_object_false;
+BtBool* ObjectTrue=&bool_object_true;
 
 
 

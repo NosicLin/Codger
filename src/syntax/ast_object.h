@@ -3,17 +3,22 @@
 #include<utility_c/list_head.h>
 #include<vm/op_code.h>
 #include<object/module_object.h>
+#include<utility_c/marocs.h>
 
+#define AST_DEBUG
 struct ast_node_type;
+
+#define AST_FLAGS_TO_OPCODE 0x1
 
 struct ast_object
 {
+	int a_flags;
 	/* the two attribute provide a simple way 
 	 * to organize synatx tree structure
-	 * if sub class don't used it ,just ignore
 	 */
 	struct list_head a_chirldren;
 	struct list_head a_sibling;
+
 	/* attribute a_link used to link  all node together*/
 	struct list_head a_link;
 
@@ -26,8 +31,8 @@ typedef struct ast_object AstObject;
 #define INHERIT_AST_OBJECT struct ast_object ast_base
 #define TO_ASTOBJECT(node) ((AstObject*)node)
 
-#define ast_node_new(TYPE,type_object) \
-   	((TYPE*)__ast_node_new(sizeof(TYPE),type_object))
+#define ast_node_new(type_object) \
+   	((AstObject*)__ast_node_new(sizeof(AstObject),type_object))
 
 /*interface*/
 void ast_tree_free(AstObject* root);
@@ -35,27 +40,35 @@ void ast_node_free(AstObject* node);
 void ast_init(AstObject* ab,struct ast_node_type* node_type);
 void* __ast_node_new(ssize_t size,struct ast_node_type* node_type);
 
+#define ast_node_new_type(Type,type_object) \
+   	((Type*)__ast_node_new(sizeof(Type),type_object))
+
+
 static inline const char* ast_name(AstObject* ab)
 {
-	return ab->a_type->n_name;
+	return ab->a_type->t_name;
 }
 static inline int ast_typeid(AstObject* ab)
 {
-	return ab->a_type->n_type;
+	return ab->a_type->t_type;
 }
 
-AstObject* ast_create_object();
 static inline void ast_node_add(AstObject* father,AstObject* chirld)
 {
+	assert(father&&chirld);
 	list_add_tail(&chirld->a_sibling,&father->a_chirldren);
 }
 static inline void ast_node_del(AstObject* father,AstObject* chirld)
 {
+	assert(father&&chirld);
 	list_del(&chirld->a_sibling);
 }
 
-struct module_object;
-struct module_object* ast_to_module(AstObject* root);
+
+/* used for generate byte code */
+int ast_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op);
+ModuleObject* ast_to_module(AstObject* root);
+
 
 
 /* we use LR(1) grammar to parse redy source code
@@ -72,5 +85,50 @@ void ast_clear_pending();
 void ast_free_pending();
 /* and a new ast_object to list pending_ast_object */
 void ast_addto_pending(AstObject*);
-#endif 
+
+
+AstNodeType node_normal;
+
+#define AST_MEM_FAILED -2
+
+#ifdef AST_DEBUG
+static inline void CHECK_SUB_NODE_NUM(AstObject* node ,int num) 
+{
+	struct list_head* head=&node->a_chirldren;
+	struct list_head* p=head;
+	int i=0;
+	for(i=0;i<num;i++)
+	{
+		p=p->next;
+	}
+	if(p->next!=head) BUG("Synatx Tree Error");
+}
+static inline void CHECK_NODE_TYPE(AstObject* node,int type)
+{
+	if(node->a_type->t_type!=type)
+	{
+		BUG("AstNode Type Error");
+	}
+}
+#else 
+#define CHECK_SUB_NODE_NUM(node,num) do{}while(0) 
+#define CHECK_NODE_TYPE(node,type) do{}while(0)
+#endif  /*AST_DEBUG*/
+
+static inline void ast_node_getsub2(AstObject* ab,AstObject** sub1,AstObject** sub2)
+{
+	struct list_head* s1=(&ab->a_chirldren)->next;
+	struct list_head* s2=s1->next;
+
+	*sub1=list_entry(s1,AstObject,a_sibling);
+	*sub2=list_entry(s2,AstObject,a_sibling);
+}
+static inline void ast_node_getsub1(AstObject* ab,AstObject** sub1)
+{
+	struct list_head* l_left=(&ab->a_chirldren)->next;
+	*sub1=list_entry(l_left,AstObject,a_sibling);
+}
+
+
+#endif  /*_CODGER_SYNTAX_AST_OBJECT_H_*/
 

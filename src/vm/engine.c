@@ -2,110 +2,328 @@
 #include"stack_frame.h"
 #include<object/module_object.h>
 #include<object/robject.h>
+#include<utility_c/marocs.h>
+#include<rtype/bt_array.h>
+#include<rstd/gr_std.h>
+/* declare*/
+static StackFrame exit_frame;
+void enlarge_data_stack();
 
+/* define */
 static ModuleObject* eg_module_cur=0;
-static StackFrame* eg_frame_bottom=0;
-static StackFrame* eg_frame_cur=0;
+static StackFrame* eg_frame_bottom=&exit_frame;
+static StackFrame* eg_frame_cur=&exit_frame;
 
-static ssize_t pc=0;
+static ssize_t reg_pc=0;
 
-static Robject* reg_acc=0;
 
 
 static unsigned char* mem_codes=0;
-static Robject* r_consts=0;
-static Robject* r_symbols=0;
+static Robject** r_consts=0;
+static Robject** r_symbols=0;
 
-static Robject* data_stack=0;
 
-static Robject* reg_op1=1;
-static Robject* reg_op2=2;
-static Robject* reg_op3=3;
+static Robject* reg_acc=0;
+static Robject* reg_op0=0;
+static Robject* reg_op1=0;
+static Robject* reg_op2=0;
 
-#define  UNPACK_TWO_OP \
+
+static ssize_t reg_sp=0;
+static Robject** data_stack=0;
+static ssize_t data_stack_size=0;
+
+unsigned long  reg_dp=0;
+
+#define WORD_FROM_CODE \
 	do{ \
-		reg_op2=data_stack; \
-		reg_op1=reg_op2->r_next; \
-		data_stack=reg_op1->r_next; \
+		reg_dp=0xff00&(mem_codes[reg_pc++]<<8); \
+		reg_dp|=0xff&mem_codes[reg_pc++]; \
+	}while(0);
+
+#define DWORD_FORM_CODE \
+	do{ \
+		reg_dp=0xff000000&(mem_codes[reg_pc++]<<24); \
+		reg_dp|=(mem_codes[reg_pc++])<<16; \
+		reg_dp|=(mem_codes[reg_pc++])<<8; \
+		reg_dp|=(mem_codes[reg_pc++]); \
+	}while(0)
+
+
+#define DATA_PUSH_NOREF \
+	do { \
+		if(reg_sp>=data_stack_size) {enlarge_data_stack();} \
+		data_stack[reg_sp++]=reg_acc; \
+	} while(0)
+
+#define DATA_PUSH \
+	do { \
+		if(reg_sp>=data_stack_size) {enlarge_data_stack();} \
+		robject_addref(reg_acc); \
+		data_stack[reg_sp++]=reg_acc; \
+	} while(0)
+
+#define UNPACK_ONE_OP \
+	do{ \
+		reg_op0=data_stack[--reg_sp];\
 	}while(0) 
+#define RELEASE_ONE_OP \
+	do { \
+		robject_release(reg_op0); \
+	}while(0) 
+
+#define UNPACK_TWO_OP \
+	do{ \
+		reg_op1=data_stack[--reg_sp]; \
+		reg_op0=data_stack[--reg_sp];  \
+	}while(0)
+
+#define RELEASE_TWO_OP \
+	do{ \
+		robject_release(reg_op1); \
+		robject_release(reg_op0); \
+	}while(0)
 
 #define UNPACK_THREE_OP \
 	do{ \
-		reg_op3=data_stack; \
-		reg_op2=reg_op3; \
-		reg_op1=reg_op2->r_next; \
-		data_stack=reg_op1->r_next; \
+		reg_op2=data_stack[--reg_sp]; \
+		reg_op1=data_stack[--reg_sp]; \
+		reg_op0=data_stack[--reg_sp];  \
 	}while(0)
+
+#define RELEASE_THREE_OP \
+	do{ \
+		robject_release(reg_op2); \
+		robject_release(reg_op1); \
+		robject_release(reg_op0); \
+	} while(0)
+
+
+static void vm_handle_except(){
+	TODO("VM_HANDLE_EXCEPT");
+	StackFrame* s=eg_frame_bottom;
+	s=0;
+}
+
 
 int engine_run()
 {
-	bool runing=true;
+	int runing=1;
+	StackFrame* s=0;
+
 	while(runing)
 	{
-		if(except_happened())
-		{
-			handle_except();
-		}
-		unsigned char op=op_codes[s_pc++];
+		unsigned char op=mem_codes[reg_pc++];
 		switch(op)
 		{
 			case OP_POSITIVE:
-				reg_acc=robject_positive(s_reg0);
+				UNPACK_ONE_OP;
+				reg_acc=robject_positive(reg_op0);
+				DATA_PUSH_NOREF;
+				RELEASE_ONE_OP;
 				break;
 			case OP_NEGATIVE:
-				reg_acc=robject_negative(s_reg0);
+				UNPACK_ONE_OP;
+				reg_acc=robject_negative(reg_op0);
+				DATA_PUSH_NOREF;
+				RELEASE_ONE_OP;
 				break;
 			case OP_NEGATED:
-				reg_acc=robject_negative(s_reg0);
+				UNPACK_ONE_OP;
+				reg_acc=robject_negated(reg_op0);
+				DATA_PUSH_NOREF;
+				RELEASE_ONE_OP;
 				break;
 			case OP_MUL:
 				UNPACK_TWO_OP;
-				reg_acc=reg_acc=robject_mul(reg_op1,reg_op2);
+				reg_acc=robject_mul(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
 				break;
+			case OP_DIV:
+				UNPACK_TWO_OP;
+				reg_acc=robject_div(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_MOD:
+				UNPACK_TWO_OP;
+				reg_acc=robject_div(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_PLUS:
+				UNPACK_TWO_OP;
+				reg_acc=robject_plus(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_MINUS:
+				UNPACK_TWO_OP;
+				reg_acc=robject_minus(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_LSHIFT:
+				UNPACK_TWO_OP;
+				reg_acc=robject_lshift(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_RSHIFT:
+				UNPACK_TWO_OP;
+				reg_acc=robject_rshift(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_AND:
+				UNPACK_TWO_OP;
+				reg_acc=robject_and(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_XOR:
+				UNPACK_TWO_OP;
+				reg_acc=robject_xor(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+			case OP_OR:
+				UNPACK_TWO_OP;
+				reg_acc=robject_or(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
+
 			case OP_EXIT:
-				runing=false;
+				runing=0;
 				break;
 			case OP_RETURN:
-				StackFrame* s=engine_pop();
+				s=engine_pop();
 				sframe_free(s);
+				break;
+			case OP_PRINT:
+				UNPACK_ONE_OP;
+				robject_print(reg_op0,NULL,PRINT_FLAGS_SPACE);
+				RELEASE_ONE_OP;
+				break;
+			case OP_PRINT_LN:
+				printf("\n");
+				break;
+			case OP_SET_ITEM:
+				UNPACK_THREE_OP;
+				RELEASE_THREE_OP;
+				break;
+			case OP_LOAD_CONST:
+				WORD_FROM_CODE;
+				reg_acc=r_consts[reg_dp];
+				DATA_PUSH;
+				break;
+			case OP_LOAD_CONST2:
+				DWORD_FORM_CODE;
+				reg_acc=r_consts[reg_dp];
+				DATA_PUSH;
+				break;
 			default:
 				BUG("Unkown OpCode");
-				runing=false;
+				runing=0;
 		}
-				
+		if(vm_except_happened())
+		{
+			vm_handle_except();
+		}
+
 	}
 	return 1;
 }
-
-static inline int init_context(struct stack_frame* s)
+static OpCode exit_code=
 {
-	pc=s->sf_pc;
+	.o_size=1,
+	.o_cap=1,
+	.o_codes=exit_code.o_small_codes,
+	.o_small_codes={OP_EXIT,},
+};
+
+static StackFrame exit_frame=
+{
+	.sf_codes=&exit_code,
+	.sf_pc=0,
+	.sf_sp=0,
+};
+
+
+static inline int restore_context(StackFrame* s)
+{
+	reg_pc=s->sf_pc;
+	reg_sp=s->sf_sp;
 	mem_codes=s->sf_codes->o_codes;
 
-	if(eg_module_cur!=s->sf_modules)
+	if(eg_module_cur!=s->sf_modules&&s->sf_modules!=NULL)
 	{
 		eg_module_cur=s->sf_modules;
+
 		r_consts=eg_module_cur->m_consts->a_objects;
 		r_symbols=eg_module_cur->m_symbols->a_objects;
 	}
 	return 0;
 }
 
-int engine_push(struct  stack_frame* s)
+int engine_push(StackFrame* s)
 {
-	eg_frame_cur->sf_pc=pc; /* only keep the pc value is enough*/
+	eg_frame_cur->sf_pc=reg_pc; /* only keep the pc value is enough*/
+	eg_frame_cur->sf_sp=reg_sp;
 
 	s->sf_link=eg_frame_cur;
 	eg_frame_cur=s;
 
-	return  init_context(s);
+	return  restore_context(s);
 }
 
-struct stack_frame* engine_pop()
+StackFrame* engine_pop()
 {
 	StackFrame* s=eg_frame_cur;
-	eg_frame_cur=eg_frame_cur->sf_next;
-	init_context(eg_frame_cur);
+	eg_frame_cur=eg_frame_cur->sf_link;
+	restore_context(eg_frame_cur);
 	return s;
 }
+#define DEFAULT_DATA_STACK_SIZE 1024*8*sizeof(Robject*)
+
+int engine_init()
+{
+	data_stack=gr_malloc(DEFAULT_DATA_STACK_SIZE);
+	if(data_stack==NULL)
+	{
+		grerr_nomemory();
+		return-1;
+	}
+	data_stack_size=DEFAULT_DATA_STACK_SIZE-1;
+	return 0;
+}
+
+void enlarge_data_stack()
+{
+	ssize_t new_size=(data_stack_size+1)*2;
+	Robject** new_statck=gr_malloc(new_size);
+	if(new_statck==NULL)
+	{
+		grerr_nomemory();
+		return ;
+	}
+	memcpy(new_statck,data_stack,data_stack_size+1);
+	gr_free(data_stack);
+	data_stack=new_statck;
+	data_stack_size=new_size-1;
+}
+
+
+
+
+
+int engine_exit()
+{
+	if(data_stack) gr_free(data_stack);
+	WARN_ON(reg_sp>1,"Some Error May Be Happed");
+	return 0;
+}
+
 

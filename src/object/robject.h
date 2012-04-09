@@ -8,6 +8,7 @@ struct hash_object;
 struct  robject 
 {
 	ssize_t r_ref;
+
 	struct hash_object* r_table;
 	struct type_object* r_type;
 };
@@ -98,6 +99,7 @@ int robject_richcmp(Robject* x,Robject* y,int op);
 
 /* print flags*/
 #define PRINT_FLAGS_NEWLINE 0x1
+#define PRINT_FLAGS_SPACE (0x1<<1)
 void robject_print(Robject* rt,FILE* f,int flags);
 #endif 
 
