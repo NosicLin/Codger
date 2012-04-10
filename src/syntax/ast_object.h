@@ -56,7 +56,7 @@ static inline int ast_typeid(AstObject* ab)
 static inline void ast_node_add(AstObject* father,AstObject* chirld)
 {
 	assert(father);
-	//printf("father:name=%s\n",father->a_type->t_name);
+//	printf("father:name=%s\n",father->a_type->t_name);
 	assert(chirld);
 	list_add_tail(&chirld->a_sibling,&father->a_chirldren);
 }

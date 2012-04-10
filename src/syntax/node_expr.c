@@ -252,7 +252,7 @@ static int logic_and_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 		return ret;
 	}
 	
-	op_code_push(op,OP_BOOL);
+	op_code_push(op,OP_BOOL_NOTAKE);
 
 	/* update jump_pos later */
 	jump_instruct=op_code_size(op);
@@ -291,7 +291,7 @@ static int logic_or_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 		return ret;
 	}
 
-	op_code_push(op,OP_BOOL);
+	op_code_push(op,OP_BOOL_NOTAKE);
 
 	/* update jump pos later */
 	jump_instruct=op_code_size(op);

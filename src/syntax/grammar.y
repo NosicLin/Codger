@@ -371,6 +371,11 @@ stmt_print:kPRINT expr_list
 	;
 stmt_while: kWHILE  expr while_delimter block kEND 
 	{
+		AstObject* node=ast_node_new(&node_while);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		ast_node_add(node,$4);
+		$$=node;
 	}
 	;
 while_delimter: tNEWLINE |kDO |tSEMI ;	

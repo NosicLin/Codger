@@ -16,11 +16,11 @@ static StackFrame* eg_frame_bottom=&exit_frame;
 static StackFrame* eg_frame_cur=&exit_frame;
 
 /* pc: program countor */
-static unsigned long reg_pc=0;
+static u_int32_t reg_pc=0;
 
 
 
-static unsigned char* mem_codes=0;
+static u_int8_t* mem_codes=0;
 static Robject** const_pool=0;
 static Robject** symbol_pool=0;
 
@@ -32,26 +32,26 @@ static Robject* reg_op2=0;
 
 
 /* sp: stack pointer */
-static ssize_t reg_sp=0;
+static u_int32_t reg_sp=0;
 static Robject** data_stack=0;
-static ssize_t data_stack_size=0;
+static u_int32_t data_stack_size=0;
 
 /* data register  */
-unsigned long  reg_dp=0;
+int32_t reg_dp=0;
 
-unsigned long reg_flags=0;
+u_int32_t reg_flags=0;
 
 #define WORD_FROM_CODE \
 	do{ \
-		reg_dp=0xff00&((unsigned long)(mem_codes[reg_pc++])<<8); \
-		reg_dp|=0xff&((unsigned long)(mem_codes[reg_pc++])); \
+		reg_dp=(int16_t)(0xff00&((u_int16_t)(mem_codes[reg_pc++])<<8)); \
+		reg_dp|=0xff&((u_int16_t)(mem_codes[reg_pc++])); \
 	}while(0);
 
 #define DWORD_FORM_CODE \
 	do{ \
-		reg_dp=0xff000000&((unsigned long)(mem_codes[reg_pc++])<<24); \
-		reg_dp|=((unsigned long)(mem_codes[reg_pc++])<<16); \
-		reg_dp|=((unsigned long)(mem_codes[reg_pc++])<<8); \
+		reg_dp=(int32_t)(0xff000000&((u_int32_t)(mem_codes[reg_pc++])<<24)); \
+		reg_dp|=((u_int32_t)(mem_codes[reg_pc++])<<16); \
+		reg_dp|=((u_int32_t)(mem_codes[reg_pc++])<<8); \
 		reg_dp|=(mem_codes[reg_pc++]); \
 	}while(0)
 
@@ -119,8 +119,8 @@ int engine_run()
 
 	while(runing)
 	{
-		//printf("pc=%ld\n",reg_pc);
-		unsigned char op=mem_codes[reg_pc++];
+		//printf("pc=%u\n",reg_pc);
+		u_int8_t op=mem_codes[reg_pc++];
 		switch(op)
 		{
 			case OP_POSITIVE:
@@ -243,7 +243,13 @@ int engine_run()
 				DATA_PUSH;
 				RELEASE_TWO_OP;
 				break;
+
 			case OP_BOOL:
+				UNPACK_ONE_OP;
+				reg_flags=robject_bool(reg_op0);
+				RELEASE_ONE_OP;
+				break;
+			case OP_BOOL_NOTAKE:
 				/* ref top stack data, but not take*/
 				reg_op0=data_stack[reg_sp-1];
 				reg_flags=robject_bool(reg_op0);
@@ -253,6 +259,10 @@ int engine_run()
 				reg_flags=robject_bool(reg_op0);
 				reg_acc=(Robject*)(reg_flags!=0?ObjectFalse:ObjectTrue);
 				DATA_PUSH;
+				RELEASE_ONE_OP;
+				break;
+			case OP_DISCARD:
+				UNPACK_ONE_OP;
 				RELEASE_ONE_OP;
 				break;
 
@@ -265,9 +275,21 @@ int engine_run()
 				WORD_FROM_CODE;
 				if(reg_flags==1) reg_pc=reg_dp;
 				break;
-			case OP_DISCARD:
-				UNPACK_ONE_OP;
-				RELEASE_ONE_OP;
+			case OP_JUMP:
+				WORD_FROM_CODE;
+				reg_pc=reg_dp;
+				break;
+			case OP_JUMPR_FALSE:
+				WORD_FROM_CODE;
+				if(reg_flags==0) reg_pc+=reg_dp-3;
+				break;
+			case OP_JUMPR_TRUE:
+				WORD_FROM_CODE;
+				if(reg_flags==1) reg_pc+=reg_dp-3;
+				break;
+			case OP_JUMPR:
+				WORD_FROM_CODE;
+				reg_pc+=reg_dp-3;
 				break;
 			case OP_EXIT:
 				runing=0;
@@ -299,7 +321,7 @@ int engine_run()
 				DATA_PUSH;
 				break;
 			default:
-				BUG("Unkown OpCode");
+				BUG("Unkown OpCode(%u) pc=%u",op,reg_pc);
 				runing=0;
 		}
 		if(vm_except_happened())

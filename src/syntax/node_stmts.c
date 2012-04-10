@@ -83,7 +83,68 @@ static int expr_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	op_code_push(op,OP_DISCARD);
 	return 0;
 }
+static int while_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_WHILE);
 
+	AstObject* expr;
+	AstObject* stmts;
+	ast_node_getsub2(ab,&expr,&stmts);
+	int ret;
+	ssize_t while_begin=0;
+	ssize_t while_jump=0;
+	ssize_t while_end=0;
+
+	while_begin=op_code_size(op);
+
+	/* expr opcode */
+	ret=ast_to_opcode(expr,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	/* condition judge opcode */
+	ret=op_code_enlarge_more(op,4);
+	if(ret<0)
+	{
+		return ret;
+	}
+	op_code_push(op,OP_BOOL);
+
+	/* update pos later*/
+	while_jump=op_code_size(op);
+	op_code_push3(op,OP_JUMPR_FALSE,0);
+
+	/* stmts opcode */
+	ret=ast_to_opcode(stmts,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	/* jump to begin */
+	ret=op_code_enlarge_more(op,3);
+	if(ret<0)
+	{
+		return ret;
+	}
+	while_end=op_code_size(op);
+	op_code_push3(op,OP_JUMPR,-(while_end-while_begin));
+
+	/* update condition judge */
+	op_code_set3(op,while_jump,OP_JUMPR_FALSE,while_end-while_jump+3);
+
+	return 0;
+}
+
+
+
+
+
+
+		
 AstNodeType node_block=
 {
 	.t_type=ATN_STMTS,
@@ -103,6 +164,13 @@ AstNodeType node_expr=
 	.t_name="Expr",
 	.t_to_opcode=expr_to_opcode,
 };
+AstNodeType node_while=
+{
+	.t_type=ATN_WHILE,
+	.t_name="While",
+	.t_to_opcode=while_to_opcode,
+};
+
 
 	
 

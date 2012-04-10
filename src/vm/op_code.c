@@ -27,13 +27,13 @@ int op_code_enlarge(struct op_code* op,int cap)
 	{
 		return -1;
 	}
-	unsigned char* new_codes=gr_malloc(new_cap);
+	u_int8_t* new_codes=gr_malloc(new_cap);
 	if(new_codes==NULL)
 	{
 		grerr_nomemory();
 		return -1;
 	}
-	unsigned char* old_codes=op->o_codes;
+	u_int8_t* old_codes=op->o_codes;
 	memcpy(new_codes,old_codes,op->o_size);
 	op->o_codes=new_codes;
 	op->o_cap=new_cap;
@@ -75,12 +75,17 @@ static char* s_op_name[]=
 	"OP_EQ",
 	"OP_GE",
 	"OP_GT",
+	"OP_BOOL_NOTAKE",
 	"OP_BOOL",
 	"OP_LOGIC_NOT",
 	/* op_normal */
 	"OP_PRINT",
 	"OP_PRINT_LN",
 	
+	/* engine op */
+	"OP_EXIT",
+	"OP_RETURN",
+
 	/* Data op */
 	"OP_STORE",  /* move reg0 to symbol<id> */
 	"OP_PUSH",   /* move reg0 to stack */
@@ -93,37 +98,36 @@ static char* s_op_name[]=
 
 	/* flow control op */
 	"OP_BREAK",
-	"OP_RETURN",
+	"OP_CONTINUE",
+	"OP_JUMP",
 	"OP_JUMP_FALSE",
 	"OP_JUMP_TRUE",
 
+	"OP_JUMPR",
+	"OP_JUMPR_FALSE",
+	"OP_JUMPR_TRUE",
 
 
-	/* engine op */
-	"OP_EXIT",
+
 };
 
 void op_code_print(struct op_code* op,FILE* f)
 {
 	ssize_t i=0;
 	fprintf(f,"#OpCode Size=%d\n",op->o_size);
-	unsigned char code=0;
-	unsigned  char d1=0;
-	unsigned char d2=0;
+	u_int8_t code=0;
+	u_int8_t d1=0;
+	u_int8_t d2=0;
 	while(i<op->o_size)
 	{
 		code=op->o_codes[i++];
 		assert(code<OP_CODE_NUM);
-		fprintf(f,"%s",s_op_name[code]);
-		if(code==OP_JUMP_FALSE||code==OP_JUMP_TRUE||
-				code==OP_LOAD_CONST||code==OP_SYMBOL)
+		fprintf(f,"%d\t %s",i-1,s_op_name[code]);
+		if(code>OP_DISCARD)
 		{
 			d1=op->o_codes[i++];
 			d2=op->o_codes[i++];
-			printf("<%ld>\n",(unsigned long)d1<<8|d2);
-			printf("OP_DATA %u\n",d1);
-			printf("OP_DATA %u",d2);
-
+			printf("<%d>",(int16_t)((u_int16_t)d1<<8|d2));
 		}
 		fprintf(f,"\n");
 	}
