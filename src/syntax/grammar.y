@@ -44,50 +44,28 @@
 %start AstTree
 %%
 
-AstTree : pretty_stmts{parser_set_root($1);}
-;
-pretty_stmts: stmts {$$=$1;}
-	|stmts stmt
+AstTree : block{parser_set_root($1);} ;
+
+block:stmt 
 	{
-		ast_node_add($1,$2);
-		$$=$1;
-	}
-	|stmt
-	{
-		AstObject* node=ast_node_new(&node_stmts);
+		AstObject* node=ast_node_new(&node_block);
 		if(node==NULL) return AST_MEM_FAILED;
 		ast_node_add(node,$1);
 		$$=node;
 	}
-	| 
+	|stmt_delimiter 
 	{
-		AstObject* node=ast_node_new(&node_stmts);
+		AstObject* node=ast_node_new(&node_block);
 		if(node==NULL) return AST_MEM_FAILED;
 		$$=node;
 	}
-	;		
-
-stmts: pretty_stmt
-	 {
-		AstObject* node=ast_node_new(&node_stmts);
-		if(node==NULL) return AST_MEM_FAILED;
-		if($1!=NULL) ast_node_add(node,$1);
-		$$=node;
-	 }
-	 | stmts pretty_stmt
-	 {
-		if($2!=NULL) ast_node_add($1,$2);
+	|block stmt_delimiter stmt 
+	{
+		ast_node_add($1,$3);
 		$$=$1;
-	 }
+	}
+	|block stmt_delimiter {$$=$1;}
 	;
-
-stmt_delimiter:tNEWLINE| tSEMI
-
-
-pretty_stmt: stmt stmt_delimiter {$$=$1;}
-		   |pseudo_stmt {$$=NULL;}
-
-pseudo_stmt: stmt_delimiter {$$=NULL;}
 
 stmt:stmt_expr {$$=$1;}
 	|stmt_assign {$$=$1;}
@@ -96,6 +74,10 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_if  {$$=$1;}
 	|stmt_for {$$=$1;}
 	;
+
+stmt_delimiter:tNEWLINE| tSEMI;
+
+
 literal: tINTEGER 
 	{
 		BtInt* bi=btint_from_str(yl_cur_string());
@@ -111,24 +93,68 @@ literal: tINTEGER
 	}
 	| tLONG
 	{
+		BtLong* bl=btlong_from_str(yl_cur_string());
+		if(bl==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_literal(L_TO_R(bl));
+		if(node==NULL)
+		{
+			robject_release(L_TO_R(bl));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
 	}
 	| tFLAOT
 	{
+		BtFloat* bf=btfloat_from_str(yl_cur_string());
+		if(bf==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_literal(F_TO_R(bf));
+		if(node==NULL)
+		{
+			robject_release(F_TO_R(bf));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
 	}
 	| tSTRING
 	{
+		BtString* bs=btstring_create(yl_cur_string());
+		if(bs==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_literal(S_TO_R(bs));
+		if(node==NULL)
+		{
+			robject_release(S_TO_R(bs));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
 	}
 	| kFALSE
 	{
+		robject_addref(B_TO_R(ObjectFalse));
+		AstObject* node=ast_create_literal(B_TO_R(ObjectFalse));
+		if(node==NULL)
+		{
+			robject_release(B_TO_R(ObjectFalse));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
 	}
 	| kTRUE
 	{
+		robject_addref(B_TO_R(ObjectTrue));
+		AstObject* node=ast_create_literal(B_TO_R(ObjectTrue));
+		if(node==NULL)
+		{
+			robject_release(B_TO_R(ObjectTrue));
+			return AST_MEM_FAILED;
+		}
+		$$=node;
 	}
 	;
 identifier:tID
 	{
 	}
 	;
+
 expr_list: expr 
 	{
 		AstObject* node=ast_node_new(&node_normal);
@@ -257,37 +283,78 @@ bit_or_expr:bit_xor_expr{$$=$1;}
 
 relational_expr:bit_or_expr{$$=$1;} 
 	|relational_expr relational_operator bit_or_expr
+	{
+		AstObject* node=ast_node_new($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
 	;	
-relational_operator:tLE{$$=&node_normal;}
-	|tLT{$$=&node_normal;}
-	|tGE{$$=&node_normal;}
-	|tGT{$$=&node_normal;}
+
+relational_operator:tLT{$$=&node_lt;}
+	|tLE{$$=&node_le;}
+	|tGE{$$=&node_ge;}
+	|tGT{$$=&node_gt;}
 	;
 
 
 equal_expr:relational_expr{$$=$1;}
 	|equal_expr equal_operator relational_expr
+	{
+		AstObject* node=ast_node_new($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
 	;
-equal_operator:tEQ{$$=&node_normal;}
-	|tNE {$$=&node_normal;}
+equal_operator:tEQ{$$=&node_eq;}
+	|tNE {$$=&node_ne;}
 	;
 
 
 
 logic_not_expr:equal_expr{$$=$1;}
 	|kNOT logic_not_expr
+	{
+		AstObject* node=ast_node_new(&node_logic_not);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
+	}
 	;
 logic_and_expr:logic_not_expr{$$=$1;}
 	|logic_and_expr kAND logic_not_expr
+	{
+		AstObject* node=ast_node_new(&node_logic_and);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
 	;	
 logic_or_expr:logic_and_expr{$$=$1;}
 	|logic_or_expr kOR logic_and_expr
-	;
-expr :logic_or_expr{$$=$1;}
+	{
+		AstObject* node=ast_node_new(&node_logic_or);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
 	;
 
-stmt_expr:expr {$$=$1;}
-		 ;
+expr :logic_or_expr{$$=$1;} ;
+
+stmt_expr:expr 
+	{
+		AstObject* node= ast_node_new(&node_expr);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		$$=node;
+	} 
+	;
 
 stmt_assign: symbols tASSIGN expr
 	{
@@ -302,7 +369,7 @@ stmt_print:kPRINT expr_list
 		$$=node;
 	}
 	;
-stmt_while: kWHILE  expr while_delimter pretty_stmts kEND 
+stmt_while: kWHILE  expr while_delimter block kEND 
 	{
 	}
 	;
@@ -310,34 +377,23 @@ while_delimter: tNEWLINE |kDO |tSEMI ;
 
 
 stmt_if:if_pre kEND {$$=$1;}
-	|if_pre else_part kEND
+	|if_pre kELSE if_delimter block kEND
 	{
 	}
 	;
 
-if_pre:if_part 
+if_pre:kIF expr if_delimter block
 	{
 	}
-	|if_pre elif_part
-	{
-	}
-	;
-if_part: kIF expr if_delimter pretty_stmts 
-	{
-	}
-	;
-elif_part: kELIF expr if_delimter pretty_stmts
-	{
-	}
-	;
-else_part: kELSE if_delimter pretty_stmts
+	|if_pre  kELIF expr if_delimter block
 	{
 	}
 	;
 
 if_delimter:tNEWLINE|kTHEN|tSEMI;
 	
-stmt_for: kFOR symbols kIN expr for_delimter pretty_stmts kEND
+
+stmt_for: kFOR symbols kIN expr for_delimter block kEND
 	{
 	}
 for_delimter: tNEWLINE|kDO|tSEMI;

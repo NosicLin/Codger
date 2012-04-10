@@ -2,6 +2,8 @@
 #define _CODGER_OBJECT_OP_CODE_H_
 #define DEFALUT_OP_CAP 32
 #include<assert.h>
+#include<stdio.h>
+
 
 struct op_code
 {
@@ -41,6 +43,7 @@ enum OP_CODES
 	OP_GE,
 	OP_GT,
 	OP_BOOL,
+	OP_LOGIC_NOT,
 	/* op_normal */
 	OP_PRINT,
 	OP_PRINT_LN,
@@ -48,6 +51,7 @@ enum OP_CODES
 	/* Data op */
 	OP_STORE,  /* move reg0 to symbol<id> */
 	OP_PUSH,   /* move reg0 to stack */
+	OP_DISCARD,
 	OP_GET_ATTR,
 	OP_SET_ATTR,
 	OP_SYMBOL, /* load symbol<id> to reg0 */
@@ -57,9 +61,14 @@ enum OP_CODES
 	/* flow control op */
 	OP_BREAK,
 	OP_RETURN,
+	OP_JUMP_FALSE,
+	OP_JUMP_TRUE,
+
+
 
 	/* engine op */
 	OP_EXIT,
+	OP_CODE_NUM,
 };
 
 struct op_code* op_code_new();
@@ -70,6 +79,24 @@ int op_code_enlarge(struct op_code* op,int new_cap);
 static inline int op_code_enlarge_more(struct op_code* op,int size)
 {
 	return op_code_enlarge(op,op->o_size+size);
+}
+
+
+static inline ssize_t op_code_size(struct op_code* op)
+{
+	return op->o_size;
+}
+static inline void op_code_set(struct op_code* op,
+				ssize_t pos,unsigned char code)
+{
+	op->o_codes[pos]=code;
+}
+static inline void op_code_set3(struct op_code* op, ssize_t pos, 
+						unsigned char code,unsigned short id)
+{
+	op->o_codes[pos++]=code;
+	op->o_codes[pos++]=(unsigned char)(id>>8);
+	op->o_codes[pos++]=(unsigned char)id;
 }
 /* make sure enough space to store code */
 static inline void op_code_push(struct op_code* op,unsigned char code)
@@ -87,7 +114,7 @@ static inline void op_code_push3(struct op_code* op,
 		unsigned char code, unsigned short id)
 {
 	op->o_codes[op->o_size++]=code;
-	op->o_codes[op->o_size++]=(unsigned char)id>>8;
+	op->o_codes[op->o_size++]=(unsigned char)(id>>8);
 	op->o_codes[op->o_size++]=(unsigned char)id;
 }
 
@@ -95,10 +122,11 @@ static inline void op_code_push5(struct op_code* op,
 		unsigned char code,unsigned long id)
 {
 	op->o_codes[op->o_size++]=code;
-	op->o_codes[op->o_size++]=(unsigned char)id>>24;
-	op->o_codes[op->o_size++]=(unsigned char)id>>16;
-	op->o_codes[op->o_size++]=(unsigned char)id>>8;
+	op->o_codes[op->o_size++]=(unsigned char)(id>>24);
+	op->o_codes[op->o_size++]=(unsigned char)(id>>16);
+	op->o_codes[op->o_size++]=(unsigned char)(id>>8);
 	op->o_codes[op->o_size++]=(unsigned char)id;
 }
 
+void op_code_print(struct op_code* op,FILE* f);
 #endif 

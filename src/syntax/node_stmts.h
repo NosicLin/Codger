@@ -4,11 +4,11 @@
 #include"ast_object.h"
 #include<utility_c/list_head.h>
 
-AstNodeType node_stmts;
+AstNodeType node_block;
 AstNodeType node_print;
 AstNodeType node_for;
 AstNodeType node_if;
 AstNodeType node_while;
-
+AstNodeType node_expr;
 #endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/
 

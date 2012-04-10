@@ -4,6 +4,7 @@
 #include<object/robject.h>
 #include<utility_c/marocs.h>
 #include<rtype/bt_array.h>
+#include<rtype/bt_bool.h>
 #include<rstd/gr_std.h>
 /* declare*/
 static StackFrame exit_frame;
@@ -14,13 +15,14 @@ static ModuleObject* eg_module_cur=0;
 static StackFrame* eg_frame_bottom=&exit_frame;
 static StackFrame* eg_frame_cur=&exit_frame;
 
-static ssize_t reg_pc=0;
+/* pc: program countor */
+static unsigned long reg_pc=0;
 
 
 
 static unsigned char* mem_codes=0;
-static Robject** r_consts=0;
-static Robject** r_symbols=0;
+static Robject** const_pool=0;
+static Robject** symbol_pool=0;
 
 
 static Robject* reg_acc=0;
@@ -29,23 +31,27 @@ static Robject* reg_op1=0;
 static Robject* reg_op2=0;
 
 
+/* sp: stack pointer */
 static ssize_t reg_sp=0;
 static Robject** data_stack=0;
 static ssize_t data_stack_size=0;
 
+/* data register  */
 unsigned long  reg_dp=0;
+
+unsigned long reg_flags=0;
 
 #define WORD_FROM_CODE \
 	do{ \
-		reg_dp=0xff00&(mem_codes[reg_pc++]<<8); \
-		reg_dp|=0xff&mem_codes[reg_pc++]; \
+		reg_dp=0xff00&((unsigned long)(mem_codes[reg_pc++])<<8); \
+		reg_dp|=0xff&((unsigned long)(mem_codes[reg_pc++])); \
 	}while(0);
 
 #define DWORD_FORM_CODE \
 	do{ \
-		reg_dp=0xff000000&(mem_codes[reg_pc++]<<24); \
-		reg_dp|=(mem_codes[reg_pc++])<<16; \
-		reg_dp|=(mem_codes[reg_pc++])<<8; \
+		reg_dp=0xff000000&((unsigned long)(mem_codes[reg_pc++])<<24); \
+		reg_dp|=((unsigned long)(mem_codes[reg_pc++])<<16); \
+		reg_dp|=((unsigned long)(mem_codes[reg_pc++])<<8); \
 		reg_dp|=(mem_codes[reg_pc++]); \
 	}while(0)
 
@@ -113,6 +119,7 @@ int engine_run()
 
 	while(runing)
 	{
+		//printf("pc=%ld\n",reg_pc);
 		unsigned char op=mem_codes[reg_pc++];
 		switch(op)
 		{
@@ -148,7 +155,7 @@ int engine_run()
 				break;
 			case OP_MOD:
 				UNPACK_TWO_OP;
-				reg_acc=robject_div(reg_op0,reg_op1);
+				reg_acc=robject_mod(reg_op0,reg_op1);
 				DATA_PUSH_NOREF;
 				RELEASE_TWO_OP;
 				break;
@@ -194,7 +201,74 @@ int engine_run()
 				DATA_PUSH_NOREF;
 				RELEASE_TWO_OP;
 				break;
+			case OP_LT:
+				UNPACK_TWO_OP;
+				reg_flags=robject_lt(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_LE:
+				UNPACK_TWO_OP;
+				reg_flags=robject_le(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_GE:
+				UNPACK_TWO_OP;
+				reg_flags=robject_ge(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_GT:
+				UNPACK_TWO_OP;
+				reg_flags=robject_gt(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_NE:
+				UNPACK_TWO_OP;
+				reg_flags=robject_ne(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_EQ:
+				UNPACK_TWO_OP;
+				reg_flags=robject_eq(reg_op0,reg_op1);
+				reg_acc=(Robject*)(reg_flags==0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_TWO_OP;
+				break;
+			case OP_BOOL:
+				/* ref top stack data, but not take*/
+				reg_op0=data_stack[reg_sp-1];
+				reg_flags=robject_bool(reg_op0);
+				break;
+			case OP_LOGIC_NOT:
+				UNPACK_ONE_OP;
+				reg_flags=robject_bool(reg_op0);
+				reg_acc=(Robject*)(reg_flags!=0?ObjectFalse:ObjectTrue);
+				DATA_PUSH;
+				RELEASE_ONE_OP;
+				break;
 
+			/* control flow instruction */
+			case OP_JUMP_FALSE:
+				WORD_FROM_CODE;
+				if(reg_flags==0) reg_pc=reg_dp;
+				break;
+			case OP_JUMP_TRUE:
+				WORD_FROM_CODE;
+				if(reg_flags==1) reg_pc=reg_dp;
+				break;
+			case OP_DISCARD:
+				UNPACK_ONE_OP;
+				RELEASE_ONE_OP;
+				break;
 			case OP_EXIT:
 				runing=0;
 				break;
@@ -216,12 +290,12 @@ int engine_run()
 				break;
 			case OP_LOAD_CONST:
 				WORD_FROM_CODE;
-				reg_acc=r_consts[reg_dp];
+				reg_acc=const_pool[reg_dp];
 				DATA_PUSH;
 				break;
 			case OP_LOAD_CONST2:
 				DWORD_FORM_CODE;
-				reg_acc=r_consts[reg_dp];
+				reg_acc=const_pool[reg_dp];
 				DATA_PUSH;
 				break;
 			default:
@@ -262,15 +336,16 @@ static inline int restore_context(StackFrame* s)
 	{
 		eg_module_cur=s->sf_modules;
 
-		r_consts=eg_module_cur->m_consts->a_objects;
-		r_symbols=eg_module_cur->m_symbols->a_objects;
+		const_pool=eg_module_cur->m_consts->a_objects;
+		symbol_pool=eg_module_cur->m_symbols->a_objects;
 	}
 	return 0;
 }
 
 int engine_push(StackFrame* s)
 {
-	eg_frame_cur->sf_pc=reg_pc; /* only keep the pc value is enough*/
+	/* only keep the pc and sp value is enough*/
+	eg_frame_cur->sf_pc=reg_pc; 
 	eg_frame_cur->sf_sp=reg_sp;
 
 	s->sf_link=eg_frame_cur;
@@ -314,8 +389,6 @@ void enlarge_data_stack()
 	data_stack=new_statck;
 	data_stack_size=new_size-1;
 }
-
-
 
 
 

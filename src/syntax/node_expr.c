@@ -176,6 +176,142 @@ static int negated_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	return unary_to_opcode(ab,m,op,OP_NEGATED);
 }
 
+/* compare expr */
+static int lt_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_LT);
+	return binary_to_opcode(ab,m,op,OP_LT);
+}
+static int le_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_LE);
+	return binary_to_opcode(ab,m,op,OP_LE);
+}
+static int gt_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_GT);
+	return binary_to_opcode(ab,m,op,OP_GT);
+}
+static int ge_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_GE);
+	return binary_to_opcode(ab,m,op,OP_GE);
+}
+static int eq_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_EQ);
+	return binary_to_opcode(ab,m,op,OP_EQ);
+}
+static int ne_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_NE);
+	return binary_to_opcode(ab,m,op,OP_NE);
+}
+
+/* logic expr */
+static int logic_not_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,1);
+	CHECK_NODE_TYPE(ab,ATN_LOGIC_NOT);
+	AstObject* sub_node=0;
+	ast_node_getsub1(ab,&sub_node);
+	int ret;
+	ret=ast_to_opcode(sub_node,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0)
+	{
+		return ret;
+	}
+	op_code_push(op,OP_LOGIC_NOT);
+	return 0;
+}
+
+static int logic_and_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_LOGIC_AND);
+	AstObject* left;
+	AstObject* right;
+	ast_node_getsub2(ab,&left,&right);
+	int ret;
+	int jump_instruct;
+	int jump_pos;
+	ret=ast_to_opcode(left,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+	
+	op_code_push(op,OP_BOOL);
+
+	/* update jump_pos later */
+	jump_instruct=op_code_size(op);
+	op_code_push3(op,OP_JUMP_FALSE,0);
+	op_code_push(op,OP_DISCARD);
+
+	ret=ast_to_opcode(right,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	jump_pos=op_code_size(op);
+
+	op_code_set3(op,jump_instruct,OP_JUMP_FALSE,jump_pos);
+
+	return 0;
+}
+static int logic_or_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_LOGIC_OR);
+	AstObject* left;
+	AstObject* right;
+	ast_node_getsub2(ab,&left,&right);
+	int ret;
+	int jump_instruct;
+	int jump_pos;
+	ret=ast_to_opcode(left,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	op_code_push(op,OP_BOOL);
+
+	/* update jump pos later */
+	jump_instruct=op_code_size(op);
+	op_code_push3(op,OP_JUMP_TRUE,0);
+	op_code_push(op,OP_DISCARD);
+
+	ret=ast_to_opcode(right,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	jump_pos=op_code_size(op);
+	op_code_set3(op,jump_instruct,OP_JUMP_TRUE,jump_pos);
+	return 0;
+}
+
+
+
+
+
 
 
 
@@ -270,6 +406,63 @@ AstNodeType node_negated=
 	.t_to_opcode=negated_to_opcode,
 };
 
+/* compare expr */
+AstNodeType node_lt=
+{
+	.t_name="Lt",
+	.t_type=ATN_LT,
+	.t_to_opcode=lt_to_opcode,
+};
+AstNodeType node_le=
+{
+	.t_name="Le",
+	.t_type=ATN_LE,
+	.t_to_opcode=le_to_opcode,
+};
+AstNodeType node_ge=
+{
+	.t_name="Ge",
+	.t_type=ATN_GE,
+	.t_to_opcode=ge_to_opcode,
+};
+AstNodeType node_gt=
+{
+	.t_name="Gt",
+	.t_type=ATN_GT,
+	.t_to_opcode=gt_to_opcode,
+};
+AstNodeType node_eq=
+{
+	.t_name="Eq",
+	.t_type=ATN_EQ,
+	.t_to_opcode=eq_to_opcode,
+};
+AstNodeType node_ne=
+{
+	.t_name="Ne",
+	.t_type=ATN_NE,
+	.t_to_opcode=ne_to_opcode,
+};
+
+/* logic expr */
+AstNodeType node_logic_not=
+{
+	.t_name="LogicNot",
+	.t_type=ATN_LOGIC_NOT,
+	.t_to_opcode=logic_not_to_opcode,
+};
+AstNodeType node_logic_or=
+{
+	.t_name="LogicOr",
+	.t_type=ATN_LOGIC_OR,
+	.t_to_opcode=logic_or_to_opcode,
+};
+AstNodeType node_logic_and=
+{
+	.t_name="LogicAnd",
+	.t_type=ATN_LOGIC_AND,
+	.t_to_opcode=logic_and_to_opcode,
+};
 
 
 

@@ -1,8 +1,8 @@
 PROJECT=vm
 
-SRC=except.c op_code.c stack_frame.c engine.c
+SRC=except.c op_code.c stack_frame.c engine.c 
 DEBUG=
-BIN=codger.c
+BIN=codger.c bytecode.c
 
 
 
