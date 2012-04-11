@@ -289,18 +289,3 @@ BtString* btstring_from_char(char c)
 	return bs;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

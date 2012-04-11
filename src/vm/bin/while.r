@@ -1,6 +1,7 @@
-while 1+2 
-	3+3
-	1 and 2
-	1 or 3
-	3+4+(4*3+6)+4
+i=0;
+sum=0;
+while i<100
+	sum=sum+i
+	i=i+1
 end 
+print sum

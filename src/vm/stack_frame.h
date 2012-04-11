@@ -2,7 +2,7 @@
 #define _CODGER_VM_STACK_FRAME_H_
 #include<rtype/bt_string.h>
 #include<object/module_object.h>
-#include<object/hash_table.h>
+#include<object/symbol_table.h>
 #include<object/func_object.h>
 #include<vm/op_code.h>
 
@@ -10,14 +10,15 @@ struct stack_frame
 {
 	struct stack_frame* sf_link;
 
-	BtString* sf_name;
 	Robject* sf_origin;
+	BtString* sf_name; /* stack frame name */
+
 	ModuleObject* sf_modules;
 
-	HashTable* sf_symbols;
+	SymbolTable* sf_scope; /* local variable */
 
 
-	OpCode* sf_codes;
+	OpCode* sf_codes;    /* execute byte code */
 
 	/* program counter */
 	ssize_t sf_pc;

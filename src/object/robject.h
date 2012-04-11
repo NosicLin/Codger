@@ -2,14 +2,11 @@
 #define _CODGER_OBJECT_ROBJECT_H_
 #include<stdio.h>
 #include<assert.h>
-
 #define ROBJECT_DEBUG
-struct hash_object;
+struct symbol_table;
 struct  robject 
 {
 	ssize_t r_ref;
-
-	struct hash_object* r_table;
 	struct type_object* r_type;
 };
 typedef struct robject Robject;
@@ -130,7 +127,6 @@ void robject_print(Robject* rt,FILE* f,int flags);
 #endif /*ROBJECT_DEBUG*/
 	
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
-
 
 
 

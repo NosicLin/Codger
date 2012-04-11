@@ -9,7 +9,6 @@ static StackFrame* s_stack_frame_cache[MAX_CACHE_NUM];
 static inline StackFrame* sf_malloc()
 {
 	StackFrame* sf=0;
-	HashTable* h=0;
 	if(s_cache_nu>0)
 	{
 		sf=s_stack_frame_cache[--s_cache_nu];
@@ -24,13 +23,6 @@ static inline StackFrame* sf_malloc()
 		}
 	}
 	memset(sf,0,sizeof(*sf));
-
-	h=hash_new();
-	if(h==NULL)
-	{
-		goto error;
-	}
-	sf->sf_symbols=h;
 	return sf;
 error:
 	if(sf) sframe_free(sf);
@@ -50,7 +42,7 @@ StackFrame* sframe_new()
 void sframe_free(StackFrame* sf)
 {
 	robject_release(S_TO_R(sf->sf_name));
-	robject_release(HASH_TO_R(sf->sf_symbols));
+	robject_release(SY_TO_R(sf->sf_scope));
 	robject_release(M_TO_R(sf->sf_modules));
 	robject_release(sf->sf_origin);
 
@@ -69,6 +61,7 @@ void sframe_clear_cache()
 		gr_free(s_stack_frame_cache[--s_cache_nu]);
 	}
 }
+
 StackFrame* sframe_from_func(FuncObject* f)
 {
 	StackFrame* sf=sf_malloc();
@@ -76,6 +69,34 @@ StackFrame* sframe_from_func(FuncObject* f)
 	{
 		return NULL;
 	}
+	SymbolTable* sy=sy_table_new();
+
+	if(sy==NULL)
+	{
+		sframe_free(sf);
+		return NULL;
+	}
+	sf->sf_scope=sy;
+
+	/* map two symbol 
+	 * @global->module
+	 * @module->module
+	 */
+
+	/* FIXME 
+	ret=sy_table_map(sy,S_TO_R(ObjectStringGloabl),f->f_module);
+	if(ret<0)
+	{
+		goto error;
+	}
+
+	ret=sy_table_map(sy,S_TO_R(ObjectStringModule),f->f_module);
+	if(ret<0)
+	{
+		goto error;
+	}
+	*/
+
 	robject_addref(FUNC_TO_R(f));
 	robject_addref(S_TO_R(f->f_name));
 	robject_addref(M_TO_R(f->f_module));
@@ -96,6 +117,9 @@ StackFrame* sframe_from_module(ModuleObject* m)
 	robject_addref(M_TO_R(m));
 	robject_addref(M_TO_R(m));
 	robject_addref(S_TO_R(m->m_name));
+	robject_addref(SY_TO_R(m->m_attrs));
+
+	sf->sf_scope=m->m_attrs;
 
 	sf->sf_name=m->m_name;
 	sf->sf_modules=m;

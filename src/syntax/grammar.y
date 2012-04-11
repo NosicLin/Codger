@@ -152,6 +152,15 @@ literal: tINTEGER
 	;
 identifier:tID
 	{
+		BtString* symbol=btstring_create_no_esc(yl_cur_string());
+		if(symbol==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_var(symbol);
+		if(node==NULL)
+		{	
+			robject_release(S_TO_R(symbol));
+			return AST_MEM_FAILED;
+		}
+		$$=node;	
 	}
 	;
 
@@ -358,6 +367,17 @@ stmt_expr:expr
 
 stmt_assign: symbols tASSIGN expr
 	{
+		if(!ast_check_can_assign($1))
+		{	
+			yyerror("Node Can'nt Assign");
+			return -1;
+		}
+		AstObject* node=ast_node_new(&node_assign);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+		
 	}
 	;
 

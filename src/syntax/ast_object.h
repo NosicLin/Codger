@@ -70,6 +70,7 @@ static inline void ast_node_del(AstObject* father,AstObject* chirld)
 
 /* used for generate byte code */
 int ast_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op);
+int ast_to_assign_opcode(AstObject* ab,ModuleObject* m,OpCode* op);
 ModuleObject* ast_to_module(AstObject* root);
 
 
@@ -132,6 +133,14 @@ static inline void ast_node_getsub1(AstObject* ab,AstObject** sub1)
 	*sub1=list_entry(l_left,AstObject,a_sibling);
 }
 
+static inline int ast_check_can_assign(AstObject* ab)
+{
+	if(ab->a_type->t_to_assign_opcode)
+	{
+		return 1;
+	}
+	return 0;
+}
 
 #endif  /*_CODGER_SYNTAX_AST_OBJECT_H_*/
 

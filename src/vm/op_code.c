@@ -95,6 +95,8 @@ static char* s_op_name[]=
 	"OP_SYMBOL", /* load symbol<id> to reg0 */
 	"OP_LOAD_CONST",  /* load const<id> to reg0,sizeof(id)=2 */
 	"OP_LOAD_CONST2",  /* load const<id> to reg0,sizeof(id)=4 */
+	"OP_LOAD_SYMBOL",
+	"OP_STORE_SYMBOL",
 
 	/* flow control op */
 	"OP_BREAK",

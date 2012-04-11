@@ -2,8 +2,11 @@
 #include<rstd/redy_std.h>
 #include"ast_object.h"
 
+
 static int literal_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 {
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_LITERAL);
 	AstNodeLiteral* node=AST_TO_LITERAL(ab);
 	int ret=op_code_enlarge_more(op,5);
 	if(ret<0)
@@ -12,7 +15,7 @@ static int literal_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 	}
 
 	Robject* value=node->l_value;
-	unsigned long id=module_map_const(md,value);
+	int32_t id=module_map_const(md,value);
 	if(id<0)
 	{
 		return -1;
@@ -52,6 +55,85 @@ AstObject* ast_create_literal(Robject* value)
 	node->l_value=value;
 	return LITERAL_TO_AST(node);
 }
+static  int var_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstNodeVar* node=AST_TO_VAR(ab);
+
+	int ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	Robject* symbol=S_TO_R(node->v_symbol);
+	int32_t id=module_map_symbol(md,symbol);
+	if(id<0)
+	{
+		return -1;
+	}
+	/*FIXME When id >(0x1<<16) OP_LOAD_SYMBOL can't work correct*/
+
+	op_code_push3(op,OP_LOAD_SYMBOL,(u_int16_t)id);
+	return 0;
+}
+static int var_to_assign_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstNodeVar* node=AST_TO_VAR(ab);
+	int ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+	Robject* symbol=S_TO_R(node->v_symbol);
+	int32_t id=module_map_symbol(md,symbol);
+	if(id<0)
+	{
+		return -1;
+	}
+	/*FIXME When id >(0x1<<16) OP_LOAD_SYMBOL can't work correct*/
+	op_code_push3(op,OP_STORE_SYMBOL,(u_int16_t)id);
+	return 0;
+}
+
+
+static void var_destruct(AstObject* ab)
+{
+	AstNodeVar* node=AST_TO_VAR(ab);
+	robject_release(S_TO_R(node->v_symbol));
+}
+
+static AstNodeType node_var=
+{
+	.t_type=ATN_VAR,
+	.t_name="Var",
+	.t_destruct=var_destruct,
+	.t_to_opcode=var_to_opcode,
+	.t_to_assign_opcode=var_to_assign_opcode,
+};
+
+
+	
+
+
+AstObject* ast_create_var(BtString* symbol)
+{
+	AstNodeVar* node=ast_node_new_type(AstNodeVar,&node_var);
+	if(node==NULL)
+	{
+		return NULL;
+	}
+	node->v_symbol=symbol;
+	return (AstObject*)node;
+}
+
+
+
 
 
 

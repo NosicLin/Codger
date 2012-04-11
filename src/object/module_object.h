@@ -17,6 +17,8 @@ struct module_object
 
 	struct bt_string* m_name;
 	struct op_code* m_codes;
+
+	struct symbol_table* m_attrs;
 };
 
 typedef struct module_object ModuleObject;

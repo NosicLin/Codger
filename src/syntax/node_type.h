@@ -16,6 +16,9 @@ struct ast_node_type
 	int (*t_to_opcode)(struct ast_object* ab,
 						struct module_object* md,
 						struct op_code* op);
+	int (*t_to_assign_opcode)(struct ast_object* ab,
+						struct module_object* md,
+						struct op_code* op);
 };
 
 typedef struct ast_node_type AstNodeType;

@@ -10,5 +10,6 @@ AstNodeType node_for;
 AstNodeType node_if;
 AstNodeType node_while;
 AstNodeType node_expr;
+AstNodeType node_assign;
 #endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/
 

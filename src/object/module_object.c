@@ -5,6 +5,7 @@
 #include<rstd/gr_std.h>
 #include<rtype/bt_bool.h>
 #include"null_object.h"
+#include"symbol_table.h"
 
 
 
@@ -16,7 +17,7 @@ void md_free(Robject* r)
 	if(md->m_symbols) robject_release(A_TO_R(md->m_symbols));
 	if(md->m_name) robject_release(S_TO_R(md->m_name));
 	if(md->m_codes) op_code_free(md->m_codes);
-
+	if(md->m_attrs) robject_release(SY_TO_R(md->m_attrs));
 
 	gr_free(md);
 }
@@ -36,8 +37,10 @@ struct module_object* module_new()
 
 	BtArray* consts=btarray_create();
 	BtArray* symbols=btarray_create();
+	SymbolTable* attrs=sy_table_new();
 
-	if(consts==NULL||symbols==NULL)
+
+	if(consts==NULL||symbols==NULL||attrs==NULL)
 	{
 		goto error;
 	}
@@ -56,10 +59,12 @@ struct module_object* module_new()
 	md->m_belong=0;
 	md->m_codes=0;
 	md->m_name=0;
+	md->m_attrs=attrs;
 	return md;
 error:
 	if(consts) robject_release(A_TO_R(consts));
 	if(symbols) robject_release(A_TO_R(symbols));
+	if(attrs) robject_release(SY_TO_R(attrs));
 
 	return NULL;
 }

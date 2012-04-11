@@ -6,6 +6,7 @@
 #include<rtype/bt_array.h>
 #include<rtype/bt_bool.h>
 #include<rstd/gr_std.h>
+#include"object/symbol_table.h"
 /* declare*/
 static StackFrame exit_frame;
 void enlarge_data_stack();
@@ -24,6 +25,7 @@ static u_int8_t* mem_codes=0;
 static Robject** const_pool=0;
 static Robject** symbol_pool=0;
 
+static SymbolTable* var_scope=0;
 
 static Robject* reg_acc=0;
 static Robject* reg_op0=0;
@@ -320,6 +322,19 @@ int engine_run()
 				reg_acc=const_pool[reg_dp];
 				DATA_PUSH;
 				break;
+			case OP_LOAD_SYMBOL:
+				WORD_FROM_CODE;
+				reg_op0=symbol_pool[reg_dp];
+				reg_acc=sy_table_lookup(var_scope,reg_op0);
+				DATA_PUSH_NOREF;
+				break;
+			case OP_STORE_SYMBOL:
+				WORD_FROM_CODE;
+				UNPACK_ONE_OP;
+				reg_acc=symbol_pool[reg_dp];
+				sy_table_map(var_scope,reg_acc,reg_op0);
+				RELEASE_ONE_OP;
+				break;
 			default:
 				BUG("Unkown OpCode(%u) pc=%u",op,reg_pc);
 				runing=0;
@@ -353,13 +368,14 @@ static inline int restore_context(StackFrame* s)
 	reg_pc=s->sf_pc;
 	reg_sp=s->sf_sp;
 	mem_codes=s->sf_codes->o_codes;
+	var_scope=s->sf_scope;
 
 	if(eg_module_cur!=s->sf_modules&&s->sf_modules!=NULL)
 	{
 		eg_module_cur=s->sf_modules;
-
 		const_pool=eg_module_cur->m_consts->a_objects;
 		symbol_pool=eg_module_cur->m_symbols->a_objects;
+
 	}
 	return 0;
 }

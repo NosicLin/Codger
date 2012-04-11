@@ -3,6 +3,7 @@
 #include"node_type.h"
 #include"ast_object.h"
 #include<object/robject.h>
+#include<rtype/bt_string.h>
 
 /* literal */
 struct ast_node_literal
@@ -13,6 +14,17 @@ struct ast_node_literal
 typedef struct ast_node_literal AstNodeLiteral;
 AstObject* ast_create_literal(Robject* value);
 AST_TYPE_CAST(LITERAL,Literal,ATN_LITERAL);
+
+struct ast_node_var
+{
+	INHERIT_AST_OBJECT;
+	BtString* v_symbol;
+};
+
+typedef struct ast_node_var AstNodeVar;
+AstObject* ast_create_var(BtString* symbol);
+AST_TYPE_CAST(VAR,Var,ATN_VAR);
+
 
 
 /* unary expr */

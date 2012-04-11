@@ -139,6 +139,30 @@ static int while_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	return 0;
 }
 
+static int assign_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_ASSIGN);
+	AstObject* left;
+	AstObject* expr;
+	ast_node_getsub2(ab,&left,&expr);
+	int ret=0;
+
+	ret=ast_to_opcode(expr,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	ret=ast_to_assign_opcode(left,m,op);
+	if(ret<0)
+	{
+		return ret;
+	}
+	return 0;
+}
+
+
 
 
 
@@ -169,6 +193,12 @@ AstNodeType node_while=
 	.t_type=ATN_WHILE,
 	.t_name="While",
 	.t_to_opcode=while_to_opcode,
+};
+AstNodeType node_assign=
+{
+	.t_type=ATN_ASSIGN,
+	.t_name="Assign",
+	.t_to_opcode=assign_to_opcode,
 };
 
 

@@ -116,7 +116,7 @@ int ast_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 	}
 	if(ab->a_type->t_to_opcode==NULL)
 	{
-		BUG("No To OpCode Func");
+		BUG("%s No To OpCode Func",ab->a_type->t_name);
 		return -1;
 	}
 
@@ -124,6 +124,28 @@ int ast_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 	int ret=ab->a_type->t_to_opcode(ab,md,op);
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 
+	return ret;
+}
+int ast_to_assign_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
+{
+	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
+	{
+		BUG("Syntax Tree Maybe Error");
+		return -1;
+	}
+	if(ab->a_type==NULL)
+	{
+		BUG("AstNodeType Not Find");
+		return -1;
+	}
+	if(ab->a_type->t_to_assign_opcode==NULL)
+	{
+		BUG("No To Assign OpCode Func");
+		return -1;
+	}
+	ab->a_flags|=AST_FLAGS_TO_OPCODE;
+	int ret=ab->a_type->t_to_assign_opcode(ab,md,op);
+	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 	return ret;
 }
 
