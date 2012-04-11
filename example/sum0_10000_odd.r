@@ -6,5 +6,13 @@ while i<10000
 	end 
 	i=i+1
 end 
+real=24995000
 print "Program Result:",sum
-print "Real Result:",24995000 
+print "Real Result:",real
+
+if sum==real
+	print "Program Ok"
+else 
+	print "Program Failed"
+end 
+

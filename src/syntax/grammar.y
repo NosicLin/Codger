@@ -404,14 +404,34 @@ while_delimter: tNEWLINE |kDO |tSEMI ;
 stmt_if:if_pre kEND {$$=$1;}
 	|if_pre kELSE if_delimter block kEND
 	{
+		AstObject* sub_node=ast_node_new(&node_else);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		ast_node_add($1,sub_node);  /* make sure add sequence?*/
+		ast_node_add(sub_node,$4);
+		$$=$1;
 	}
 	;
 
 if_pre:kIF expr if_delimter block
 	{
+		AstObject* node=ast_node_new(&node_if);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* sub_node=ast_node_new(&node_if_elif);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,sub_node); /* make sure add sequence? */
+		ast_node_add(sub_node,$2);
+		ast_node_add(sub_node,$4);
+		$$=node;
 	}
 	|if_pre  kELIF expr if_delimter block
 	{
+		AstObject* sub_node=ast_node_new(&node_if_elif);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		ast_node_add($1,sub_node); /* make sure add sequence */
+
+		ast_node_add(sub_node,$3);
+		ast_node_add(sub_node,$5);
+		$$=$1;
 	}
 	;
 

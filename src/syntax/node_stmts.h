@@ -8,6 +8,8 @@ AstNodeType node_block;
 AstNodeType node_print;
 AstNodeType node_for;
 AstNodeType node_if;
+AstNodeType node_if_elif;
+AstNodeType node_else;
 AstNodeType node_while;
 AstNodeType node_expr;
 AstNodeType node_assign;

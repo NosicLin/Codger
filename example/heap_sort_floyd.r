@@ -4,14 +4,14 @@ array=[45,23,9,134,54,56,26,100,34,87,77]
 
 #buiding heap use floyd method 
 i=size/2-1
-while i>=0
+while i>=0:
 	f_now=i
 	largest=f_now*2+1
-	while largest<size
+	while largest<size:
 		if largest+1<size and array[largest+1]>array[largest]
 			largest=largest+1
 		end 
-		if array[f_now]<array[largest]
+		if array[f_now]<array[largest]:
 			temp=array[f_now]
 			array[f_now]=array[largest]
 			array[largest]=temp

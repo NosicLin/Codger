@@ -7,7 +7,7 @@ DEBUG=
 BIN=
 
 CC=gcc
-FLAGS=-g -Wall  -Werror -include sys/types.h  -D AST_MACHINE
+FLAGS=-g -Wall  -Werror -include sys/types.h  
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 	-L../lib/ -lrtype -llexical -lvm -lrstd -lobject 

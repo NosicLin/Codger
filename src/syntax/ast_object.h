@@ -56,8 +56,8 @@ static inline int ast_typeid(AstObject* ab)
 static inline void ast_node_add(AstObject* father,AstObject* chirld)
 {
 	assert(father);
-//	printf("father:name=%s\n",father->a_type->t_name);
 	assert(chirld);
+	//printf("(%s<-%s)\n",father->a_type->t_name,chirld->a_type->t_name);
 	list_add_tail(&chirld->a_sibling,&father->a_chirldren);
 }
 static inline void ast_node_del(AstObject* father,AstObject* chirld)
@@ -96,24 +96,27 @@ AstNodeType node_normal;
 #define AST_MEM_FAILED -2
 
 #ifdef AST_DEBUG
-static inline void CHECK_SUB_NODE_NUM(AstObject* node ,int num) 
-{
-	struct list_head* head=&node->a_chirldren;
-	struct list_head* p=head;
-	int i=0;
-	for(i=0;i<num;i++)
-	{
-		p=p->next;
-	}
-	if(p->next!=head) BUG("Synatx Tree Error");
-}
-static inline void CHECK_NODE_TYPE(AstObject* node,int type)
-{
-	if(node->a_type->t_type!=type)
-	{
-		BUG("AstNode Type Error");
-	}
-}
+#define CHECK_SUB_NODE_NUM( node ,num)  \
+	do{ \
+		struct list_head* head=&node->a_chirldren; \
+		struct list_head* p=head; \
+		int i=0; \
+		for(i=0;i<num;i++) \
+		{ \
+			p=p->next; \
+			if(p==head) BUG("Synatx Tree Error"); \
+		} \
+		if(p->next!=head) BUG("Synatx Tree Error"); \
+	}while(0)
+
+#define CHECK_NODE_TYPE(node,type) \
+	do{ \
+		if(node->a_type->t_type!=type) \
+		{ \
+			BUG("AstNode Type Error(%s<%d,%d>)",node->a_type->t_name, \
+					node->a_type->t_type,type); \
+		} \
+	}while(0)
 #else 
 #define CHECK_SUB_NODE_NUM(node,num) do{}while(0) 
 #define CHECK_NODE_TYPE(node,type) do{}while(0)

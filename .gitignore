@@ -7,5 +7,6 @@ tags
 *.dat
 grammar.tab.c
 
+temp
 
 
