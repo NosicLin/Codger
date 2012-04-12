@@ -70,7 +70,6 @@ u_int32_t reg_flags=0;
 		robject_addref(reg_acc); \
 		data_stack[reg_sp++]=reg_acc; \
 	} while(0)
-
 #define UNPACK_ONE_OP \
 	do{ \
 		reg_op0=data_stack[--reg_sp];\
@@ -107,6 +106,20 @@ u_int32_t reg_flags=0;
 	} while(0)
 
 
+#define RELEASE_OP0 \
+	do { \
+		robject_release(reg_op0); \
+	}while(0) 
+
+#define RELEASE_OP1 \
+	do { \
+		robject_release(reg_op1); \
+	}while(0) 
+
+#define RELEASE_OP2 \
+	do { \
+		robject_release(reg_op2); \
+	}while(0) 
 static void vm_handle_except(){
 	TODO("VM_HANDLE_EXCEPT");
 	StackFrame* s=eg_frame_bottom;
@@ -245,6 +258,30 @@ int engine_run()
 				DATA_PUSH;
 				RELEASE_TWO_OP;
 				break;
+			case OP_ARRAY_BEGIN:
+				reg_acc=(Robject*)btarray_create();
+				DATA_PUSH_NOREF;
+				break;
+			case OP_ARRAY_END:
+				break;
+			case OP_ARRAY_PUSH:
+				UNPACK_TWO_OP;
+				btarray_push_back(R_TO_A(reg_op0),reg_op1);
+				reg_acc=reg_op0;
+				DATA_PUSH_NOREF;
+				RELEASE_OP1;
+				break;
+			case OP_SET_ITEM:
+				UNPACK_THREE_OP;
+				robject_set_item(reg_op1,reg_op2,reg_op0);
+				RELEASE_THREE_OP;
+				break;
+			case OP_GET_ITEM:
+				UNPACK_TWO_OP;
+				reg_acc=robject_get_item(reg_op0,reg_op1);
+				DATA_PUSH_NOREF;
+				RELEASE_TWO_OP;
+				break;
 
 			case OP_BOOL:
 				UNPACK_ONE_OP;
@@ -307,10 +344,6 @@ int engine_run()
 				break;
 			case OP_PRINT_LN:
 				printf("\n");
-				break;
-			case OP_SET_ITEM:
-				UNPACK_THREE_OP;
-				RELEASE_THREE_OP;
 				break;
 			case OP_LOAD_CONST:
 				WORD_FROM_CODE;

@@ -4,7 +4,7 @@
 #include"ast_object.h"
 #include<utility_c/list_head.h>
 
-AstNodeType node_block;
+AstNodeType node_stmts;
 AstNodeType node_print;
 AstNodeType node_for;
 AstNodeType node_if;

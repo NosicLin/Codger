@@ -1,3 +1,5 @@
-a=3
-print a
+if a==1 then end 
+if a==1 then 
 
+	end 
+a=1

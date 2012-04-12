@@ -46,25 +46,43 @@
 
 AstTree : block{parser_set_root($1);} ;
 
-block:stmt 
+stmts:stmt 
 	{
-		AstObject* node=ast_node_new(&node_block);
+		AstObject* node=ast_node_new(&node_stmts);
 		if(node==NULL) return AST_MEM_FAILED;
 		ast_node_add(node,$1);
 		$$=node;
 	}
 	|stmt_delimiter 
 	{
-		AstObject* node=ast_node_new(&node_block);
+		AstObject* node=ast_node_new(&node_stmts);
 		if(node==NULL) return AST_MEM_FAILED;
 		$$=node;
 	}
-	|block stmt_delimiter stmt 
+
+	|stmt_delimiter stmt 
+	{
+		AstObject* node=ast_node_new(&node_stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
+	}
+
+	|stmts stmt_delimiter stmt 
 	{
 		ast_node_add($1,$3);
 		$$=$1;
 	}
-	|block stmt_delimiter {$$=$1;}
+	|stmts stmt_delimiter {$$=$1;}
+	;
+
+block:stmts{$$=$1;}
+	|
+	{
+		AstObject* node=ast_node_new(&node_stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
 	;
 
 stmt:stmt_expr {$$=$1;}
@@ -164,30 +182,46 @@ identifier:tID
 	}
 	;
 
-expr_list: expr 
+
+expr_list:expr_list_pre {$$=$1;}
+	|expr_list_pre tCOMMA{$$=$1;}
+	;
+
+expr_list_pre:expr 
 	{
 		AstObject* node=ast_node_new(&node_normal);
 		if(node==NULL) return AST_MEM_FAILED;
 		ast_node_add(node,$1);
 		$$=node;
 	}
-	| expr_list tCOMMA expr
+	|expr_list_pre tCOMMA expr 
 	{
 		ast_node_add($1,$3);
 		$$=$1;
 	}
-	| 
-	{
-		AstObject* node=ast_node_new(&node_normal);
-		if(node==NULL) return AST_MEM_FAILED;
-		$$=node;
-	}
 	;
 
-array:tL_SB expr_list tR_SB
+
+array:l_sb expr_list r_sb 
 	{
+		AstObject* node=ast_node_new(&node_array);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
 	}
-		
+	|l_sb r_sb 
+	{
+		AstObject* node=ast_node_new(&node_array);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* sub_node=ast_node_new(&node_normal);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,sub_node);
+		$$=node;
+	}
+
+l_sb :tL_SB{yl_ignore_newline();};
+r_sb:tR_SB{yl_restore_newline();}
+		   
 primary_expr: literal {$$=$1;}
 	|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
 	|identifier{$$=$1;}
@@ -195,8 +229,13 @@ primary_expr: literal {$$=$1;}
 	;
 
 postfix_expr: primary_expr{$$=$1;}
-	|postfix_expr tL_SB expr tR_SB
+	|postfix_expr l_sb expr r_sb 
 	{
+		AstObject* node=ast_node_new(&node_square);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
 	}
 	;
 symbols:postfix_expr{$$=$1;}

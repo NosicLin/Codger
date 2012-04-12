@@ -32,7 +32,7 @@ static inline void module_set_opcode(ModuleObject* m,struct op_code* c)
 }
 
 
-unsigned long module_map_const(ModuleObject* m,Robject* value);
-unsigned long module_map_symbol(ModuleObject* m,Robject* symbol);
+u_int32_t module_map_const(ModuleObject* m,Robject* value);
+u_int32_t module_map_symbol(ModuleObject* m,Robject* symbol);
 #endif  /*_CODGER_OBJECT_MODULE_OBJECT_H_*/
 

@@ -280,10 +280,10 @@ static int else_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 
 
 		
-AstNodeType node_block=
+AstNodeType node_stmts=
 {
 	.t_type=ATN_STMTS,
-	.t_name="Block",
+	.t_name="Stmts",
 	.t_to_opcode=stmts_to_opcode,
 };
 

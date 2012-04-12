@@ -26,6 +26,9 @@ AstObject* ast_create_var(BtString* symbol);
 AST_TYPE_CAST(VAR,Var,ATN_VAR);
 
 
+/* primary_expr */
+AstNodeType node_array;
+AstNodeType node_square;
 
 /* unary expr */
 AstNodeType node_positive;

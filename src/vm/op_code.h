@@ -5,6 +5,7 @@
 #include<stdio.h>
 #include<rstd/gr_std.h>
 
+#define OP_CODE_DEBUG
 struct op_code
 {
 	ssize_t o_size;
@@ -49,6 +50,10 @@ enum OP_CODES
 	OP_PRINT,
 	OP_PRINT_LN,
 	
+	/* array item */
+	OP_ARRAY_BEGIN,
+	OP_ARRAY_PUSH,
+	OP_ARRAY_END,
 	/* engine op */
 	OP_EXIT,
 	OP_RETURN,
@@ -111,20 +116,32 @@ static inline void op_code_set3(struct op_code* op, ssize_t pos,
 	op->o_codes[pos++]=(u_int8_t)id;
 }
 /* make sure enough space to store code */
+#ifdef OP_CODE_DEBUG 
+#define op_code_push(op,code)  \
+	do{ \
+		assert(op->o_size<op->o_cap); \
+		op->o_codes[op->o_size++]=code; \
+	}while(0)
+#else 
 static inline void op_code_push(struct op_code* op,u_int8_t code)
 {
 	assert(op->o_size<op->o_cap);
 	op->o_codes[op->o_size++]=code;
 }
+#endif  /*OP_CODE_DEBUG*/
+
+
 static inline void op_code_pushs(struct op_code* op, u_int8_t* codes,int size)
 {
 	int i=0;
+	assert(op->o_size+size<=op->o_cap);
 	for(;i<size;i++) op->o_codes[op->o_size++]=codes[i];
 }
 
 static inline void op_code_push3(struct op_code* op,
 		u_int8_t code, u_int16_t id)
 {
+	assert(op->o_size+3<=op->o_cap);
 	op->o_codes[op->o_size++]=code;
 	op->o_codes[op->o_size++]=(u_int8_t)(id>>8);
 	op->o_codes[op->o_size++]=(u_int8_t)id;
@@ -133,6 +150,7 @@ static inline void op_code_push3(struct op_code* op,
 static inline void op_code_push5(struct op_code* op,
 		u_int8_t code,u_int32_t id)
 {
+	assert(op->o_size+5<=op->o_cap);
 	op->o_codes[op->o_size++]=code;
 	op->o_codes[op->o_size++]=(u_int8_t)(id>>24);
 	op->o_codes[op->o_size++]=(u_int8_t)(id>>16);

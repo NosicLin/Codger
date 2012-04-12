@@ -165,6 +165,11 @@ ModuleObject*  ast_to_module(AstObject* root)
 	{
 		goto error;
 	}
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0)
+	{
+		goto error;
+	}
 	op_code_push(op,OP_RETURN);
 	module_set_opcode(md,op);
 	return md;

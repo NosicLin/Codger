@@ -82,6 +82,11 @@ static char* s_op_name[]=
 	"OP_PRINT",
 	"OP_PRINT_LN",
 	
+	/* array item */
+	"OP_ARRAY_BEGIN",
+	"OP_ARRAY_PUSH",
+	"OP_ARRAY_END",
+
 	/* engine op */
 	"OP_EXIT",
 	"OP_RETURN",

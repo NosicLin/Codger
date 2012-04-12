@@ -73,6 +73,7 @@ rm:
 	rm -f obj/*
 	rm -f lib/*
 	rm -f bin/*.exe
+	rm -f ../lib/lib$(PROJECT).a
 clear:
 	rm -rf obj 
 	rm -rf bin 

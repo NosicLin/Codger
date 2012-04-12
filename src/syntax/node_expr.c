@@ -15,12 +15,12 @@ static int literal_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 	}
 
 	Robject* value=node->l_value;
-	int32_t id=module_map_const(md,value);
+	u_int32_t id=module_map_const(md,value);
 	if(id<0)
 	{
 		return -1;
 	}
-	if(id>(0x1<<16))
+	if(id>((u_int32_t)0x1<<16))
 	{
 		op_code_push5(op,OP_LOAD_CONST2,id);
 	}
@@ -131,6 +131,104 @@ AstObject* ast_create_var(BtString* symbol)
 	node->v_symbol=symbol;
 	return (AstObject*)node;
 }
+
+
+static int array_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,1);
+	CHECK_NODE_TYPE(ab,ATN_ARRAY);
+
+	AstObject* expr_list;
+	int ret;
+	AstObject* expr;
+
+	ast_node_getsub1(ab,&expr_list);
+
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+	op_code_push(op,OP_ARRAY_BEGIN);
+
+	list_for_each_entry(expr,&expr_list->a_chirldren,a_sibling)
+	{
+		ret=ast_to_opcode(expr,m,op);
+		if(ret<0)  return ret; 
+		ret=op_code_enlarge_more(op,1);
+		if(ret<0) return ret;
+		op_code_push(op,OP_ARRAY_PUSH);
+	}
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+	op_code_push(op,OP_ARRAY_END);
+	return 0;
+}
+
+AstNodeType node_array=
+{
+	.t_name="Array",
+	.t_type=ATN_ARRAY,
+	.t_to_opcode=array_to_opcode,
+};
+
+static int square_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_SQUARE);
+	AstObject* expr;
+	AstObject* index;
+	int ret;
+
+	ast_node_getsub2(ab,&expr,&index);
+
+	ret=ast_to_opcode(expr,m,op);
+	if(ret<0) return ret;
+
+	ret=ast_to_opcode(index,m,op);
+	if(ret<0) return ret;
+
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+
+	op_code_push(op,OP_GET_ITEM);
+
+	return 0;
+}
+
+static int square_to_assign_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_SQUARE);
+	AstObject* expr;
+	AstObject* index;
+	int ret;
+
+	ast_node_getsub2(ab,&expr,&index);
+
+	ret=ast_to_opcode(expr,m,op);
+	if(ret<0) return ret;
+
+	ret=ast_to_opcode(index,m,op);
+	if(ret<0) return ret;
+
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+
+	op_code_push(op,OP_SET_ITEM);
+
+	return 0;
+}
+
+AstNodeType node_square=
+{
+	.t_name="Square",
+	.t_type=ATN_SQUARE,
+	.t_to_opcode=square_to_opcode,
+	.t_to_assign_opcode=square_to_assign_opcode,
+};
+
+
+	
+
+
 
 
 

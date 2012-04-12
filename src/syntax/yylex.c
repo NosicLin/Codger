@@ -4,6 +4,7 @@
 #include<lexical/lexical.h>
 #define TOKEN_BASE 258
 static struct scanner* yl_scanner=0;
+static int ignore_newline=0;
 void yl_set_scanner(struct scanner* sc)
 {
 	yl_scanner=sc;
@@ -27,7 +28,7 @@ int yylex()
 {
 	BUG_ON(yl_scanner==0,"NULL Scanner");
 	int token=TOKEN_WS;
-	while(token==TOKEN_WS)
+	while(1)
 	{
 		token=sc_next_token(yl_scanner);
 
@@ -40,6 +41,19 @@ int yylex()
 		{
 			token=symbol_type(sc_token_string(yl_scanner));
 		}
+
+		if(token==TOKEN_NEWLINE)
+		{
+			if(ignore_newline)
+			{
+				continue;
+			}
+		}
+		if(token==TOKEN_WS)
+		{
+			continue;
+		}
+		break;
 	}
 	if(token!=EOF)
 	{
@@ -49,6 +63,15 @@ int yylex()
 	return token;
 }
 
+
+void yl_ignore_newline()
+{
+	ignore_newline+=1;
+}
+void yl_restore_newline()
+{
+	ignore_newline-=1;
+}
 
 
 
