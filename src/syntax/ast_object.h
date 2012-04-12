@@ -122,6 +122,16 @@ AstNodeType node_normal;
 #define CHECK_NODE_TYPE(node,type) do{}while(0)
 #endif  /*AST_DEBUG*/
 
+static inline void ast_node_getsub3(AstObject* ab,AstObject** sub1,AstObject** sub2,AstObject** sub3)
+{
+	struct list_head* s1=(&ab->a_chirldren)->next;
+	struct list_head* s2=s1->next;
+	struct list_head* s3=s2->next;
+
+	*sub1=list_entry(s1,AstObject,a_sibling);
+	*sub2=list_entry(s2,AstObject,a_sibling);
+	*sub3=list_entry(s3,AstObject,a_sibling);
+}
 static inline void ast_node_getsub2(AstObject* ab,AstObject** sub1,AstObject** sub2)
 {
 	struct list_head* s1=(&ab->a_chirldren)->next;

@@ -82,6 +82,10 @@ static char* s_op_name[]=
 	"OP_PRINT",
 	"OP_PRINT_LN",
 	
+	/* iterator */
+	"OP_ITER",
+	"OP_ITER_NEXT",
+
 	/* array item */
 	"OP_ARRAY_BEGIN",
 	"OP_ARRAY_PUSH",
@@ -113,6 +117,9 @@ static char* s_op_name[]=
 	"OP_JUMPR",
 	"OP_JUMPR_FALSE",
 	"OP_JUMPR_TRUE",
+
+	/* used for if */
+	"OP_TEMP_IF3",
 
 
 	"OP_LOAD_CONST2",  /* load const<id> to reg0,sizeof(id)=4 */

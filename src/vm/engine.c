@@ -305,6 +305,39 @@ int engine_run()
 				RELEASE_ONE_OP;
 				break;
 
+			case OP_PRINT:
+				UNPACK_ONE_OP;
+				robject_print(reg_op0,NULL,PRINT_FLAGS_SPACE);
+				RELEASE_ONE_OP;
+				break;
+			case OP_PRINT_LN:
+				printf("\n");
+				break;
+			case OP_ITER:
+				UNPACK_ONE_OP;
+				reg_acc=robject_iter(reg_op0);
+				DATA_PUSH_NOREF;
+				RELEASE_ONE_OP;
+				break;
+			case OP_ITER_NEXT:
+				/* ref top stack data, but not take */
+				reg_op0=data_stack[reg_sp-1];
+				reg_acc=robject_next(reg_op0);
+				if(vm_except_happened())
+				{
+					if(vm_except_type()==E_ITER_STOP)
+					{
+						vm_clear_except();
+						break;
+					}
+				}
+				else 
+				{
+					reg_pc+=3;
+				}
+				DATA_PUSH_NOREF;
+				break;
+
 			/* control flow instruction */
 			case OP_JUMP_FALSE:
 				WORD_FROM_CODE;
@@ -337,14 +370,10 @@ int engine_run()
 				s=engine_pop();
 				sframe_free(s);
 				break;
-			case OP_PRINT:
-				UNPACK_ONE_OP;
-				robject_print(reg_op0,NULL,PRINT_FLAGS_SPACE);
-				RELEASE_ONE_OP;
-				break;
-			case OP_PRINT_LN:
-				printf("\n");
-				break;
+
+
+
+			/* data instruction */
 			case OP_LOAD_CONST:
 				WORD_FROM_CODE;
 				reg_acc=const_pool[reg_dp];

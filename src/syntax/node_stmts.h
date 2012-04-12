@@ -13,5 +13,7 @@ AstNodeType node_else;
 AstNodeType node_while;
 AstNodeType node_expr;
 AstNodeType node_assign;
+AstNodeType node_break;
+AstNodeType node_continue;
 #endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/
 

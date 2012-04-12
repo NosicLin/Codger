@@ -15,20 +15,30 @@ end
 
 
 [translate]
-<expr1>
+{
+	<expr1>
+}
 bool
 jump_false @L1
-<block1>
+{
+	<block1>
+}
 jump   @end 
 L1:
-<expr2>
+{
+	<expr2>
+}
 bool 
 jump_false @L2:
-<block2>
+{
+	<block2>
+}
 jump @end
 L2:
 ...
 Ln:
-<block3>
+{
+	<block3>
+}
 end:
 

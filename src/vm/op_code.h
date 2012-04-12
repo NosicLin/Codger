@@ -49,6 +49,10 @@ enum OP_CODES
 	/* op_normal */
 	OP_PRINT,
 	OP_PRINT_LN,
+
+	/* iterator */
+	OP_ITER,
+	OP_ITER_NEXT,
 	
 	/* array item */
 	OP_ARRAY_BEGIN,
@@ -80,6 +84,9 @@ enum OP_CODES
 	OP_JUMPR,
 	OP_JUMPR_FALSE,
 	OP_JUMPR_TRUE,
+
+	/*used for if */
+	OP_TEMP_IF3,
 
 #define OP_NEED_PARAM4 OP_LOAD_CONST2
 	OP_LOAD_CONST2,  /* load const<id> to reg0,sizeof(id)=4 */

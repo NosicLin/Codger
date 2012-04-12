@@ -91,6 +91,8 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_while {$$=$1;}
 	|stmt_if  {$$=$1;}
 	|stmt_for {$$=$1;}
+	|stmt_break{$$=$1;}
+	|stmt_continue{$$=$1;}
 	;
 
 stmt_delimiter:tNEWLINE| tSEMI;
@@ -466,7 +468,7 @@ if_pre:kIF expr if_delimter block
 	{
 		AstObject* sub_node=ast_node_new(&node_if_elif);
 		if(sub_node==NULL) return AST_MEM_FAILED;
-		ast_node_add($1,sub_node); /* make sure add sequence */
+		ast_node_add($1,sub_node); /* make sure add sequence? */
 
 		ast_node_add(sub_node,$3);
 		ast_node_add(sub_node,$5);
@@ -479,10 +481,29 @@ if_delimter:tNEWLINE|kTHEN|tSEMI;
 
 stmt_for: kFOR symbols kIN expr for_delimter block kEND
 	{
+		AstObject* node=ast_node_new(&node_for);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		ast_node_add(node,$4);
+		ast_node_add(node,$6);
+		$$=node;
 	}
 for_delimter: tNEWLINE|kDO|tSEMI;
 
-
+stmt_break: kBREAK
+	{
+		AstObject* node=ast_node_new(&node_break);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
+	;
+stmt_continue: kCONTINUE
+	{
+		AstObject* node=ast_node_new(&node_continue);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
+	;
 
 
 

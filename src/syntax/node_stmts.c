@@ -194,7 +194,7 @@ static int if_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	codes=op->o_codes; /* NOTE codes maybe replace when enlarge */
 	for(i=if_begin;i<if_end;i++)
 	{
-		if(codes[i]==OP_BREAK)
+		if(codes[i]==OP_TEMP_IF3)
 		{
 			op_code_set3(op,i,OP_JUMPR,if_end-i);
 		}
@@ -253,8 +253,8 @@ static int if_elif_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	{
 		return ret;
 	}
-	/* use OP_BREAK for temp,it will replace by OP_JUMPR later */
-	op_code_push3(op,OP_BREAK,0);
+	/* use OP_USER1_3 for temp,it will replace by OP_JUMPR later */
+	op_code_push3(op,OP_TEMP_IF3,0);
 
 
 	end_pos=op_code_size(op);
@@ -274,6 +274,110 @@ static int else_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	ret=ast_to_opcode(stmts,m,op);
 	return ret;
 }
+
+
+static int for_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,3);
+	CHECK_NODE_TYPE(ab,ATN_FOR);
+
+	AstObject* symbol;
+	AstObject* expr;
+	AstObject* stmts;
+	int ret;
+	ssize_t for_begin;
+	ssize_t for_end;
+	u_int8_t* codes;
+	ssize_t i;
+
+
+	ast_node_getsub3(ab,&symbol,&expr,&stmts);
+
+	/* expr to opcode */
+	ret=ast_to_opcode(expr,m,op);
+	if(ret<0) return ret;
+
+	ret=op_code_enlarge_more(op,5);
+	if(ret<0) return ret;
+
+	op_code_push(op,OP_ITER);
+	for_begin=op_code_size(op);
+
+	/* @begin */
+	op_code_push(op,OP_ITER_NEXT);
+
+	/* update jump pos later @end*/
+	op_code_push3(op,OP_JUMPR,0);
+
+	/* symbols to opcode */
+	ret=ast_to_assign_opcode(symbol,m,op);
+	if(ret<0) return ret;
+
+	/* stmts to opcode */
+	ret=ast_to_opcode(stmts,m,op);
+	if(ret<0) return ret;
+
+	/* jump to @begin */
+	ret=op_code_enlarge_more(op,4);
+	for_end=op_code_size(op);
+	op_code_push3(op,OP_JUMPR,for_begin-for_end);
+
+	/* @end */
+	for_end=op_code_size(op);
+	op_code_push(op,OP_DISCARD);
+
+	/* update pre jump  @end */
+	op_code_set3(op,for_begin+1,OP_JUMPR,for_end-(for_begin+1));
+
+	/* update continue and break */
+
+	codes=op->o_codes;
+	for(i=for_begin;i<for_end;i++)
+	{
+		if(codes[i]==OP_BREAK)
+		{
+			op_code_set3(op,i,OP_JUMPR,for_end-i);
+		}
+		if(codes[i]==OP_CONTINUE)
+		{
+			op_code_set3(op,i,OP_JUMPR,for_begin-i);
+		}
+		if(codes[i]>=OP_NEED_PARAM2)
+		{
+			i+=2;
+		}
+	}
+	return 0;
+}
+
+
+static int  break_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_BREAK);
+	int ret;
+	ret=op_code_enlarge_more(op,3);
+	if(ret<0) return ret;
+
+	/* pos will update later by for or while stmt*/
+	op_code_push3(op,OP_BREAK,0);
+	return 0;
+}
+static int continue_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_CONTINUE);
+	int ret;
+	ret=op_code_enlarge_more(op,3);
+	if(ret<0) return ret;
+	
+	op_code_push3(op,OP_CONTINUE,0);
+	return 0;
+}
+
+
+
+
 
 
 
@@ -331,7 +435,25 @@ AstNodeType node_else=
 	.t_to_opcode=else_to_opcode,
 };
 
+AstNodeType node_for=
+{
+	.t_type=ATN_FOR,
+	.t_name="For",
+	.t_to_opcode=for_to_opcode,
+};
 	
+AstNodeType node_break=
+{
+	.t_type=ATN_BREAK,
+	.t_name="Break",
+	.t_to_opcode=break_to_opcode,
+};
+AstNodeType node_continue=
+{
+	.t_type=ATN_CONTINUE,
+	.t_name="Continue",
+	.t_to_opcode=continue_to_opcode,
+};
 
 
 
