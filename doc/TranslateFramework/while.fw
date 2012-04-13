@@ -1,0 +1,28 @@
+[file]
+	while translate framework 
+
+[grammar]
+	while <condition> [do]
+		<codes>
+	end 
+
+
+[translate]
+	@lable Begin:
+	{
+		condition
+	}
+	OP_BOOL
+	OP_JUMPR_FALSE @End
+	{
+		codes
+	}
+	OP_JUMPR @Begin
+	@lable End:
+
+
+[finally]
+	Update OP_BREAK -> OP_JUMPR @End
+	Update OP_CONTINUE -> OP_JUMPR @Begin
+
+

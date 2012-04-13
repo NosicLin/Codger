@@ -1,5 +1,0 @@
-[instruction]
-	pushd
-
-[instruction run]
-	CFRC.c_data.push(r0)

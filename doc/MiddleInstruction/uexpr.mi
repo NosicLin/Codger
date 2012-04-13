@@ -1,0 +1,14 @@
+[file]
+	unary expr middle instruction
+
+[expr]
+	POSITIVE NEGATIVE NEGATED
+
+[instruction]
+	OP_$(expr)
+
+[Internal Execute]
+	reg_op0=data_stack.pop()
+	reg_acc=robject_$(expr)(reg_op0)
+	data_stack.push(reg_acc)
+

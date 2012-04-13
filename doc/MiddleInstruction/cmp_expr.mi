@@ -1,0 +1,17 @@
+[file]
+	compare expr middle instruction
+
+[expr]
+	LE LT GE GT
+	EQ NE
+
+[instruction]
+	OP_$(expr)
+
+[Internal Execute]
+	reg_op1=data_stack.pop()
+	reg_op0=data_stack.pop()
+	reg_flags=robject_$(expr)(reg_op0,reg_op1)
+	reg_acc=reg_flags==0?ObjectFalse:ObjectTrue
+	data_stack.push(reg_acc)
+

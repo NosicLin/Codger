@@ -1,0 +1,12 @@
+[file]
+	logic not expr middle instruction
+
+[instruction]
+	OP_LOGIC_NOT
+
+[Internal Execute]
+	reg_op0=data_stack.pop()
+	reg_flags=robject_bool(reg_op0)
+	reg_acc=reg_flags==0?ObjectTrue:ObjectFalse
+	data_stack.push(reg_acc)
+

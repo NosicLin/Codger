@@ -1,0 +1,17 @@
+[file]
+	unary expr translate framework 
+
+[grammar]
+	unary_operator <expr>
+
+[translate]
+	{
+		expr
+	}
+	<OP_UNARY_EXPR>
+
+[note OP_UNARY_EXPR]
+	+  -> OP_POSITIVE
+	-  -> OP_NEGATIVE
+	~  -> OP_NEGATED
+

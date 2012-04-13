@@ -1,0 +1,50 @@
+[file]
+	jump middle instruction
+
+[instruction]
+	OP_JUMP
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	reg_pc=reg_dp
+
+---------------------------------------------------
+[instruction]
+	OP_JUMP_FALSE
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	if(reg_flags==0) reg_pc=reg_dp
+
+---------------------------------------------------
+[instruction]
+	OP_JUMP_TRUE
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	if(reg_flags==1) reg_pc=reg_dp
+
+---------------------------------------------------
+[instruction]
+	OP_JUMPR
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	reg_pc+=reg_dp-3
+
+---------------------------------------------------
+[instruction]
+	OP_JUMPR_FALSE
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	if(reg_flags==0) reg_pc+=reg_dp-3
+
+---------------------------------------------------
+[instruction]
+	OP_JUMPR_TRUE
+
+[Internal Execute]
+	reg_dp=word_from_code()
+	if(reg_flags==1) reg_pc+=reg_dp-3
+

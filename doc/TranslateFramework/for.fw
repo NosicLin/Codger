@@ -1,0 +1,31 @@
+[file]
+	for translate framework
+
+
+[grammar]
+	for <symbol> in <expr> [do]
+		<codes>
+	end 
+
+
+[translate]
+	{
+		expr
+	}
+	OP_ITER
+	@lable Begin:
+	OP_ITER_NEXT
+	OP_JUMPR @End 
+	{
+		symbol 
+	}
+	{
+		codes
+	}
+	OP_JUMPR @Begin
+	@lable End:
+	OP_DESCARD
+
+[finally]
+	Update OP_BREAK -> OP_JUMPR @End
+	Update OP_CONTINUE -> OP_JUMPR @Begin 

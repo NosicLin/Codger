@@ -1,0 +1,37 @@
+[file]
+	func translate framework
+
+[grammar]
+	func func_name(arg1,arg2,...,argm,
+					argm_1=<expr1>,argm_2=<expr2>,...,argm_n=<exprn>,
+					...args)
+		<codes>
+	end 
+
+[initiate]
+	Generate FuncObject  
+	MapConst FuncObject  (funcid -> FuncObject) 
+	MapSymbol func_name  (nameid -> func_name)
+
+[translate]
+	OP_LOAD_CONST $funcid
+	OP_ARRAY_BEGIN
+	{
+		expr1
+	}
+	OP_ARRAY_PUSH
+	{
+		expr2
+	}
+	OP_ARRAY_PUSH 
+	.
+	.
+	.
+	{
+		exprn
+	}
+	OP_ARRAY_PUSH
+	OP_ARRAY_END
+	OP_FUNC_DEFALUT_ARGS
+	OP_STORE_SYMBOL $name_id 
+

@@ -1,0 +1,30 @@
+[file]
+	array middle instruction 
+
+[instruction]
+	OP_ARRAY_BEGIN
+
+[Internal Execute]
+	reg_acc=btarray_create()
+	data_stack.push(reg_acc)
+
+---------------------------------------------------
+[instruction]
+	OP_ARRAY_PUSH
+
+[Internal Execute]
+	reg_op1=data_stack.pop()
+	reg_op0=data_stack.pop()
+	btarray_push_back(reg_op0,reg_op1)
+	reg_acc=reg_op0
+	data_stack.push(reg_acc)
+
+
+---------------------------------------------------
+[instruction]
+	OP_ARRAY_END
+
+[Internal Execute]
+	do_nothing
+
+

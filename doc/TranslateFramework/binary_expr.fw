@@ -1,0 +1,36 @@
+[file]
+	binary expr translate framework 
+
+[grammar]
+	<expr_left> binary_operator <expr_right>
+
+[translate]
+	{
+		expr_left
+	}
+	{
+		expr_right
+	}
+	<OP_BINARY_EXPR>
+
+[note OP_BINARY_EXPR ]
+	*  -> OP_MUL
+	/  -> OP_DIV
+	%  -> OP_MOD
+	+  -> OP_PLUS
+	-  -> OP_MINUS
+	<< -> OP_RSHIFT
+	>> -> OP_LSHIFT
+	&  -> OP_AND
+	^  -> OP_XOR
+	|  -> OP_OR
+	<  -> OP_LT
+	>  -> OP_GT
+	>= -> OP_GE
+	<= -> OP_LE
+	== -> OP_EQ
+	!= -> OP_NE
+
+
+	
+

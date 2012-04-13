@@ -1,0 +1,13 @@
+[file]
+	literal translate framework
+
+[grammar]
+	Integer|Long|Float|String
+
+[initiate]
+	Generate Robject 
+	MapConst Robject (c_id -> Robject) 
+
+[translate]
+	OP_LOAD_CONST $c_id
+

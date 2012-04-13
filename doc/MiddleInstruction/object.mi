@@ -1,7 +1,0 @@
-[instruction]
-	object <object_id>
-
-[internal run]
-	Object ob=code_box.g_object_table.take(object_id)
-	r0=ob.clone()
-

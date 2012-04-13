@@ -1,0 +1,17 @@
+[file]
+	bool middle instruction
+
+[instruction]
+	OP_BOOL
+
+[Internal Execute]
+	reg_op0=data_stack.pop()
+	reg_flags=robject_bool(reg_op0)
+
+---------------------------------------------------
+[instruction]
+	OP_BOOL_NOTAKE
+
+[Internal Execute]
+	reg_op0=data_stack.top()   #only ref,not take
+	reg_flags=robject_bool(reg_op0)

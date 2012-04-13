@@ -1,0 +1,12 @@
+[file]
+	logic not translate framework
+
+[grammar]
+	not <expr>
+
+[translate]
+	{
+		expr
+	}
+	OP_LOGIC_NOT
+

@@ -1,0 +1,45 @@
+[file]
+	if-elif-else 
+	
+[grammar]
+	if <condition1>
+		<codes1>
+	elif <condition2>
+		<codes2>
+	elif 
+		.
+		.
+		.
+	else 
+		<codes3>
+	end 
+	
+	
+[translate]
+	{
+		condition1
+	}
+	OP_BOOL
+	OP_JUMPR_FALSE @L1
+	{
+		codes1
+	}
+	OP_JUMPR @End 
+	@label L1:
+	{
+		condition2
+	}
+	OP_BOOL
+	OP_JUMPR_FALSE @L2:
+	{
+		codes2
+	}
+	OP_JUMPR @End
+	@label L2:
+	...
+	@label Ln:
+	{
+		codes3
+	}
+	@label End:
+	

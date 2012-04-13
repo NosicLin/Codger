@@ -1,0 +1,26 @@
+[file]
+	array translate framework 
+
+[grammar]
+	[expr1,expr2,...,exprn]
+
+[translate]
+	OP_ARRAY_BEGIN
+	{
+		expr1
+	}
+	OP_ARRAY_PUSH
+	{
+		expr2
+	}
+	OP_ARRAY_PUSH
+	.
+	.
+	.
+	{
+		exprn
+	}
+	OP_ARRAY_PUSH
+	OP_ARRAY_END
+
+

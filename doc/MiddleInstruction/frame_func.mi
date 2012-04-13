@@ -1,7 +1,0 @@
-[instruction]
-	frame_func 
-
-[internal run]
-	FuncFrame f=new FuncFrame
-	f.exe_code=r0
-	RF=f

@@ -1,0 +1,19 @@
+[file]
+	logic and translate framework
+
+[grammar]
+	<expr_left> and <expr_right>
+
+[translate]
+	{
+		expr_left
+	}
+	OP_BOOL_NOTAKE
+	OP_JUMPR_FASLE @End
+	OP_DISCARD
+	{
+		expr_right
+	}
+	@lable End: 
+
+

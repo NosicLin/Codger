@@ -1,8 +1,0 @@
-[instruction]
-	assign <string_id>
-
-[internal run]
-	String s=code_box.g_string_table.take(string_id)
-	Symbol sy=CFRC.symbol_table.force_take(s)
-	sy.ref=r0 
-
