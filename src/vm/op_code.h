@@ -66,6 +66,9 @@ enum OP_CODES
 	OP_STORE,  /* move reg0 to symbol<id> */
 	OP_PUSH,   /* move reg0 to stack */
 	OP_DISCARD,
+
+	/* func */
+	OP_FUNC_DEFALUT_ARGS,
 #define OP_NEED_PARAM2 OP_GET_ATTR
 	OP_GET_ATTR,
 	OP_SET_ATTR,
@@ -90,6 +93,7 @@ enum OP_CODES
 
 #define OP_NEED_PARAM4 OP_LOAD_CONST2
 	OP_LOAD_CONST2,  /* load const<id> to reg0,sizeof(id)=4 */
+	OP_STORE_SYMBOL2,
 
 
 	OP_CODE_NUM,
@@ -154,6 +158,10 @@ static inline void op_code_push3(struct op_code* op,
 	op->o_codes[op->o_size++]=(u_int8_t)id;
 }
 
+static inline int op_code_is_udata2(u_int32_t d)
+{
+	return d<(u_int32_t)(0x1<<16);
+}
 static inline void op_code_push5(struct op_code* op,
 		u_int8_t code,u_int32_t id)
 {

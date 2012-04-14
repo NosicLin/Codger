@@ -2,6 +2,8 @@
 #include"vm/except.h"
 #include<rstd/redy_std.h>
 #include<utility_c/marocs.h>
+#include<object/func_object.h>
+#include"node_expr.h"
 
 
 
@@ -375,9 +377,156 @@ static int continue_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	return 0;
 }
 
+static int arg_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_ARG);
+	int ret;
+	int arg_type;
+	AstNodeArg* arg=AST_TO_ARG(ab);
+	arg_type=arg->a_type;
+	AstObject* expr;
+
+	if(arg_type==ARG_SIMPLY||arg_type==ARG_MANY)
+	{
+		CHECK_SUB_NODE_NUM(ab,0);
+		return 0;
+	}
+	else if(arg_type==ARG_DEFALUT_VALUE)
+	{
+		CHECK_SUB_NODE_NUM(ab,1);
+		ast_node_getsub1(ab,&expr);
+		ret=ast_to_opcode(expr,m,op);
+		if(ret<0) return ret;
+		ret=op_code_enlarge_more(op,1);
+		if(ret<0) return ret;
+		op_code_push(op,OP_ARRAY_PUSH);
+	}
+	else
+	{
+		BUG("Unkown Arg Type");
+		return -1;
+	}
+	return 0;
+}
+
+static int func_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,3);
+	CHECK_NODE_TYPE(ab,ATN_FUNC);
+	int ret;
+	int arg_type;
+	unsigned long flags=0;
+	AstObject* name;
+	AstObject* arg_list;
+	AstObject* stmts;
+	BtString* func_name;
+	AstObject* _arg;
+	AstNodeArg* arg;
+	int arg_nu=0;
+	int arg_min=0;
+	ssize_t name_id;
+	ssize_t func_id;
 
 
 
+	FuncObject* func=0;
+	BtArray* args_name=0;
+	OpCode* func_opcode=0;
+	
+
+	ast_node_getsub3(ab,&name,&arg_list,&stmts);
+	func_name=AST_TO_VAR(name)->v_symbol;
+
+	func=func_new();
+	args_name=btarray_create();
+	func_opcode=op_code_new();
+	if(func==NULL||args_name==NULL||func_opcode==NULL)
+	{
+		goto error;
+	}
+	/* map id */
+	func_id=module_map_const(m,FUNC_TO_R(func));
+	name_id=module_map_symbol(m,S_TO_R(func_name));
+	if(func_id<0||name_id<0)
+	{
+		goto error;
+	}
+
+	/* set func name */ 
+	func_set_name(func,func_name);
+
+	/* Generate func Body Codes */
+	ret=ast_to_opcode(stmts,m,func_opcode);
+	if(ret<0) goto error;
+	func_set_opcode(func,func_opcode);
+	func_opcode=NULL;
+
+
+	/* func begin */
+	ret=op_code_enlarge_more(op,6);
+	if(ret<0) goto error;
+	if(op_code_is_udata2(func_id))
+	{
+		op_code_push3(op,OP_LOAD_CONST,func_id);
+	}
+	else
+	{
+		op_code_push5(op,OP_LOAD_CONST2,func_id);
+	}
+	op_code_push(op,OP_ARRAY_BEGIN);
+
+
+	/* traverse arg_list */
+	list_for_each_entry(_arg,&arg_list->a_chirldren,a_sibling)
+	{
+		arg=AST_TO_ARG(_arg);
+		arg_type=arg->a_type;
+		if(arg_type==ARG_SIMPLY)
+		{
+			arg_nu++;
+			arg_min++;
+
+		}
+		else if(arg_type==ARG_DEFALUT_VALUE)
+		{
+			arg_nu++;
+			flags|=FUNC_FLAGS_DEFALUT_ARGS;
+		}
+		else if(arg_type==ARG_MANY)
+		{
+			flags|=FUNC_FLAGS_MANY_ARGS;
+		}
+		else 
+		{
+			BUG("Unkown Arg Type");
+			goto error;
+		}
+		ret=btarray_push_back(args_name,S_TO_R(arg->a_name));
+		if(ret<0) goto error;
+		ret=ast_to_opcode(ARG_TO_AST(arg),m,op);
+		if(ret<0) goto error;
+	}
+	ret=op_code_enlarge_more(op,7);
+	if(ret<0) goto error;
+	op_code_push(op,OP_ARRAY_END);
+	op_code_push(op,OP_FUNC_DEFALUT_ARGS);
+	if(op_code_is_udata2(name_id))
+	{
+		op_code_push3(op,OP_STORE_SYMBOL,name_id);
+	}
+	else
+	{
+		op_code_push5(op,OP_STORE_SYMBOL2,name_id);
+	}
+	if(func) robject_release(FUNC_TO_R(func));
+	if(args_name) robject_release(A_TO_R(args_name));
+	return 0;
+error:
+	if(func) robject_release(FUNC_TO_R(func));
+	if(args_name) robject_release(A_TO_R(args_name));
+	if(func_opcode) op_code_free(func_opcode);
+	return -1;
+}
 
 
 
@@ -455,6 +604,18 @@ AstNodeType node_continue=
 	.t_to_opcode=continue_to_opcode,
 };
 
+AstNodeType node_arg=
+{
+	.t_type=ATN_ARG,
+	.t_name="Arg",
+	.t_to_opcode=arg_to_opcode,
+};
+AstNodeType node_func=
+{
+	.t_type=ATN_FUNC,
+	.t_name="Func",
+	.t_to_opcode=func_to_opcode,
+};
 
 
 

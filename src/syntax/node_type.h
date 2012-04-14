@@ -83,6 +83,8 @@ enum AST_NODE_TYPE
 	ATN_FOR,
 	ATN_BREAK,
 	ATN_CONTINUE,
+	ATN_FUNC,
+	ATN_ARG,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

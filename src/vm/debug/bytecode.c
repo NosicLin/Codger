@@ -44,9 +44,9 @@ int main(int argc,char** argv)
 	}
 	module->m_name=module_name;
 	module_name=NULL;
-	op_code_print(module->m_codes,stdout);
+	module_write(module,stdout);
 error:
-	if(module) robject_release(M_TO_R(module));
+	if(module) module_free(module);
 	if(module_name) robject_release(S_TO_R(module_name));
 	if(root) ast_tree_free(root);
 	if(sc) sc_destory(sc);

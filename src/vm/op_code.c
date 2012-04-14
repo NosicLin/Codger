@@ -100,6 +100,9 @@ static char* s_op_name[]=
 	"OP_PUSH",   /* move reg0 to stack */
 	"OP_DISCARD",
 
+
+	"OP_FUNC_DEFALUT_ARGS",
+
 	"OP_GET_ATTR",
 	"OP_SET_ATTR",
 	"OP_SYMBOL", /* load symbol<id> to reg0 */
@@ -123,6 +126,7 @@ static char* s_op_name[]=
 
 
 	"OP_LOAD_CONST2",  /* load const<id> to reg0,sizeof(id)=4 */
+	"OP_STORE_SYMBOL2",
 
 
 };
