@@ -24,6 +24,7 @@ struct func_object
 
 	struct bt_string* f_name;
 	struct bt_array* f_args_name;
+	struct bt_array* f_defargs;
 	struct module_object* f_module;
 	struct op_code* f_codes;
 };
@@ -84,6 +85,12 @@ static inline void func_set_opcode(FuncObject* f,OpCode* op)
 	f->f_codes=op;
 }
 
+static inline void func_set_defargs(FuncObject* f,BtArray* defargs)
+{
+	robject_addref(A_TO_R(defargs));
+	BUG_ON(f->f_defargs!=NULL,"FuncObject Already Have defargs");
+	f->f_defargs=defargs;
+}
 void func_free(FuncObject* f);
 
 ROBJECT_TYPE_CAST(FUNC,TYPE_FUNC,FuncObject);

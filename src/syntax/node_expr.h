@@ -30,6 +30,8 @@ AST_TYPE_CAST(VAR,Var,ATN_VAR);
 AstNodeType node_array;
 AstNodeType node_square;
 
+/* postfix_expr */
+AstNodeType node_call;
 /* unary expr */
 AstNodeType node_positive;
 AstNodeType node_negative;

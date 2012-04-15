@@ -94,6 +94,7 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_break{$$=$1;}
 	|stmt_continue{$$=$1;}
 	|stmt_func{$$=$1;}
+	|stmt_return{$$=$1;}
 	;
 
 stmt_delimiter:tNEWLINE| tSEMI;
@@ -104,9 +105,9 @@ literal: tINTEGER
 		BtInt* bi=btint_from_str(yl_cur_string());
 		if(bi==NULL) return AST_MEM_FAILED;
 		AstObject* node=ast_create_literal(I_TO_R(bi));
+		robject_release(I_TO_R(bi));
 		if(node==NULL)
 		{
-			robject_release(I_TO_R(bi));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
@@ -117,9 +118,9 @@ literal: tINTEGER
 		BtLong* bl=btlong_from_str(yl_cur_string());
 		if(bl==NULL) return AST_MEM_FAILED;
 		AstObject* node=ast_create_literal(L_TO_R(bl));
+		robject_release(L_TO_R(bl));
 		if(node==NULL)
 		{
-			robject_release(L_TO_R(bl));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
@@ -129,9 +130,9 @@ literal: tINTEGER
 		BtFloat* bf=btfloat_from_str(yl_cur_string());
 		if(bf==NULL) return AST_MEM_FAILED;
 		AstObject* node=ast_create_literal(F_TO_R(bf));
+		robject_release(F_TO_R(bf));
 		if(node==NULL)
 		{
-			robject_release(F_TO_R(bf));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
@@ -141,31 +142,27 @@ literal: tINTEGER
 		BtString* bs=btstring_create(yl_cur_string());
 		if(bs==NULL) return AST_MEM_FAILED;
 		AstObject* node=ast_create_literal(S_TO_R(bs));
+		robject_release(S_TO_R(bs));
 		if(node==NULL)
 		{
-			robject_release(S_TO_R(bs));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
 	}
 	| kFALSE
 	{
-		robject_addref(B_TO_R(ObjectFalse));
 		AstObject* node=ast_create_literal(B_TO_R(ObjectFalse));
 		if(node==NULL)
 		{
-			robject_release(B_TO_R(ObjectFalse));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
 	}
 	| kTRUE
 	{
-		robject_addref(B_TO_R(ObjectTrue));
 		AstObject* node=ast_create_literal(B_TO_R(ObjectTrue));
 		if(node==NULL)
 		{
-			robject_release(B_TO_R(ObjectTrue));
 			return AST_MEM_FAILED;
 		}
 		$$=node;
@@ -176,9 +173,9 @@ identifier:tID
 		BtString* symbol=btstring_create_no_esc(yl_cur_string());
 		if(symbol==NULL) return AST_MEM_FAILED;
 		AstObject* node=ast_create_var(symbol);
+		robject_release(S_TO_R(symbol));
 		if(node==NULL)
 		{	
-			robject_release(S_TO_R(symbol));
 			return AST_MEM_FAILED;
 		}
 		$$=node;	
@@ -240,6 +237,23 @@ postfix_expr: primary_expr{$$=$1;}
 		if(node==NULL) return AST_MEM_FAILED;
 		ast_node_add(node,$1);
 		ast_node_add(node,$3);
+		$$=node;
+	}
+	|postfix_expr l_rb expr_list r_rb
+	{
+		AstObject* node=ast_node_new(&node_call);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,$3);
+		$$=node;
+	}
+	|postfix_expr l_rb r_rb 
+	{
+		AstObject* node=ast_node_new(&node_call);
+		AstObject* sub_node=ast_node_new(&node_normal);
+		if(node==NULL||sub_node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		ast_node_add(node,sub_node);
 		$$=node;
 	}
 	;
@@ -507,22 +521,59 @@ stmt_continue: kCONTINUE
 		$$=node;
 	}
 	;
+stmt_return: kRETURN expr
+	{
+		AstObject* node=ast_node_new(&node_return);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		$$=node;
+	}
+	|kRETURN
+	{
+		AstObject* node=ast_node_new(&node_return);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
+	;
 
 
 
-stmt_func:func_declare;
+stmt_func:func_declare{$$=$1;};
 
-func_declare:kFUNC identifier l_rb args_list r_rb func_delimeter block kEND ;
+
+func_declare:kFUNC identifier l_rb args_list r_rb func_delimeter block kEND 
+	{
+		AstObject* node=ast_node_new(&node_func);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$2);
+		ast_node_add(node,$4);
+		ast_node_add(node,$7);
+		$$=node;
+	}
+	;
+
 
 func_delimeter:tNEWLINE|tCOMMA;
 
-/* @check_valid_args:make sure args_type sequence
- * {simply_arg}{,default_arg}[,many_args]
- */
 
 args_list:arg
+	{
+		AstObject* node=ast_node_new(&node_normal);
+		if(node==NULL) return AST_MEM_FAILED;
+		ast_node_add(node,$1);
+		$$=node;
+	}
 	|args_list tCOMMA arg 
+	{
+		ast_node_add($1,$3);
+		$$=$1;
+	}
 	|
+	{
+		AstObject* node=ast_node_new(&node_normal);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
 	;
 		 
 arg:simply_arg{$$=$1;}
@@ -533,16 +584,24 @@ arg:simply_arg{$$=$1;}
 simply_arg:identifier
 	{
 		
-		AstObject* node=ast_create_arg(ARG_SIMPLY);
-		if(node==NULL) return AST_MEM_FAILED;
+		BtString* name=AST_TO_VAR($1)->v_symbol;
+		AstObject* node=ast_create_arg(ARG_SIMPLY,name);
+		if(node==NULL)
+		{
+			return AST_MEM_FAILED;
+		}
 		ast_node_add(node,$1);
 		$$=node;
 	}
 	;
 default_arg:identifier tASSIGN expr 
 	{
-		AstObject* node=ast_create_arg(ARG_DEFALUT_VALUE);
-		if(node==NULL) return AST_MEM_FAILED;
+		BtString* name=AST_TO_VAR($1)->v_symbol;
+		AstObject* node=ast_create_arg(ARG_DEFALUT_VALUE,name);
+		if(node==NULL)
+		{
+			return AST_MEM_FAILED;
+		}
 		ast_node_add(node,$1);
 		ast_node_add(node,$3);
 		$$=node;
@@ -551,21 +610,30 @@ default_arg:identifier tASSIGN expr
 
 many_args:tMUL identifier 
 	{
-		AstObject* node=ast_create_arg(ARG_MANY);
-		if(node==NULL) return AST_MEM_FAILED;
-		ast_node_add(node,$1);
+		BtString* name=AST_TO_VAR($2)->v_symbol;
+		AstObject* node=ast_create_arg(ARG_MANY,name);
+		if(node==NULL)
+		{
+			return AST_MEM_FAILED;
+		}
+		ast_node_add(node,$2);
 		$$=node;
 	}
 	|tMUL
 	{
-		AstObject* node=ast_create_arg(ARG_MANY);
-		if(node==NULL) return AST_MEM_FAILED;
 		BtString* arg_list=btstring_create_no_esc("@arg_list");
 		if(arg_list==NULL) return AST_MEM_FAILED;
-		AstObject* sub_node=ast_create_var(arg_list);
-		if(sub_node==NULL)
+
+		AstObject* node=ast_create_arg(ARG_MANY,arg_list);
+		if(node==NULL)
 		{
 			robject_release(S_TO_R(arg_list));
+			return AST_MEM_FAILED;
+		}
+		AstObject* sub_node=ast_create_var(arg_list);
+		robject_release(S_TO_R(arg_list));
+		if(sub_node==NULL)
+		{
 			return AST_MEM_FAILED;
 		}
 		ast_node_add(node,sub_node);

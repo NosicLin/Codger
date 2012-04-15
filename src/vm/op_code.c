@@ -1,6 +1,7 @@
 #include"op_code.h"
 #include<rstd/gr_std.h>
 #include<string.h>
+#include<utility_c/marocs.h>
 struct op_code* op_code_new()
 {
 	struct op_code* op=gr_malloc(sizeof(*op));
@@ -90,7 +91,6 @@ static char* s_op_name[]=
 	"OP_ARRAY_BEGIN",
 	"OP_ARRAY_PUSH",
 	"OP_ARRAY_END",
-
 	/* engine op */
 	"OP_EXIT",
 	"OP_RETURN",
@@ -131,23 +131,37 @@ static char* s_op_name[]=
 
 };
 
-void op_code_print(struct op_code* op,FILE* f)
+void op_code_print(struct op_code* op,FILE* f,int indent)
 {
 	ssize_t i=0;
+	int j;
+	for(j=0;j<indent;j++)
+	{
+		fprintf(f,"\t");
+	}
 	fprintf(f,"#OpCode Size=%d\n",op->o_size);
 	u_int8_t code=0;
 	u_int8_t d1=0;
 	u_int8_t d2=0;
+	i=0;
 	while(i<op->o_size)
 	{
 		code=op->o_codes[i++];
 		assert(code<OP_CODE_NUM);
+		for(j=0;j<indent;j++)
+		{
+			fprintf(f,"\t");
+		}
 		fprintf(f,"%d\t %s",i-1,s_op_name[code]);
-		if(code>OP_DISCARD)
+		if(code>=OP_NEED_PARAM2)
 		{
 			d1=op->o_codes[i++];
 			d2=op->o_codes[i++];
 			printf("<%d>",(int16_t)((u_int16_t)d1<<8|d2));
+		}
+		else if(code>=OP_NEED_PARAM4)
+		{
+			TODO("OP_NEED_PARAM4");
 		}
 		fprintf(f,"\n");
 	}

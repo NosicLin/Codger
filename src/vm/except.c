@@ -189,6 +189,22 @@ void except_iter_err_format(const char* s,...)
 	s_except_type=E_ITER_ERR;
 	printf("IterErr:%s\n",s_format_buf);
 }
+void except_args_err_format(const char* s,...)
+{
+	int n;
+	va_list ap;
+	va_start(ap,s);
+	n=vsnprintf(s_format_buf,FORMAT_BUF_SIZE,s,ap);
+	va_end(ap);
+	if(n>=FORMAT_BUF_SIZE||n<0)
+	{
+		WARN("format message failed(%d)",n);
+		s_format_buf[0]='\0';
+	}
+	except_flags=1;
+	s_except_type=E_ARGS;
+	printf("ArgsErr:%s\n",s_format_buf);
+}
 
 void except_iter_stop()
 {

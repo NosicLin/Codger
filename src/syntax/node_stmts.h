@@ -16,6 +16,7 @@ AstNodeType node_expr;
 AstNodeType node_assign;
 AstNodeType node_break;
 AstNodeType node_continue;
+AstNodeType node_return;
 AstNodeType node_func;
 
 enum ARG_TYPE
@@ -32,7 +33,7 @@ struct ast_node_arg
 	BtString* a_name;
 };
 typedef struct ast_node_arg AstNodeArg;
-AstObject* ast_create_arg(int type)
+AstObject* ast_create_arg(int type,BtString* name);
 AST_TYPE_CAST(ARG,Arg,ATN_ARG);
 
 #endif  /*_CODGER_SYNTAX_AST_NODE_STMTS_H_*/

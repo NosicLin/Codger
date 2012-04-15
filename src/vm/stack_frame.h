@@ -36,6 +36,7 @@ void sframe_clear_cache();
 
 StackFrame* sframe_from_func(FuncObject* f);
 StackFrame* sframe_from_module(ModuleObject* m);
+SymbolTable* sframe_get_sytable(StackFrame* sf);
 
 #endif /*_CODGER_VM_STACK_FRAME_H_*/
 

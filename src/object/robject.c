@@ -1,3 +1,4 @@
+#include<rtype/bt_array.h>
 #include "robject.h"
 #include"type_object.h"
 #include<utility_c/marocs.h>
@@ -27,6 +28,13 @@
 #define OPER_NAME_NEGATED "~"
 #define OPER_NAME_POSITIVE "+"
 #define OPER_NAME_GET_ITEM "[ ]"
+
+static Robject __object_dummy=
+{
+	.r_ref=1,
+};
+Robject* ObjectDummy=&__object_dummy;
+
 
 static inline char* EXPR_NAME_CMP(int op)
 {
@@ -465,6 +473,40 @@ default_action:
 error:
 	return NULL;
 }
+
+Robject* robject_call(Robject* r,Robject* args)
+{
+	TypeObject* t=r->r_type;;
+	if(t==NULL)
+	{
+		BUG("TypeObject Error");
+		except_unkown_err_format("Not Find TypeObject");
+		goto error;
+	}
+	if(t->t_expr_funcs==NULL)
+	{
+		goto default_action;
+	}
+	if(t->t_expr_funcs->ro_call==NULL)
+	{
+		goto default_action;
+	}
+	Robject* ret=t->t_expr_funcs->ro_call(r,R_TO_A(args));
+	if(ret==NULL)
+	{
+		if(!vm_except_happened())
+		{
+			except_unkown_err_format("Internal Bug");
+		}
+	}
+	return ret;
+default_action:
+	except_type_err_format("'%s' cann't call",robject_name(r));
+	return NULL;
+error:
+	return NULL;
+}
+	
 
 
 

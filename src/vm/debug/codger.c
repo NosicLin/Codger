@@ -56,7 +56,7 @@ int main(int argc,char** argv)
 	ret=engine_run();
 error:
 	if(sf) sframe_free(sf);
-	if(module) robject_release(M_TO_R(module));
+	if(module) module_free(module);
 	if(module_name) robject_release(S_TO_R(module_name));
 	if(root) ast_tree_free(root);
 	if(sc) sc_destory(sc);

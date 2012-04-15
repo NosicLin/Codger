@@ -164,13 +164,45 @@ void module_write(ModuleObject* m,FILE* f)
 	{
 		cur=btarray_get_item(m->m_funcs,i);
 		func=R_TO_FUNC(cur);
-		fprintf(f,"@OpCode Func(%s) \n{\n",func->f_name->s_value);
-		op_code_print(func->f_codes,f);
+		fprintf(f,"@FuncObject(%s) \n{\n",func->f_name->s_value);
+		fprintf(f,"\tArgNu:%d\n",func->f_args_nu);
+		fprintf(f,"\tArgMin:%d\n",func->f_args_min);
+		
+		fprintf(f,"\tFlags:");
+		if(func->f_flags&FUNC_FLAGS_DEFALUT_ARGS) 
+		{
+			fprintf(f," DEFAULT_ARGS");
+		}
+		if(func->f_flags&FUNC_FLAGS_MANY_ARGS)
+		{
+			fprintf(f," MANY_ARGS");
+		}
+		if(func->f_flags==0)
+		{
+			fprintf(f,"NORMAL_FUNC");
+		}
+
+		fprintf(f,"\n");
+		fprintf(f,"\tArgName: ");
+
+		int j;
+		for(j=0;j<btarray_size(func->f_args_name);j++)
+		{
+			Robject* arg_name=btarray_get_item(func->f_args_name,j);
+			fprintf(f," %s",R_TO_S(arg_name)->s_value);
+			robject_release(arg_name);
+		}
+		fprintf(f,"\n");
+
+		fprintf(f,"\tOpCode: \n\t{\n");
+		op_code_print(func->f_codes,f,2);
+		robject_release(cur);
+		fprintf(f,"\t}\n");
 		fprintf(f,"}\n");
 	}
 
 	fprintf(f,"@OpCode Module(%s) \n{\n",m->m_name->s_value);
-	op_code_print(m->m_codes,f);
+	op_code_print(m->m_codes,f,1);
 	fprintf(f,"}\n");
 }
 

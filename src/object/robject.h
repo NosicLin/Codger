@@ -11,6 +11,7 @@ struct  robject
 };
 typedef struct robject Robject;
 
+extern Robject* ObjectDummy;
 #include"type_object.h"
 
 #define INHERIT_ROBJECT struct robject r_base 
@@ -77,6 +78,9 @@ int robject_bool(Robject* rt);
 Robject* robject_iter(Robject* r);
 Robject* robject_next(Robject* r);
 
+/* func call */
+Robject* robject_call(Robject* r,Robject* args);
+
 ssize_t robject_hash(Robject* rt);
 #define CMP_LT  0  /*<*/
 #define CMP_LE  1  /*<=*/
@@ -125,6 +129,7 @@ void robject_print(Robject* rt,FILE* f,int flags);
 		return (type*)r; \
 	} \
 #endif /*ROBJECT_DEBUG*/
+
 	
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 

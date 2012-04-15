@@ -138,6 +138,15 @@ int engine_run()
 		u_int8_t op=mem_codes[reg_pc++];
 		switch(op)
 		{
+			case OP_CALL:
+				UNPACK_TWO_OP;
+				reg_acc=robject_call(reg_op0,reg_op1);
+				if(reg_acc!=ObjectDummy)
+				{
+					DATA_PUSH_NOREF;
+				}
+				RELEASE_TWO_OP;
+				break;
 			case OP_POSITIVE:
 				UNPACK_ONE_OP;
 				reg_acc=robject_positive(reg_op0);
@@ -338,6 +347,15 @@ int engine_run()
 				DATA_PUSH_NOREF;
 				break;
 
+			case OP_FUNC_DEFALUT_ARGS:
+				UNPACK_ONE_OP;
+				reg_acc=data_stack[reg_sp-1];
+				BUG_ON(robject_typeid(reg_acc)!=TYPE_FUNC,
+						"Need FuncObject But Is Not");
+				func_set_defargs(R_TO_FUNC(reg_acc),R_TO_A(reg_op0));
+				RELEASE_ONE_OP;
+				break;
+
 			/* control flow instruction */
 			case OP_JUMP_FALSE:
 				WORD_FROM_CODE;
@@ -428,7 +446,7 @@ static StackFrame exit_frame=
 static inline int restore_context(StackFrame* s)
 {
 	reg_pc=s->sf_pc;
-	reg_sp=s->sf_sp;
+//	reg_sp=s->sf_sp;
 	mem_codes=s->sf_codes->o_codes;
 	var_scope=s->sf_scope;
 
@@ -450,6 +468,7 @@ int engine_push(StackFrame* s)
 
 	s->sf_link=eg_frame_cur;
 	eg_frame_cur=s;
+	s->sf_sp=reg_sp;
 
 	return  restore_context(s);
 }

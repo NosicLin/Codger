@@ -173,5 +173,5 @@ static inline void op_code_push5(struct op_code* op,
 	op->o_codes[op->o_size++]=(u_int8_t)id;
 }
 
-void op_code_print(struct op_code* op,FILE* f);
+void op_code_print(struct op_code* op,FILE* f,int indent);
 #endif 

@@ -1,5 +1,6 @@
 #include"stack_frame.h"
 #include<rstd/gr_std.h>
+#include<assert.h>
 
 #define MAX_CACHE_NUM 200
 
@@ -128,8 +129,12 @@ StackFrame* sframe_from_module(ModuleObject* m)
 	return sf;
 }
 
-
-
+SymbolTable* sframe_get_sytable(StackFrame* sf)
+{
+	assert(sf->sf_scope);
+	robject_addref(SY_TO_R(sf->sf_scope));
+	return sf->sf_scope;
+}
 
 
 

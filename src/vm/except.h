@@ -18,6 +18,7 @@ enum EXCEPT_TYPE
 	E_SYNTAX_ERR,
 	E_ITER_STOP,
 	E_ITER_ERR,
+	E_ARGS,
 };
 
 
@@ -32,6 +33,7 @@ void except_key_err_format(const char* s,...);
 void except_unkown_err_format(const char* s,...);
 void except_name_err_format(const char* s,...);
 void except_syntax_err_format(const char* s,...);
+void except_args_err_format(const char* s,...);
 void except_iter_err_format(const char* s,...);
 void except_iter_stop();
 

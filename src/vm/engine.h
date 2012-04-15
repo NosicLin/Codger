@@ -9,6 +9,8 @@ int engine_run();
 
 int engine_push(struct  stack_frame* s);
 struct stack_frame* engine_pop();
+struct robject;
+struct robject* stack_data_pop();
 
 #endif 
 

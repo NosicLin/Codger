@@ -385,16 +385,17 @@ static int arg_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	AstNodeArg* arg=AST_TO_ARG(ab);
 	arg_type=arg->a_type;
 	AstObject* expr;
+	AstObject* var;
 
 	if(arg_type==ARG_SIMPLY||arg_type==ARG_MANY)
 	{
-		CHECK_SUB_NODE_NUM(ab,0);
+		CHECK_SUB_NODE_NUM(ab,1);
 		return 0;
 	}
 	else if(arg_type==ARG_DEFALUT_VALUE)
 	{
-		CHECK_SUB_NODE_NUM(ab,1);
-		ast_node_getsub1(ab,&expr);
+		CHECK_SUB_NODE_NUM(ab,2);
+		ast_node_getsub2(ab,&var,&expr);
 		ret=ast_to_opcode(expr,m,op);
 		if(ret<0) return ret;
 		ret=op_code_enlarge_more(op,1);
@@ -447,17 +448,25 @@ static int func_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	/* map id */
 	func_id=module_map_const(m,FUNC_TO_R(func));
 	name_id=module_map_symbol(m,S_TO_R(func_name));
-	if(func_id<0||name_id<0)
+	ret=module_add_func(m,func);
+	if(func_id<0||name_id<0||ret<0)
 	{
 		goto error;
 	}
 
 	/* set func name */ 
 	func_set_name(func,func_name);
+	func_set_module(func,m);
 
 	/* Generate func Body Codes */
 	ret=ast_to_opcode(stmts,m,func_opcode);
 	if(ret<0) goto error;
+	ret=op_code_enlarge_more(func_opcode,4);
+	if(ret<0) goto  error;
+	/* if func no return stmt 
+	 * add default to it return NULL */
+	op_code_push3(func_opcode,OP_LOAD_CONST,2);
+	op_code_push(func_opcode,OP_RETURN);
 	func_set_opcode(func,func_opcode);
 	func_opcode=NULL;
 
@@ -506,6 +515,10 @@ static int func_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 		ret=ast_to_opcode(ARG_TO_AST(arg),m,op);
 		if(ret<0) goto error;
 	}
+	func_set_arg_nu(func,arg_nu,arg_min);
+	func_set_flags(func,flags);
+
+
 	ret=op_code_enlarge_more(op,7);
 	if(ret<0) goto error;
 	op_code_push(op,OP_ARRAY_END);
@@ -518,6 +531,10 @@ static int func_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
 	{
 		op_code_push5(op,OP_STORE_SYMBOL2,name_id);
 	}
+
+	/* set func args_name */
+	func_set_args_name(func,args_name);
+
 	if(func) robject_release(FUNC_TO_R(func));
 	if(args_name) robject_release(A_TO_R(args_name));
 	return 0;
@@ -528,6 +545,37 @@ error:
 	return -1;
 }
 
+
+
+static int return_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_NODE_TYPE(ab,ATN_RETURN);
+
+	AstObject* expr;
+	int ret;
+	/* no return value */ 
+	if(ab->a_chirldren.next==&ab->a_chirldren)
+	{
+		ret=op_code_enlarge_more(op,3);
+		if(ret<0) return ret;
+		op_code_push3(op,OP_LOAD_CONST,2);
+	}
+	else
+	{
+		CHECK_SUB_NODE_NUM(ab,1);
+		ast_node_getsub1(ab,&expr);
+		ret=ast_to_opcode(expr,m,op);
+		if(ret<0) return ret;
+	}
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+	op_code_push(op,OP_RETURN);
+	return 0;
+}
+
+
+
+		
 
 
 
@@ -604,19 +652,43 @@ AstNodeType node_continue=
 	.t_to_opcode=continue_to_opcode,
 };
 
+
+
+static void  arg_destruct(AstObject* ab)
+{
+	AstNodeArg* node=AST_TO_ARG(ab);
+	robject_release(S_TO_R(node->a_name));
+}
 AstNodeType node_arg=
 {
 	.t_type=ATN_ARG,
 	.t_name="Arg",
 	.t_to_opcode=arg_to_opcode,
+	.t_destruct=arg_destruct,
 };
+
+AstObject* ast_create_arg(int type,BtString* name)
+{
+	AstNodeArg* node=ast_node_new_type(AstNodeArg,&node_arg);
+	if(node==NULL) return NULL;
+	node->a_type=type;
+	node->a_name=name;
+	robject_addref(S_TO_R(name));
+	return (AstObject*)node;
+}
+
 AstNodeType node_func=
 {
 	.t_type=ATN_FUNC,
 	.t_name="Func",
 	.t_to_opcode=func_to_opcode,
 };
-
+AstNodeType node_return=
+{
+	.t_type=ATN_RETURN,
+	.t_name="Return",
+	.t_to_opcode=return_to_opcode,
+};
 
 
 

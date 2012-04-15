@@ -53,6 +53,7 @@ AstObject* ast_create_literal(Robject* value)
 		return NULL;
 	}
 	node->l_value=value;
+	robject_addref(value);
 	return LITERAL_TO_AST(node);
 }
 static  int var_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
@@ -128,6 +129,7 @@ AstObject* ast_create_var(BtString* symbol)
 	{
 		return NULL;
 	}
+	robject_addref(S_TO_R(symbol));
 	node->v_symbol=symbol;
 	return (AstObject*)node;
 }
@@ -644,6 +646,49 @@ AstNodeType node_logic_and=
 	.t_to_opcode=logic_and_to_opcode,
 };
 
+
+
+static int call_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_CALL);
+	
+	AstObject* prefix_expr;
+	AstObject* expr_list;
+	ast_node_getsub2(ab,&prefix_expr,&expr_list);
+
+	AstObject* expr;
+
+	int ret;
+
+	ret=ast_to_opcode(prefix_expr,m,op);
+	if(ret<0) return ret;
+
+	ret=op_code_enlarge_more(op,1);
+	if(ret<0) return ret;
+	op_code_push(op,OP_ARRAY_BEGIN);
+
+	list_for_each_entry(expr,&expr_list->a_chirldren,a_sibling)
+	{
+		ret=ast_to_opcode(expr,m,op);
+		if(ret<0) return ret;
+		ret=op_code_enlarge_more(op,1);
+		op_code_push(op,OP_ARRAY_PUSH);
+	}
+
+	ret=op_code_enlarge_more(op,2);
+	if(ret<0) return ret;
+	op_code_push(op,OP_ARRAY_END);
+	op_code_push(op,OP_CALL);
+	return 0;
+}
+
+AstNodeType node_call=
+{
+	.t_name="Call",
+	.t_type=ATN_CALL,
+	.t_to_opcode=call_to_opcode,
+};
 
 
 

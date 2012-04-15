@@ -53,6 +53,15 @@ static inline int ast_typeid(AstObject* ab)
 	return ab->a_type->t_type;
 }
 
+#ifdef AST_DEBUG
+
+#define ast_node_add(father, chirld) \
+	do{ \
+		assert(father); \
+		assert(chirld); \
+		list_add_tail(&((AstObject*)chirld)->a_sibling,&((AstObject*)father)->a_chirldren); \
+	}while(0)
+#else 
 static inline void ast_node_add(AstObject* father,AstObject* chirld)
 {
 	assert(father);
@@ -60,6 +69,8 @@ static inline void ast_node_add(AstObject* father,AstObject* chirld)
 	//printf("(%s<-%s)\n",father->a_type->t_name,chirld->a_type->t_name);
 	list_add_tail(&chirld->a_sibling,&father->a_chirldren);
 }
+#endif
+
 static inline void ast_node_del(AstObject* father,AstObject* chirld)
 {
 	assert(father);
