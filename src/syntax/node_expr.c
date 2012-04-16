@@ -691,4 +691,78 @@ AstNodeType node_call=
 };
 
 
+static int global_id_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_GLOBAL);
+
+	AstNodeGlobal* node=AST_TO_GLOBAL(ab);
+
+	int ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+
+	Robject* symbol=S_TO_R(node->g_symbol);
+	int32_t id=module_map_symbol(m,symbol);
+	if(id<0)
+	{
+		return -1;
+	}
+	/*FIXME When id >(0x1<<16) OP_LOAD_SYMBOL can't work correct*/
+
+	op_code_push3(op,OP_LOAD_GLOBAL,(u_int16_t)id);
+	return 0;
+
+}
+static int global_id_to_assign_opcode(AstObject* ab,ModuleObject* m,OpCode* op)
+{
+
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_GLOBAL);
+
+	AstNodeGlobal* node=AST_TO_GLOBAL(ab);
+	int ret=op_code_enlarge_more(op,5);
+	if(ret<0)
+	{
+		return ret;
+	}
+	Robject* symbol=S_TO_R(node->g_symbol);
+	int32_t id=module_map_symbol(m,symbol);
+	if(id<0)
+	{
+		return -1;
+	}
+	/*FIXME When id >(0x1<<16) OP_LOAD_SYMBOL can't work correct*/
+	op_code_push3(op,OP_STORE_GLOBAL,(u_int16_t)id);
+	return 0;
+}
+static void global_destruct(AstObject* ab)
+{
+	AstNodeGlobal* node=AST_TO_GLOBAL(ab);
+	robject_release(S_TO_R(node->g_symbol));
+}
+
+AstNodeType node_global=
+{
+	.t_name="Global",
+	.t_type=ATN_GLOBAL,
+	.t_destruct=global_destruct,
+	.t_to_opcode=global_id_to_opcode,
+	.t_to_assign_opcode=global_id_to_assign_opcode,
+};
+
+AstObject* ast_create_global(BtString* symbol)
+{
+	AstNodeGlobal* node=ast_node_new_type(AstNodeGlobal,&node_global);
+	if(node==NULL)
+	{
+		return NULL;
+	}
+	robject_addref(S_TO_R(symbol));
+	node->g_symbol=symbol;
+	return (AstObject*)node;
+}
+
 

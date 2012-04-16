@@ -25,7 +25,7 @@
 /*base type */
 %token tINTEGER tLONG tFLAOT tSTRING tID
 /*delimiter*/
-%token tCOMMA tPERIOD tL_RB tR_RB tL_SB tR_SB  
+%token tDOLLAR tCOMMA tPERIOD tL_RB tR_RB tL_SB tR_SB  
 /*expr operator and assign */
 %token tASSIGN tAMUL tADIV tAMOD tAPLUS tAMINUS tALS tARS tAAND tAOR tAXOR
 /* expr operator */
@@ -181,6 +181,20 @@ identifier:tID
 		$$=node;	
 	}
 	;
+global_id:tDOLLAR tID
+	{
+		BtString* symbol=btstring_create_no_esc(yl_cur_string());
+		if(symbol==NULL) return AST_MEM_FAILED;
+		AstObject* node=ast_create_global(symbol);
+		robject_release(S_TO_R(symbol));
+		if(node==NULL)
+		{
+			return AST_MEM_FAILED;
+		}
+		$$=node;
+	}
+	;
+
 
 
 expr_list:expr_list_pre {$$=$1;}
@@ -228,6 +242,7 @@ primary_expr: literal {$$=$1;}
 	|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
 	|identifier{$$=$1;}
 	|array {$$=$1;}
+	|global_id{$$=$1;}
 	;
 
 postfix_expr: primary_expr{$$=$1;}

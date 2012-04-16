@@ -76,6 +76,8 @@ enum OP_CODES
 	OP_LOAD_CONST,  /* load const<id> to reg0,sizeof(id)=2 */
 	OP_LOAD_SYMBOL,
 	OP_STORE_SYMBOL,
+	OP_LOAD_GLOBAL,
+	OP_STORE_GLOBAL,
 
 	/* flow control op */
 	OP_BREAK,

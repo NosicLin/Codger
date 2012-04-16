@@ -20,6 +20,7 @@ enum REDY_TOKEN
 	TOKEN_ID,
 
 	/* delimiter */
+	TOKEN_DOLLAR,
 	TOKEN_COMMA,
 	TOKEN_PERIOD,
 	TOKEN_L_RB,

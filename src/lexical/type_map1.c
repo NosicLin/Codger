@@ -37,6 +37,7 @@ enum OPER_INPUT_TYPE
 	ME_SEMICOLON,
 	ME_ANNO,
 
+	SP_DOLLAR,
 	OPER_COMMA,
 	OPER_PERIOD,
 	OPER_REVERSE,
@@ -86,6 +87,7 @@ void id_array_create()
 	id_array['#']=ME_ANNO;
 
 
+	id_array['$']=SP_DOLLAR,
 	id_array[',']=OPER_COMMA;
 	id_array['.']=OPER_PERIOD;
 	id_array['~']=OPER_REVERSE;

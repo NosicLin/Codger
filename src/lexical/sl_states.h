@@ -98,4 +98,7 @@ extern struct state sb_newline;
 /*merge parts*/
 extern struct state me_begin;
 extern struct state me_period; 
+
+/*special charicter*/
+extern struct state sp_dollar;
 #endif /*_REDY_LEXICAL_SL_STATE_H_*/

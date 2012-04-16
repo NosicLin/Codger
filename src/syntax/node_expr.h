@@ -25,6 +25,14 @@ typedef struct ast_node_var AstNodeVar;
 AstObject* ast_create_var(BtString* symbol);
 AST_TYPE_CAST(VAR,Var,ATN_VAR);
 
+struct ast_node_global
+{
+	INHERIT_AST_OBJECT;
+	BtString* g_symbol;
+};
+typedef struct ast_node_global AstNodeGlobal;
+AstObject* ast_create_global(BtString* symbol);
+AST_TYPE_CAST(GLOBAL,Global,ATN_GLOBAL);
 
 /* primary_expr */
 AstNodeType node_array;

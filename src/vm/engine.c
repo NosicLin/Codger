@@ -26,6 +26,7 @@ static Robject** const_pool=0;
 static Robject** symbol_pool=0;
 
 static SymbolTable* var_scope=0;
+static SymbolTable* global_scope=0;
 
 static Robject* reg_acc=0;
 static Robject* reg_op0=0;
@@ -415,6 +416,20 @@ int engine_run()
 				sy_table_map(var_scope,reg_acc,reg_op0);
 				RELEASE_ONE_OP;
 				break;
+			case OP_LOAD_GLOBAL:
+				WORD_FROM_CODE;
+				reg_op0=symbol_pool[reg_dp];
+				reg_acc=sy_table_lookup(global_scope,reg_op0);
+				DATA_PUSH_NOREF;
+				break;
+			case OP_STORE_GLOBAL:
+				WORD_FROM_CODE;
+				UNPACK_ONE_OP;
+				reg_acc=symbol_pool[reg_dp];
+				sy_table_map(global_scope,reg_acc,reg_op0);
+				RELEASE_ONE_OP;
+				break;
+
 			default:
 				BUG("Unkown OpCode(%u) pc=%u",op,reg_pc);
 				runing=0;
@@ -455,7 +470,7 @@ static inline int restore_context(StackFrame* s)
 		eg_module_cur=s->sf_modules;
 		const_pool=eg_module_cur->m_consts->a_objects;
 		symbol_pool=eg_module_cur->m_symbols->a_objects;
-
+		global_scope=eg_module_cur->m_attrs;
 	}
 	return 0;
 }

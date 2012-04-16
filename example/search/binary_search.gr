@@ -1,0 +1,43 @@
+#binary_search 
+array=[-15,-6,0,7,9,23,54,82,101]
+size=9
+
+# @value to search
+# @return index: if not find return -1
+func binary_search(value,low,high)
+	if low>high
+		return -1
+	end 
+
+	middle=(low+high)/2
+	if $array[middle]==value
+		return middle
+	elif $array[middle]>value
+		return $binary_search(value,low,middle-1)
+	else
+		return $binary_search(value,middle+1,high)
+	end 
+end 
+
+# unit test binary_search 
+flags=true
+pos=0
+for i in array
+	index=binary_search(i,0,size-1)
+	if index!=pos
+		flags=false
+		break
+	end 
+	print "search", i, "pos=",index
+	pos=pos+1
+end 
+
+if flags
+	print "Program Ok"
+else
+	print "Program Err"
+end 
+
+
+
+
