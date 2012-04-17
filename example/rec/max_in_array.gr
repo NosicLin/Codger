@@ -1,0 +1,29 @@
+array=[3,45,78,14,35,67,57,101,65,79,36,24]
+size=12
+func max(index)
+	if index==$size-1
+		return $array[index]
+	else
+		cur=$array[index]
+		nexts=$max(index+1)
+		if cur > nexts
+			return cur
+		else
+			return nexts
+		end
+	end 
+end 
+
+max_value=max(0)
+
+real=101
+print "Program Result",max_value
+print "Real Result" ,real
+
+if max_value==real
+	print "Program Ok"
+else
+	print "Program Failed"
+end 
+
+

@@ -1,0 +1,21 @@
+func gcd(a,b)
+	if a==0 then return b end 
+	if b==0 then return a end 
+	if a>b then 
+		return $gcd(b,a%b) 
+	else  
+		return $gcd(a,b%a)
+	end 
+end 
+
+a=gcd(100,55)
+real=5
+print "Program Result",a
+print "Real Result",real
+
+if a==real
+	print "Program Ok"
+else 
+	print "Program Failed"
+end 
+
