@@ -1,0 +1,24 @@
+[Description]
+	Gr_GetSymbol(h,s)
+	
+[Gr_GetSymbol]
+	Gr_GetSymbol(h,s):
+		value=h.GetSymbol(s)
+		if Gr_IsExeObject(value):
+			ret=value.Call(h);
+		else
+	 		ret=value;
+		end
+		return ret;
+	end 
+
+[Gr_SetSymbol]
+	Gr_SetSymbol(h,s,v):
+		ret=h.SetSymbol(s,v)
+		return ret
+	end 
+
+
+
+
+

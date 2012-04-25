@@ -1,0 +1,61 @@
+[Description]
+	GrIntance.GetSymbol
+	GrIntance.SetSymbol
+
+
+[GrIntance.GetSymbol]
+	GrInstance.GetSymbol(s):
+
+		#first find it in GrIntance symbol table
+        ret=GrIntance.c_symbols.LookUp(s);
+        if ret!=NULL:
+            return ret;
+        end
+
+		#if symbol not exsit,look up in class.c_template
+        template=GrIntance.g_type.t_class.c_template
+        ret=template.LookUp(s);
+        if ret!=NULL:
+			return ret
+        end
+
+		#finally find it in Object 
+		ret=Object.c_template.LookUp(s);
+		if ret!=NULL:
+			return ret 
+		end 
+
+		# not find it ,raise exception	
+		raise SymbolErr
+		return NULL
+	end
+
+
+[GrIntance.SetSymbol]
+	GrInstance.SetSymbol(s,v):
+		#first find it in GrIntance symbol table
+		ret=GrIntance.c_symbols.ReMap(s,v);
+		if ret==0:
+			return 0
+		end 
+
+		#if symbol not exsit,check it whether belong to instance or not 
+		template=GrIntance.g_type.t_class.c_template
+
+		#if belong 
+		if template.CheckExist(s):
+			GrIntance.c_symbols.Map(s,v);
+			return 0
+		end 
+
+		#becase all symbol in object is readonly,
+		#so no need to check in object
+
+		raise SymbolErr
+		return -1
+	end 
+
+
+
+		
+		
