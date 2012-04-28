@@ -4,5 +4,6 @@ void* Gr_MemAlloc(size_t size);
 void Gr_MemFree(void* ptr);
 
 int GrModule_MemInit();
+int GrModule_MemExit();
 
 #endif 

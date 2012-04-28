@@ -4,8 +4,8 @@
 #include<stdlib.h>
 #include<assert.h>
 
-#define SLOT_SIZE  20
-void* ptr[SLOT_SIZE];
+#define SLOT_SIZE 1000
+int* ptr[SLOT_SIZE]={0};
 
 int main()
 {
@@ -13,14 +13,29 @@ int main()
 	int i=0;
 	int size=0;
 	srand((unsigned int)time(NULL));
-	
+
 	for(i=0;i<SLOT_SIZE;i++)
 	{
-		size=20;
-
+		size=8;
 		ptr[i]=Gr_MemAlloc(size);
+		*(ptr[i])=2;
 		assert(ptr[i]!=NULL);
-		printf("%lu \n",(unsigned long)ptr[i]);
+	}
+	int j=0;
+	while(j<2)
+	{
+		for(i=j%1;i<SLOT_SIZE;i+=2)
+		{
+			Gr_MemFree(ptr[i]);
+		}
+		for(i=j%1;i<SLOT_SIZE;i+=2)
+		{
+			size=8;
+			ptr[i]=Gr_MemAlloc(size);
+			*(ptr[i])=2;
+		}
+		j++;
+
 	}
 	for(i=0;i<SLOT_SIZE;i++)
 	{

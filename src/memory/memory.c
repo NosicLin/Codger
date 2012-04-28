@@ -37,13 +37,14 @@ struct page_header
 	int p_page_idx;
 	short int p_slot_idx;
 	short int p_block_used;
-	short int p_free_pos;
+	unsigned long p_free_pos;
 };
 
 struct slot_header
 {
 	struct list_head s_free_page;
 	struct list_head s_full_page;
+	struct page_header* s_cur;
 	short int s_block_size;
 	short int s_alloc_offset;
 	short int s_block_nu;
@@ -109,75 +110,80 @@ static inline void pages_idx_free(int pos)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-void* slot_alloc(register struct slot_header* s)
+static inline void* slot_alloc(register struct slot_header* s)
 {
-	register struct block_header* ptr;
-	register struct page_header* h=0;
-	int page_idx=0;
-	/* make sure this is free page to alloc */
-	if(list_empty(&s->s_free_page))
+	register void* ptr;
+	register struct page_header* cur;
+	int page_idx;
+	if(s->s_cur==NULL)
 	{
-		h=(struct page_header*)Gr_AllocPage();
-		if(h==NULL)
+		register struct page_header* h;
+
+		/* make sure this is free page to alloc */
+		if(list_empty(&s->s_free_page))
 		{
-			return NULL;
+			h=(struct page_header*)Gr_AllocPage();
+			if(h==NULL)
+			{
+				return NULL;
+			}
+			page_idx=pages_idx_alloc((void*)h);
+			if(page_idx<0)
+			{
+				Gr_FreePage(h);
+				return NULL;
+			}
+
+			/* init page_header */ 
+			memset(h,0,sizeof(*h));
+
+			h->p_slot_idx=(s-slots);
+			h->p_page_idx=page_idx;
+			h->p_free_pos=(unsigned long)h+s->s_alloc_offset;
+			s->s_cur=h;
 		}
-		page_idx=pages_idx_alloc((void*)h);
-		if(page_idx<0)
+		else
 		{
-			Gr_FreePage(h);
-			return NULL;
+
+			s->s_cur=list_entry(s->s_free_page.next,struct page_header,p_link);
+			list_del(&s->s_cur->p_link);
 		}
-
-		/* init page_header */ 
-		memset(h,0,sizeof(*h));
-
-		h->p_slot_idx=(s-slots);
-
-		h->p_page_idx=page_idx;
-
-		list_add(&h->p_link,&s->s_free_page);
-
-		h=0;
 	}
-	/* get the free page*/
-	h=list_entry(s->s_free_page.next,struct page_header,p_link);
+	cur=s->s_cur;
+	assert(cur);
 
 	/* alloc a block from page */
-	if(h->p_free_block)
+	if(cur->p_free_block)
 	{
-		ptr=h->p_free_block;
-		h->p_free_block=ptr->b_next;
+		ptr=cur->p_free_block;
+		cur->p_free_block=((struct block_header*)ptr)->b_next;
 	}
 	else
 	{
-		assert(h->p_free_pos<s->s_block_nu);
-		ptr=(struct block_header*)((unsigned long)h+s->s_alloc_offset+
-					h->p_free_pos++*s->s_block_size);
+		ptr=(void*)cur->p_free_pos;
+		cur->p_free_pos+=s->s_block_size;
 	}
-	h->p_block_used++;
+
+	/*printf("alloc from %lu, pos=%lu,offset=%lu,block_used=%d\n",
+		(unsigned long)cur,(unsigned long)ptr,
+		(unsigned long)ptr-(unsigned long)cur,
+		cur->p_block_used);
+	*/
+
+	cur->p_block_used++;
 
 	/* if all block in page has allocate
 	 * link it to s_full_page
 	 */
 
-	if(h->p_block_used==s->s_block_nu)
+	BUG_ON(cur->p_block_used>s->s_block_nu,
+			"%d>%d,cur=%lu",cur->p_block_used,s->s_block_nu,(unsigned long)cur);
+	if(cur->p_block_used==s->s_block_nu)
 	{
-		list_del(&h->p_link);
-		list_add(&h->p_link,&s->s_full_page);
+		list_add(&cur->p_link,&s->s_full_page);
+		s->s_cur=NULL;
 	}
-	return (void*) ptr;
+	return  ptr;
 }
 
 
@@ -210,6 +216,8 @@ void* Gr_MemAlloc(size_t size)
 
 void Gr_MemFree(void* ptr)
 {
+	assert(!((unsigned long)ptr&GR_MEM_ALIGN_LOW_MASK));
+
 	register struct block_header* b=(struct block_header*)ptr;
 	register struct page_header* h=(struct page_header*)GR_PAGE_ROUND_UPPER(ptr);
 	assert(GR_PAGE_ALIGNED(h));
@@ -224,7 +232,7 @@ void Gr_MemFree(void* ptr)
 	/* if page_idx >=pages_idx_free_pos,
 	 * we can sure it come from c lib heap
 	 */
-	if(page_idx>=pages_idx_free_pos)
+	if(page_idx>=pages_idx_free_pos||page_idx<0)
 	{
 		Gr_Free(ptr);
 		return ;
@@ -238,7 +246,8 @@ void Gr_MemFree(void* ptr)
 		return;
 	}
 
-	assert(h->p_slot_idx<GR_MEM_MAX_SLOT_NU);
+	BUG_ON(h->p_slot_idx>=GR_MEM_MAX_SLOT_NU,"h->p_slot_idx=%d,Max=%d",
+					h->p_slot_idx,GR_MEM_MAX_SLOT_NU);
 
 	s=&slots[h->p_slot_idx];
 
@@ -253,13 +262,29 @@ void Gr_MemFree(void* ptr)
 	}
 
 	h->p_block_used--;
+
+	/*
+	printf("Free %lu,%lu offset=%lu,block_used=%d\n",
+			(unsigned long)h,(unsigned long)ptr,
+			(unsigned long)ptr-(unsigned long)h,
+			h->p_block_used);
+	*/
+
 	b->b_next=h->p_free_block;
+
 	h->p_free_block=b;
 
 	/* if all block in page are free,we free the page to mem_base */
-	if(h->p_block_used==0)
+	if((h->p_block_used==0))
 	{
-		list_del(&h->p_link);
+		if(s->s_cur==h)
+		{
+			s->s_cur=NULL;
+		}
+		else
+		{
+			list_del(&h->p_link);
+		}
 		Gr_FreePage(h);
 		pages_idx_free(page_idx);
 	}
@@ -280,9 +305,21 @@ int GrModule_MemInit()
 		s=&slots[i];
 		INIT_LIST_HEAD(&s->s_free_page);
 		INIT_LIST_HEAD(&s->s_full_page);
+		s->s_cur=NULL;
 		s->s_block_size=(i+1)<<GR_MEM_ALIGN_SHIFT;
 		s->s_alloc_offset=GR_MEM_ROUND_LOWER(sizeof(struct page_header));
 		s->s_block_nu=(GR_PAGE_SIZE-s->s_alloc_offset)/s->s_block_size;
+
+	}
+	return 0;
+}
+
+int GrModule_MemExit()
+{
+	if(pages_idx_array)
+	{
+		Gr_Free(pages_idx_array);
+		pages_idx_array=NULL;
 
 	}
 	return 0;
@@ -292,12 +329,10 @@ int GrModule_MemInit()
 
 
 
-		
 
 
-	
 
-	
+
 
 
 

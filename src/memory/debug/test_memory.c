@@ -16,14 +16,14 @@ int main()
 
 	for(i=0;i<SLOT_SIZE;i++)
 	{
-		size=rand()%256+1;
+		size=rand()%500+1;
 
 		ptr[i]=Gr_MemAlloc(size);
-		*(ptr[i])=1;
+		*(ptr[i])=2;
 		assert(ptr[i]!=NULL);
 	}
 	int j=0;
-	while(j<100)
+	while(j<10)
 	{
 		for(i=j%1;i<SLOT_SIZE;i+=2)
 		{
@@ -31,9 +31,9 @@ int main()
 		}
 		for(i=j%1;i<SLOT_SIZE;i+=2)
 		{
-			size=rand()%256+1;
+			size=rand()%500+1;
 			ptr[i]=Gr_MemAlloc(size);
-			*(ptr[i])=1;
+			*(ptr[i])=2;
 		}
 		j++;
 
@@ -42,6 +42,7 @@ int main()
 	{
 		Gr_MemFree(ptr[i]);
 	}
+	GrModule_MemExit();
 	return 0;
 }
 

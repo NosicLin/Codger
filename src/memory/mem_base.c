@@ -163,8 +163,8 @@ LIST_HEAD(area_page_full_link);
 
 void* Gr_AllocPage()
 {
-	struct area_header* h=0;
-	void* page=0;
+	register struct area_header* h=0;
+	register void* page=0;
 
 	/* if area_page_free_link is empty */
 	/* alloc a area */
@@ -196,12 +196,12 @@ void* Gr_AllocPage()
 	return page;
 }
 
-void Gr_FreePage(void* ptr)
+void Gr_FreePage(register void* ptr)
 {
 
 	assert(GR_PAGE_ALIGNED(ptr));
 
-	struct area_header* h=0;
+	register struct area_header* h=0;
 
 
 	/* travserse area_page_free_link to find page's area */
