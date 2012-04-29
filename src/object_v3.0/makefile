@@ -1,9 +1,8 @@
-PROJECT=memory
-
-SRC=mem_base.c memory.c gc.c
+PROJECT=object
+SRC=hash_table.c robject.c null_object.c  func_object.c \
+	module_object.c
 DEBUG=
-BIN=test_page.c test_memory.c test_memory2.c test_clib.c 
-
+BIN=test_hash.c
 
 
 OBJ_NAME=$(SRC:%.c=%.o) 
@@ -25,14 +24,15 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
-INCLUDE=-I. -I./debug   -I../  
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  \
-
-
+INCLUDE=-I. -I./debug   -I../ 
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug \
+	-L../lib/ -lvm  -lrstd -lrtype -lutility_c  
 
 
 main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
+
+
 
 lib/lib$(PROJECT).a:$(OBJ_NAME_WITH_PATH) ../lib 
 	ar cr $@ $(OBJ_NAME_WITH_PATH)
@@ -43,7 +43,7 @@ lib/lib$(PROJECT)debug.a:$(DEBUG_OBJ_NAME_WITH_PATH)
 
 
 bin/%.exe:obj/%.o lib/lib$(PROJECT).a lib/lib$(PROJECT)debug.a 
-	$(CC) $(FLAGS) -o $@ $< -Xlinker "-(" $(LIB) -Xlinker "-)"
+	$(CC) $(FLAGS) -o $@ $< $(LIB)
 
 obj/%.o:%.c
 	$(CC) $(FLAGS) -c -o $@ $< $(INCLUDE) 
@@ -87,4 +87,3 @@ depend:
 	done
 
 -include .$(PROJECT).dep
-

@@ -4,9 +4,9 @@
 #define GrGc_New(TypeName,type_info) \
 	((TypeName*)__GrGc_New(sizeof(TypeName),type_info))
 
-#define GrGc_HEAP_YONG 1
-#define GrGc_HEAP_OLD 2
-#define GrGc_HEAP_STATIC 3
+#define GrGc_HEAP_YONG (1ul<<0)
+#define GrGc_HEAP_OLD (1ul<<1)
+#define GrGc_HEAP_STATIC (1ul<<2)
 
 #define GrGc_Alloc(TypeName,type_info,flags) \
 	((TypeName*)__GrGc_Alloc(sizeof(TypeName),type_info,flags))
@@ -46,6 +46,9 @@ void* __GrGc_SafeNew(size_t size,struct gr_type_info*);
 void* __GrGc_SafeAlloc(size_t size,struct gr_type_info*);
 
 int GrGc_Collection();
+
+int GrModule_GcInit();
+int GrModule_GcExit();
 
 #endif  /*_GR_MEMORY_GC_H_*/
 
