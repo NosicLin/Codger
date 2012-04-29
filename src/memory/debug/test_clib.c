@@ -15,7 +15,7 @@ int main()
 
 	for(i=0;i<SLOT_SIZE;i++)
 	{
-		size=rand()%500+1;
+		size=rand()%256+1;
 
 		ptr[i]=malloc(size);
 		*(ptr[i])=1;
@@ -32,7 +32,7 @@ int main()
 		}
 		for(i=j%1;i<SLOT_SIZE;i+=2)
 		{
-			size=rand()%500+1;
+			size=rand()%256+1;
 			ptr[i]=malloc(size);
 			*(ptr[i])=1;
 		}

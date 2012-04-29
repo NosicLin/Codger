@@ -1,5 +1,6 @@
 #include"gr_int.h"
 #include<memory/gc.h>
+#include<memory/memory.h>
 #include<utility_c/marocs.h>
 
 
@@ -9,6 +10,7 @@
 inline GrInt* GrInt_New(long value)
 {
 	GrInt* ret=GrGc_New(GrInt,&Gr_Type_Int);
+
 	if(ret==NULL)
 	{
 		GrMem_ALLOC_INT_ERR;

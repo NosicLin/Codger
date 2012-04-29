@@ -1,8 +1,10 @@
-PROJECT=memory
+PROJECT=object
 
-SRC=gr_int.c
+SRC=gr_int.c gr_object.c
+
 DEBUG=
-BIN=
+
+BIN=int_unit.c
 
 
 
@@ -26,7 +28,7 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../  
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  \
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  -L../lib -lmemory
 
 
 

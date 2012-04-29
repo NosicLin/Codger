@@ -74,14 +74,14 @@ static struct gc_heap* gc_static=__heap+4;
 
 /* two for gc_young,two for old,and one for static */
 
-int gc_heap_enlarge(register struct gc_heap* g)
+static int gc_heap_enlarge(register struct gc_heap* g)
 {
 	/* alloc a page */
 	register struct block_header* h=(struct block_header*)Gr_AllocPage();
 
 	if(h==NULL) return -1;
 	h->b_flags=g->g_flags;
-	h->b_free_pos=GC_BLOCK_HEADER_NEED;
+	h->b_free_pos=(size_t)h+GC_BLOCK_HEADER_NEED;
 	h->b_max_pos=(size_t)h+GC_BLOCK_SIZE;
 
 	/* link to g->g_blocks */
@@ -157,5 +157,30 @@ void* __GrGc_Alloc(size_t size,struct gr_type_info* info,long flags)
 	return NULL;
 }
 
+int GrModule_GcInit()
+{
+	int i=0;
+	struct gc_heap* g;
+	for(g=__heap;i<5;i++,g++)
+	{
+		INIT_LIST_HEAD(&g->g_blocks);
+		g->g_cur=0;
+		g->g_obs_nu=0;
+		if(gc_heap_enlarge(g)<0)
+		{
+			return -1;
+		}
+	}
+	__heap[0].g_flags=GrGc_HEAP_YONG;
+	__heap[1].g_flags=GrGc_HEAP_YONG;
+	__heap[2].g_flags=GrGc_HEAP_OLD;
+	__heap[3].g_flags=GrGc_HEAP_OLD;
+	__heap[4].g_flags=GrGc_HEAP_STATIC;
+	return 0;
+}
 
-
+int GrModule_GcExit()
+{
+	/*TODO*/
+	return 0;
+}
