@@ -1,10 +1,10 @@
 PROJECT=object
 
-SRC=gr_int.c gr_object.c
+SRC=gr_int.c gr_object.c gr_hash.c gr_array.c
 
 DEBUG=
 
-BIN=int_unit.c
+BIN=int_unit.c hash_unit.c array_unit.c
 
 
 

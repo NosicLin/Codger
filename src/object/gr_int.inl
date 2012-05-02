@@ -1,6 +1,6 @@
 #ifndef GR_OBJECT_GR_INT_INL_
 #define GR_OBJECT_GR_INT_INL_
-#include<vm/except.h>
+#include<engine/except.h>
 #include<stdio.h>
 static inline GrInt* GrInt_Positive(GrInt* gi)
 {
@@ -144,5 +144,9 @@ static inline int GrInt_Verify(GrObject* gr)
 	return 0;
 }
 
+static inline long GrInt_GetValue(GrInt* gi)
+{
+	return gi->i_value;
+}
 
 #endif 

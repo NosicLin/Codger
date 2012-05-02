@@ -39,7 +39,7 @@ void GrInt_Init(GrInt*,long value);
 GrInt* GrInt_New(long value);
 GrInt* GrInt_FromStr(const char* str);
 
-long GrInt_GetValue(GrInt*);
+static inline long GrInt_GetValue(GrInt* gi);
 
 /* type cast */
 /*

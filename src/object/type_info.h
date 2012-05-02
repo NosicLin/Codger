@@ -25,7 +25,10 @@ typedef int (*GrBoolFunc)(GrObject*);
 typedef ssize_t (*GrHashFunc)(GrObject*);
 typedef GrObject* (*GrNewFunc)(GrObject*);
 typedef int (*GrPrintFunc)(GrObject*,FILE*);
+typedef int (*GrSetItemFunc)(GrObject*,GrObject*,GrObject*);
+typedef GrObject* (*GrGetItemFunc)(GrObject*,GrObject*);
 
+typedef int (*GrDestructFunc)(GrObject*);
 struct gr_type_ops
 {
 	struct gr_operator_ops* t_operator;
@@ -33,6 +36,7 @@ struct gr_type_ops
 	struct gr_type_cast* t_type_cast;
 
 	GrHashFunc t_hash;
+	GrCmpFunc t_rich_eq;
 
 	GrPrintFunc t_print;
 
@@ -45,7 +49,7 @@ struct gr_type_ops
 
 	GrNewFunc t_new;
 
-	int (*t_destruct)(GrObject*);
+	GrDestructFunc t_destruct;
 };
 typedef struct gr_type_ops GrTypeOps;
 
@@ -53,8 +57,8 @@ typedef struct gr_type_ops GrTypeOps;
 
 struct gr_operator_ops 
 {
-	int (*t_set_item)(GrObject*,GrObject*,GrObject*);
-	GrObject* (*t_get_item)(GrObject*,GrObject*);
+	GrSetItemFunc t_set_item;
+	GrGetItemFunc t_get_item;
 
 	GrUnaryFunc t_negative;
 	GrUnaryFunc t_positive;

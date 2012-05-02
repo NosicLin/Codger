@@ -5,7 +5,7 @@
 
 
 #define GrMem_ALLOC_INT_ERR \
-		GrMem_ErrFormat("Can't Alloc Memory For Int Object")
+		GrErr_MemFormat("Can't Alloc Memory For Int Object")
 
 inline GrInt* GrInt_New(long value)
 {
@@ -130,6 +130,16 @@ static int int_cmp(GrObject* l,GrObject* r)
 	return GR_CMP_NOT_SUPPORT;
 }
 
+static int int_rich_eq(GrObject* l,GrObject* r)
+{
+	if(GrInt_Verify(r))
+	{
+		return GR_TO_I(l)->i_value==GR_TO_I(r)->i_value;
+	}
+	return GR_CMP_NOT_SUPPORT;
+}
+
+
 
 static struct gr_operator_ops int_operator_ops=
 {
@@ -161,6 +171,7 @@ static struct gr_type_ops int_type_ops=
 	.t_operator=&int_operator_ops,
 	.t_hash=(GrHashFunc)GrInt_Hash,
 	.t_print=(GrPrintFunc)GrInt_Print,
+	.t_rich_eq=int_rich_eq,
 };
 
 struct gr_type_info Gr_Type_Int=
@@ -177,6 +188,7 @@ static struct gr_type_ops bool_type_ops=
 	.t_operator=&int_operator_ops,
 	.t_hash=(GrHashFunc)GrInt_Hash,
 	.t_print=(GrPrintFunc)GrBool_Print,
+	.t_rich_eq=int_rich_eq,
 };
 struct gr_type_info Gr_Type_Bool=
 {

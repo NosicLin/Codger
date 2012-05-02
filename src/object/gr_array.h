@@ -1,0 +1,75 @@
+#ifndef _CODGER_OBJECT_ARRAY_H_
+#define _CODGER_OBJECT_ARRAY_H_
+#include"gr_object.h"
+#include<assert.h>
+#define GR_ARRAY_SMALL_SIZE 12
+
+#define GR_ARRAY_DEBUG
+struct gr_array
+{
+	INHERIT_GROBJECT;
+	ssize_t a_cap;
+	ssize_t a_size;
+	long a_flags;
+	struct gr_object** a_objects;
+	struct gr_object* a_small_objects[GR_ARRAY_SMALL_SIZE];
+};
+
+typedef struct gr_array GrArray;
+extern GrTypeInfo Gr_Type_Array;
+
+
+GrArray* GrArray_New();
+GrArray* GrArray_NewWithSize(ssize_t size);
+
+int GrArray_Init(GrArray*);
+int GrArray_Resize(GrArray*);
+
+int GrArray_Push(GrArray*,GrObject* item);
+GrObject* GrArray_Pop(GrArray*);
+
+int GrArray_Set(GrArray*,ssize_t index,GrObject* item);
+GrObject* GrArray_Get(GrArray*,ssize_t index);
+
+int GrArray_Insert(GrArray*,ssize_t index,GrObject* item);
+int GrArray_Remove(GrArray*,ssize_t index);
+
+GrArray* GrArray_Plus(GrArray* ,GrArray*);
+
+static inline ssize_t GrArray_Size(GrArray* ga)
+{
+	return ga->a_size;
+}
+
+int GrArray_Bool(GrArray*);
+int GrArray_Print(GrArray*,FILE* f);
+
+static inline int GrArray_Verify(GrObject* ga)
+{
+	return  ga->g_type==&Gr_Type_Array;
+}
+
+
+
+#ifdef GR_ARRAY_DEBUG
+static inline GrArray* GR_TO_A(GrObject* g)
+{
+	assert(GrArray_Verify(g));
+	return (GrArray*)g;
+}
+static inline GrObject* A_TO_GR(GrArray* g)
+{
+	return (GrObject*) g;
+}
+#else 
+
+#define GR_TO_A(x) ((GrArray*)(x))
+#define GA_TO_R(x) ((GrObject*)(x))
+
+#endif  /*GR_ARRAY_DEBUG*/
+
+#endif /*_CODGER_OBJECT_ARRAY_H_*/
+
+
+
+
