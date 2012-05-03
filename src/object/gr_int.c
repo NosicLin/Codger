@@ -2,12 +2,88 @@
 #include<memory/gc.h>
 #include<memory/memory.h>
 #include<utility_c/marocs.h>
+#include<string.h>
+
+static int char_to_int(char c)
+{
+	int ret=0;
+	if('0'<=c && c<='9')
+	{
+		ret=c-'0';
+	}
+	else if('a'<=c && c<='f')
+	{
+		ret= c-'a'+10;
+	}
+	else if('A'<=c && c<='F')
+	{
+		ret=c-'A'+10;
+	}
+	else 
+	{
+		/* invalid char */
+		BUG("Error Char(%c)",c);
+		ret=0;
+	}
+	return ret; 
+}
+
+static int str_to_int(const char* str)
+{
+	int len=strlen(str);
+	int base=0;
+	int value=0;
+	assert(len!=0);
+	if(len==1)
+	{
+		BUG_ON(*str<'0'||*str>'9',"Error Str(%s)",str);
+		return *str-'0';
+	}
+	if(*str=='0')
+	{
+		char str_1=*(str+1);
+		if(str_1=='x'||str_1=='X')
+		{
+			base=16;
+			str+=2;
+		}
+		else if (str_1=='b'||str_1=='B')
+		{
+			base=2;
+			str+=2;
+		}
+		else if (str_1=='o'||str_1=='O')
+		{
+			base=8;
+			str+=2;
+		}
+		else 
+		{
+			base=8;
+			str+=1;
+		}
+	}
+	else
+	{
+		base=10;
+	}
+
+	while(*str)
+	{
+		char c_str=*str;
+		int c_value=char_to_int(c_str);
+		value=value*base+c_value;
+		str++;
+	}
+	return value;
+}
+
 
 
 #define GrMem_ALLOC_INT_ERR \
 		GrErr_MemFormat("Can't Alloc Memory For Int Object")
 
-inline GrInt* GrInt_New(long value)
+inline GrInt* GrInt_GcNew(long value)
 {
 	GrInt* ret=GrGc_New(GrInt,&Gr_Type_Int);
 
@@ -19,11 +95,28 @@ inline GrInt* GrInt_New(long value)
 	ret->i_value=value;
 	return ret;
 }
-GrInt* GrInt_FromStr(const char* str)
+inline GrInt* GrInt_GcNewFlag(long value,long flags)
 {
-	TODO("Transate String To GrInt Object");
-	GrMem_ALLOC_INT_ERR;
-	return NULL;
+	GrInt* ret=GrGc_Alloc(GrInt,&Gr_Type_Int,flags);
+
+	if(ret==NULL)
+	{
+		GrMem_ALLOC_INT_ERR;
+		return  NULL;
+	}
+	ret->i_value=value;
+	return ret;
+}
+
+GrInt* GrInt_GcNewFromStr(const char* str)
+{
+	long val=str_to_int(str);
+	return GrInt_GcNew(val);
+}
+GrInt* GrInt_GcNewFromStrFlag(const char* str,long flags)
+{
+	long val=str_to_int(str);
+	return GrInt_GcNewFlag(val,flags);
 }
 
 /*

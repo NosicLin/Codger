@@ -1,6 +1,7 @@
 PROJECT=object
 
-SRC=gr_int.c gr_object.c gr_hash.c gr_array.c
+SRC=gr_int.c gr_object.c gr_hash.c gr_array.c gr_string.c \
+	gr_opcode.c gr_scope.c gr_module.c
 
 DEBUG=
 

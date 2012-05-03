@@ -8,9 +8,9 @@
 struct gr_array
 {
 	INHERIT_GROBJECT;
+	long a_flags;
 	ssize_t a_cap;
 	ssize_t a_size;
-	long a_flags;
 	struct gr_object** a_objects;
 	struct gr_object* a_small_objects[GR_ARRAY_SMALL_SIZE];
 };
@@ -19,8 +19,9 @@ typedef struct gr_array GrArray;
 extern GrTypeInfo Gr_Type_Array;
 
 
-GrArray* GrArray_New();
-GrArray* GrArray_NewWithSize(ssize_t size);
+GrArray* GrArray_GcNew();
+GrArray* GrArray_GcNewFlag(long);
+GrArray* GrArray_GcNewWithSize(ssize_t size);
 
 int GrArray_Init(GrArray*);
 int GrArray_Resize(GrArray*);

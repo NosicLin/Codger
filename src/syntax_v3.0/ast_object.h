@@ -1,12 +1,12 @@
 #ifndef _CODGER_SYNTAX_AST_OBJECT_H_
 #define _CODGER_SYNTAX_AST_OBJECT_H_
 #include<utility_c/list_head.h>
-#include<object/gr_opcode.h>
-#include<object/gr_module.h>
+#include<vm/op_code.h>
+#include<object/module_object.h>
 #include<utility_c/marocs.h>
 
 #define AST_DEBUG
-struct ast_type_info;
+struct ast_node_type;
 
 #define AST_FLAGS_TO_OPCODE 0x1
 
@@ -23,46 +23,46 @@ struct ast_object
 	struct list_head a_link;
 
 	/* node type */
-	struct ast_type_info* a_type;
+	struct ast_node_type* a_type;
 };
 typedef struct ast_object AstObject;
-#include"ast_type_info.h"
+#include"node_type.h"
 
 #define INHERIT_AST_OBJECT struct ast_object ast_base
 #define TO_ASTOBJECT(node) ((AstObject*)node)
 
-#define AstNode_New(type_object) \
+#define ast_node_new(type_object) \
    	((AstObject*)__ast_node_new(sizeof(AstObject),type_object))
 
 /*interface*/
-void AstTree_Free(AstObject* root);
-void AstNode_Free(AstObject* node);
-void AstObject_Init(AstObject* ab,struct ast_type_info* node_type);
-void* __ast_node_new(ssize_t size,struct ast_type_info* node_type);
+void ast_tree_free(AstObject* root);
+void ast_node_free(AstObject* node);
+void ast_init(AstObject* ab,struct ast_node_type* node_type);
+void* __ast_node_new(ssize_t size,struct ast_node_type* node_type);
 
-#define AstNode_NewType(Type,type_object) \
+#define ast_node_new_type(Type,type_object) \
    	((Type*)__ast_node_new(sizeof(Type),type_object))
 
 
-static inline const char* AstObject_Name(AstObject* ab)
+static inline const char* ast_name(AstObject* ab)
 {
 	return ab->a_type->t_name;
 }
-static inline int AstObject_TypeId(AstObject* ab)
+static inline int ast_typeid(AstObject* ab)
 {
 	return ab->a_type->t_type;
 }
 
 #ifdef AST_DEBUG
 
-#define AstNode_Add(father, chirld) \
+#define ast_node_add(father, chirld) \
 	do{ \
 		assert(father); \
 		assert(chirld); \
 		list_add_tail(&((AstObject*)chirld)->a_sibling,&((AstObject*)father)->a_chirldren); \
 	}while(0)
 #else 
-static inline void AstNode_Add(AstObject* father,AstObject* chirld)
+static inline void ast_node_add(AstObject* father,AstObject* chirld)
 {
 	assert(father);
 	assert(chirld);
@@ -71,7 +71,7 @@ static inline void AstNode_Add(AstObject* father,AstObject* chirld)
 }
 #endif
 
-static inline void AstNode_Del(AstObject* father,AstObject* chirld)
+static inline void ast_node_del(AstObject* father,AstObject* chirld)
 {
 	assert(father);
 	assert(chirld);
@@ -80,9 +80,9 @@ static inline void AstNode_Del(AstObject* father,AstObject* chirld)
 
 
 /* used for generate byte code */
-int Ast_ToOpcode(AstObject* ab,GrModule* m,GrOpcode* op);
-int Ast_ToAssignOpcode(AstObject* ab,GrModule* m,GrOpcode* op);
-GrModule* Ast_ToModule(AstObject* root);
+int ast_to_opcode(AstObject* ab,ModuleObject* m,OpCode* op);
+int ast_to_assign_opcode(AstObject* ab,ModuleObject* m,OpCode* op);
+ModuleObject* ast_to_module(AstObject* root);
 
 
 
@@ -95,14 +95,14 @@ GrModule* Ast_ToModule(AstObject* root);
  */ 
 
 /* success,break the list*/
-void AstPending_Clear();
+void ast_clear_pending();
 /* failed traversal and free*/
-void AstPending_Free();
+void ast_free_pending();
 /* and a new ast_object to list pending_ast_object */
-void AstPending_Add(AstObject*);
+void ast_addto_pending(AstObject*);
 
 
-extern AstTypeInfo Ast_Type_Normal;
+AstNodeType node_normal;
 
 #define AST_MEM_FAILED -2
 
@@ -133,7 +133,7 @@ extern AstTypeInfo Ast_Type_Normal;
 #define CHECK_NODE_TYPE(node,type) do{}while(0)
 #endif  /*AST_DEBUG*/
 
-static inline void AstNode_GetSub3(AstObject* ab,AstObject** sub1,AstObject** sub2,AstObject** sub3)
+static inline void ast_node_getsub3(AstObject* ab,AstObject** sub1,AstObject** sub2,AstObject** sub3)
 {
 	struct list_head* s1=(&ab->a_chirldren)->next;
 	struct list_head* s2=s1->next;
@@ -143,7 +143,7 @@ static inline void AstNode_GetSub3(AstObject* ab,AstObject** sub1,AstObject** su
 	*sub2=list_entry(s2,AstObject,a_sibling);
 	*sub3=list_entry(s3,AstObject,a_sibling);
 }
-static inline void AstNode_GetSub2(AstObject* ab,AstObject** sub1,AstObject** sub2)
+static inline void ast_node_getsub2(AstObject* ab,AstObject** sub1,AstObject** sub2)
 {
 	struct list_head* s1=(&ab->a_chirldren)->next;
 	struct list_head* s2=s1->next;
@@ -151,13 +151,13 @@ static inline void AstNode_GetSub2(AstObject* ab,AstObject** sub1,AstObject** su
 	*sub1=list_entry(s1,AstObject,a_sibling);
 	*sub2=list_entry(s2,AstObject,a_sibling);
 }
-static inline void AstNode_GetSub1(AstObject* ab,AstObject** sub1)
+static inline void ast_node_getsub1(AstObject* ab,AstObject** sub1)
 {
 	struct list_head* l_left=(&ab->a_chirldren)->next;
 	*sub1=list_entry(l_left,AstObject,a_sibling);
 }
 
-static inline int AstObject_CanAssign(AstObject* ab)
+static inline int ast_check_can_assign(AstObject* ab)
 {
 	if(ab->a_type->t_to_assign_opcode)
 	{

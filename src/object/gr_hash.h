@@ -40,7 +40,8 @@ extern GrTypeInfo Gr_Type_Hash;
  * call GrHash_Destruct() interface ,and free it to where it come from 
  */
 
-GrHash* GrHash_New();
+GrHash* GrHash_GcNew();
+GrHash* GrHash_GcNewFlag(long);
 int GrHash_Init();
 
 int GrHash_Map(GrHash* h,GrObject* key,GrObject* value);

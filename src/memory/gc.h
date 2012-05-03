@@ -1,12 +1,17 @@
 #ifndef _GR_MEMORY_GC_H_
 #define _GR_MEMORY_GC_H_
 
+
 #define GrGc_New(TypeName,type_info) \
 	((TypeName*)__GrGc_New(sizeof(TypeName),type_info))
 
-#define GrGc_HEAP_YONG (1ul<<0)
+#define GrGc_HEAP_YOUNG (1ul<<0)
 #define GrGc_HEAP_OLD (1ul<<1)
 #define GrGc_HEAP_STATIC (1ul<<2)
+
+#define GRGC_HEAP_YOUNG GrGc_HEAP_YOUNG 
+#define GRGC_HEAP_OLD GrGc_HEAP_OLD 
+#define GRGC_HEAP_STATIC GrGc_HEAP_STATIC
 
 #define GrGc_Alloc(TypeName,type_info,flags) \
 	((TypeName*)__GrGc_Alloc(sizeof(TypeName),type_info,flags))

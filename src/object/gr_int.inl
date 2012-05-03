@@ -9,19 +9,19 @@ static inline GrInt* GrInt_Positive(GrInt* gi)
 static inline GrInt* GrInt_Negative(GrInt* gi)
 {
 	long val=-gi->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 
 }
 static inline GrInt* GrInt_Negated(GrInt* gi)
 {
 	long val=~gi->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline GrInt* GrInt_Mul(GrInt* l,GrInt* r)
 {
 	long val=l->i_value*r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 
@@ -34,7 +34,7 @@ static inline GrInt* GrInt_Div(GrInt* l,GrInt* r)
 		return NULL;
 	}
 	long val=l->i_value/r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline GrInt* GrInt_Mod(GrInt* l,GrInt* r)
@@ -45,17 +45,17 @@ static inline GrInt* GrInt_Mod(GrInt* l,GrInt* r)
 		return NULL;
 	}
 	long val=l->i_value%r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 static inline GrInt* GrInt_Plus(GrInt* l,GrInt* r)
 {
 	long val=l->i_value+r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 static inline GrInt* GrInt_Minus(GrInt* l,GrInt* r)
 {
 	long val=l->i_value-r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline GrInt* GrInt_LShift(GrInt* l ,GrInt* r)
@@ -66,7 +66,7 @@ static inline GrInt* GrInt_LShift(GrInt* l ,GrInt* r)
 		return NULL;
 	}
 	long val=l->i_value<<r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline GrInt* GrInt_RShift(GrInt* l,GrInt* r)
@@ -77,23 +77,23 @@ static inline GrInt* GrInt_RShift(GrInt* l,GrInt* r)
 		return NULL;
 	}
 	long val=l->i_value>>r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 static inline GrInt* GrInt_And(GrInt* l,GrInt* r)
 {
 	long val=l->i_value&r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline GrInt* GrInt_Xor(GrInt* l,GrInt* r)
 {
 	long val=l->i_value^r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 static inline GrInt* GrInt_Or(GrInt* l,GrInt* r)
 {
 	long val=l->i_value|r->i_value;
-	return GrInt_New(val);
+	return GrInt_GcNew(val);
 }
 
 static inline int GrInt_Cmp(GrInt* l,GrInt* r)

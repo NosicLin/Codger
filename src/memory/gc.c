@@ -6,6 +6,26 @@
 #include"utility_c/list_head.h"
 
 
+//#define  GRGC_MEM_TOOL_DEBUG
+
+#ifdef GRGC_MEM_TOOL_DEBUG 
+void* __GrGc_New(size_t size,struct gr_type_info* info)
+{
+	void* ptr=GrMem_Alloc(size);
+	((GrObject*)ptr)->g_type=info;
+	return ptr;
+}
+
+void* __GrGc_Alloc(size_t size,struct gr_type_info* info,long flags)
+{
+	return __GrGc_New(size,info);
+}
+int GrModule_GcInit(){return 1;}
+int GrModule_GcExit(){return 1;}
+
+
+#else 
+
 #define GC_BLOCK_SIZE GR_PAGE_SIZE
 
 #define GC_ADDR_SHIFT 3
@@ -16,7 +36,6 @@
 #define GC_BLOCK_HEADER_NEED GC_ROUND_ADDR(sizeof(struct block_header))
 
 #define GC_MAX_ALLOC_SIZE (GR_PAGE_SIZE-GC_BLOCK_HEADER_NEED)
-
 
 void* __GrGc_New(size_t size,struct gr_type_info*);
 void* __GrGc_Alloc(size_t size,struct gr_type_info*,long flags);
@@ -41,6 +60,35 @@ struct gc_heap
 	struct block_header* g_cur;
 	int g_obs_nu;
 };
+
+
+#if 0
+static void gc_block_header_print(struct block_header* b)
+{
+	printf("@block_header\n{\n");
+	printf("\tflags=");
+	if(b->b_flags&GrGc_HEAP_YOUNG)
+	{
+		printf("GrGc_HEAP_YOUNG");
+	}
+	if(b->b_flags&GrGc_HEAP_OLD)
+	{
+		printf("GRGC_HEAP_OLD");
+	}
+	if(b->b_flags&GRGC_HEAP_STATIC)
+	{
+		printf("GRGC_HEAP_STATIC");
+	}
+	printf("\n");
+
+	printf("\tbegin_ops=%lx\n",(long)b);
+	printf("\tfree_pos=%lx\n",(long)(b->b_free_pos));
+	printf("\tmax_pos=%lx\n",(long)(b->b_max_pos));
+	printf("}\n");
+}
+#endif 
+
+
 
 
 /* garbage collection heap,total three generation: young,old and static 
@@ -113,7 +161,9 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 	if(free_pos<=cur->b_max_pos)
 	{
 		cur->b_free_pos=free_pos;
-		*(struct gr_type_info**)ptr=info;
+		//gc_block_header_print(cur);
+		//printf(" %s alloc from %lx,size=%x\n",info->t_name,(long)ptr,alloc_size);
+		((GrObject*)ptr)->g_type=info;
 		return (void*)ptr;
 	}
 	else  /* enlarge heap */
@@ -128,7 +178,10 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 	cur=g->g_cur;
 	ptr=cur->b_free_pos;
 	cur->b_free_pos=GC_ROUND_ADDR(ptr+alloc_size);
-	*(struct gr_type_info**)ptr=info;
+
+	//gc_block_header_print(cur);
+	//printf(" %s alloc from %lx,size=%x\n",info->t_name,(long)ptr,alloc_size);
+	((GrObject*)ptr)->g_type=info;
 	return (void*)ptr;
 }
 
@@ -138,27 +191,39 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 
 void* __GrGc_New(size_t size,struct gr_type_info* info)
 {
-	return gc_heap_alloc(gc_young,info);
+	assert(size==info->t_size);
+	void* ptr=gc_heap_alloc(gc_young,info);
+	return ptr;
 }
 
 void* __GrGc_Alloc(size_t size,struct gr_type_info* info,long flags)
 {
+	assert(size==info->t_size);
+	void* ptr=0;
 	switch(flags)
 	{
-		case GrGc_HEAP_YONG:
-			return gc_heap_alloc(gc_young,info);
+		case GrGc_HEAP_YOUNG:
+			ptr=gc_heap_alloc(gc_young,info);
+			break;
 		case GrGc_HEAP_OLD:
-			return gc_heap_alloc(gc_old,info);
+			ptr=gc_heap_alloc(gc_old,info);
+			break;
 		case GrGc_HEAP_STATIC:
-			return gc_heap_alloc(gc_static,info);
+			ptr=gc_heap_alloc(gc_static,info);
+			break;
+		default:
+			BUG("UnKown Flags");
 	}
-
-	BUG("UnKown Flags");
-	return NULL;
+	return ptr;
 }
 
 int GrModule_GcInit()
 {
+	__heap[0].g_flags=GrGc_HEAP_YOUNG;
+	__heap[1].g_flags=GrGc_HEAP_YOUNG;
+	__heap[2].g_flags=GrGc_HEAP_OLD;
+	__heap[3].g_flags=GrGc_HEAP_OLD;
+	__heap[4].g_flags=GrGc_HEAP_STATIC;
 	int i=0;
 	struct gc_heap* g;
 	for(g=__heap;i<5;i++,g++)
@@ -171,11 +236,6 @@ int GrModule_GcInit()
 			return -1;
 		}
 	}
-	__heap[0].g_flags=GrGc_HEAP_YONG;
-	__heap[1].g_flags=GrGc_HEAP_YONG;
-	__heap[2].g_flags=GrGc_HEAP_OLD;
-	__heap[3].g_flags=GrGc_HEAP_OLD;
-	__heap[4].g_flags=GrGc_HEAP_STATIC;
 	return 0;
 }
 
@@ -184,3 +244,6 @@ int GrModule_GcExit()
 	/*TODO*/
 	return 0;
 }
+
+#endif /* GR_MEM_TOOL_DEBUG*/
+

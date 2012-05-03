@@ -7,9 +7,10 @@
 
 #define GR_ARRAY_FLAG_PRINT 0x1l
 
-static inline GrArray* ga_malloc()
+static inline GrArray* ga_malloc(long flags)
 {
-	GrArray* ga=GrGc_New(GrArray,&Gr_Type_Array);
+	GrArray* ga=GrGc_Alloc(GrArray,&Gr_Type_Array,flags);
+//	printf("array address=%lx\n",(long)ga);
 	if(ga==NULL)
 	{
 		GrErr_MemFormat("Can't Alloc Memory For Array Object");
@@ -86,23 +87,27 @@ static  inline int ga_outof_range(GrArray* ga,ssize_t index)
 	}
 }
 
-GrArray* GrArray_New()
+GrArray* GrArray_GcNew()
 {
-	GrArray* ga=ga_malloc();
+	GrArray* ga=ga_malloc(GRGC_HEAP_YOUNG);
+	if(ga==NULL) return NULL;
+
+	ga_init(ga,0);
+	return ga;
+}
+GrArray* GrArray_GcNewFlag(long flags)
+{
+	GrArray* ga=ga_malloc(flags);
 	if(ga==NULL) return NULL;
 
 	ga_init(ga,0);
 	return ga;
 }
 
-GrArray* GrArray_NewWithSize(ssize_t size)
+GrArray* GrArray_GcNewWithSize(ssize_t size)
 {
 	int ret;
-	if(size<GR_ARRAY_SMALL_SIZE)
-	{
-		size=GR_ARRAY_SMALL_SIZE;
-	}
-	GrArray* ga=ga_malloc();
+	GrArray* ga=ga_malloc(GRGC_HEAP_YOUNG);
 	if(ga==NULL) return NULL;
 
 	ret=ga_init(ga,size);
@@ -116,12 +121,15 @@ GrArray* GrArray_NewWithSize(ssize_t size)
 
 int GrArray_Init(GrArray* ga)
 {
-	return ga_init(ga,GR_ARRAY_SMALL_SIZE);
+	return ga_init(ga,0);
 }
 
 int GrArray_Push(GrArray* ga,GrObject* item)
 {
+	BUG_ON(ga->a_size>ga->a_cap,"ga->a_size=%d,ga->a_cap=%d",
+								ga->a_size,ga->a_cap);
 	int ret;
+
 	if(ga->a_size==ga->a_cap)
 	{
 		size_t enlarged=ga->a_cap*2;
@@ -251,7 +259,7 @@ GrArray* GrArray_Plus(GrArray* x ,GrArray* y)
 		return NULL;
 	}
 
-	m=GrArray_NewWithSize(m_size);
+	m=GrArray_GcNewWithSize(m_size);
 	if(m==NULL)
 	{
 		return NULL;

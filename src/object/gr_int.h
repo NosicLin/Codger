@@ -21,7 +21,6 @@ extern GrInt* Gr_True;
 
 
 
-void GrInt_Init(GrInt*,long value);
 
 /* all return value memory come from gc, you can't free it 
  *
@@ -36,8 +35,13 @@ void GrInt_Init(GrInt*,long value);
  * or temporary compute. it will never access from out side,
  * 
  */
-GrInt* GrInt_New(long value);
-GrInt* GrInt_FromStr(const char* str);
+GrInt* GrInt_GcNew(long value);
+GrInt* GrInt_GcNewFlag(long value,long flags);
+
+GrInt* GrInt_GcNewFromStr(const char* str);
+GrInt* GrInt_GcNewFromStrFlag(const char* str,long flags);
+
+void GrInt_Init(GrInt*,long value);
 
 static inline long GrInt_GetValue(GrInt* gi);
 

@@ -11,8 +11,8 @@ int GrObject_Cmp(GrObject*,GrObject*,int op);
 int GrObject_RichEq(GrObject* x,GrObject* y)
 {
 	int ret;
-	GrTypeInfo* t_x=x->g_type;
-	GrTypeInfo* t_y=y->g_type;
+	GrTypeInfo* t_x=GrObject_Type(x);
+	GrTypeInfo* t_y=GrObject_Type(y);
 	if(t_x->t_ops->t_rich_eq!=0)
 	{
 		ret=t_x->t_ops->t_rich_eq(x,y);
@@ -38,7 +38,7 @@ int GrObject_RichEq(GrObject* x,GrObject* y)
 ssize_t GrObject_Hash(GrObject* x)
 {
 	assert(x);
-	GrTypeInfo* t_x=x->g_type;
+	GrTypeInfo* t_x=GrObject_Type(x);
 	ssize_t ret;
 	if(t_x->t_ops->t_hash!=0)
 	{
@@ -66,7 +66,7 @@ ssize_t GrObject_NotSupportHash(GrObject* x)
 }
 int GrObject_Print(GrObject* x,FILE* f,long flags)
 {
-	GrTypeInfo* t_x=x->g_type;
+	GrTypeInfo* t_x=GrObject_Type(x);
 	int ret=0;
 	if(t_x->t_ops->t_print!=0)
 	{
@@ -103,13 +103,16 @@ int GrObject_Print(GrObject* x,FILE* f,long flags)
 
 const char* GrObject_Name(GrObject* x)
 {
-	return x->g_type->t_name;
+	return GrObject_Type(x)->t_name;
 }
 	
 
 
 
-
+struct gr_type_ops GR_TYPE_OPS_NOT_SUPPORT=
+{
+	
+};
 
 
 

@@ -1,32 +1,44 @@
 #include"ast_object.h"
 #include<stdlib.h>
 #include<utility_c/marocs.h>
-#include<engine/except.h>
-#include<object/gr_module.h>
-#include<object/gr_opcode.h>
-#include<memory/memory.h>
-#include<memory/gc.h>
+#include<rstd/gr_std.h>
+#include<vm/except.h>
+#include<object/module_object.h>
+#include<vm/op_code.h>
 
 static LIST_HEAD(pending_ast_object);
-
-inline void AstNode_Free(AstObject* ab)
+static inline void __cache_free(AstObject* ab)
 {
-	AstTypeInfo* t=ab->a_type;
+	gr_free(ab);
+}
+static inline AstObject* __cache_alloc(ssize_t size)
+{
+	assert(size>=sizeof(AstObject));
+	AstObject* ao=(AstObject*)gr_malloc(size);
+	if(ao==NULL)
+	{
+		grerr_nomemory();
+		return NULL;
+	}
+	return ao;
+}
+
+inline void ast_node_free(AstObject* ab)
+{
+	AstNodeType* t=ab->a_type;
 	BUG_ON(t==NULL,"Error AstObject");
 	if(t->t_destruct)
 	{
 		t->t_destruct(ab);
 	}
-	GrMem_Free(ab);
+	__cache_free(ab);
 }
 
-void AstPending_Clear()
+void ast_clear_pending()
 {
 	list_del_init(&pending_ast_object);
 }
-
-
-void AstPending_Free()
+void ast_free_pending()
 {
 	AstObject* p=0;
 	struct list_head* cur=0;
@@ -35,36 +47,36 @@ void AstPending_Free()
 		cur=pending_ast_object.next;
 		list_del(cur);
 		p=list_entry(cur,AstObject,a_link);
-		AstNode_Free(p);
+		ast_node_free(p);
 	}
 }
 
-inline void AstPending_Add(AstObject* ab)
+inline void ast_addto_pending(AstObject* ab)
 {
 	list_add_tail(&ab->a_link,&pending_ast_object);
 }
 
-inline void AstObject_Init(AstObject* ab,struct ast_type_info* node_type)
+inline void ast_init(AstObject* ab,struct ast_node_type* node_type)
 {
 	ab->a_flags=0;
 	ab->a_type=node_type;
 	INIT_LIST_HEAD(&ab->a_sibling);
 	INIT_LIST_HEAD(&ab->a_chirldren);
 	INIT_LIST_HEAD(&ab->a_link);
-	AstPending_Add(ab);
+	ast_addto_pending(ab);
 }
 
-void* __ast_node_new(ssize_t size,struct ast_type_info* node_type)
+void* __ast_node_new(ssize_t size,struct ast_node_type* node_type)
 {
-	AstObject* ab=GrMem_Alloc(size);
+	AstObject* ab=__cache_alloc(size);
 	if(ab==NULL)
 	{
 		return NULL;
 	}
-	AstObject_Init(ab,node_type);
+	ast_init(ab,node_type);
 	return ab;
 }
-void AstTree_Free(AstObject* node)
+void ast_tree_free(AstObject* node)
 {
 	struct list_head* head=&node->a_link;
 	AstObject* p;
@@ -74,14 +86,14 @@ void AstTree_Free(AstObject* node)
 		cur=head->next;
 		list_del(cur);
 		p=list_entry(cur,AstObject,a_link);
-		AstNode_Free(p);
+		ast_node_free(p);
 	}
-	AstNode_Free(node);
+	ast_node_free(node);
 }
 
 
 
-AstTypeInfo Ast_Type_Normal=
+AstNodeType node_normal=
 {
 	.t_type=ATN_NORMAL,
 	.t_name="NormalNode",
@@ -89,9 +101,8 @@ AstTypeInfo Ast_Type_Normal=
 
 
 
-int Ast_ToOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
+int ast_to_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 {
-	assert(md&&op);
 	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
 	{
 		BUG("Synatx Tree Maybe Error");
@@ -110,12 +121,12 @@ int Ast_ToOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
 	}
 
 	ab->a_flags|=AST_FLAGS_TO_OPCODE;
-	int ret=ab->a_type->t_to_opcode(ab,md,op,0);
+	int ret=ab->a_type->t_to_opcode(ab,md,op);
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 
 	return ret;
 }
-int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
+int ast_to_assign_opcode(AstObject* ab,ModuleObject* md,OpCode* op)
 {
 	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
 	{
@@ -133,47 +144,38 @@ int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
 		return -1;
 	}
 	ab->a_flags|=AST_FLAGS_TO_OPCODE;
-	int ret=ab->a_type->t_to_assign_opcode(ab,md,op,0);
+	int ret=ab->a_type->t_to_assign_opcode(ab,md,op);
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 	return ret;
 }
 
-GrModule*  Ast_ToModule(AstObject* root)
+ModuleObject*  ast_to_module(AstObject* root)
 {
-	GrModule* md=0;
-	GrOpcode* op=0;
+	ModuleObject* md=0;
+	OpCode* op=0;
 	int ret=0;
-	md=GrModule_GcNewFlag(GRGC_HEAP_OLD);
-	op=GrOpcode_GcNewFlag(GRGC_HEAP_OLD);
-
-	GrString* op_name=GrString_GcNewFlag("module",GRGC_HEAP_OLD);
-	GrArray* op_args_name=GrArray_GcNewFlag(GRGC_HEAP_OLD);
-
-	if(op_name==NULL) goto error;
-	if(op_args_name==NULL) goto error;
-
-
-	GrOpcode_SetArgName(op,op_args_name);
-	GrOpcode_SetName(op,op_name);
-
+	md=module_new();
+	op=op_code_new();
 	if(md==NULL||op==NULL)
 	{
 		goto error;
 	}
-	ret=Ast_ToOpcode(root,md,op);
+	ret=ast_to_opcode(root,md,op);
 	if(ret<0)
 	{
 		goto error;
 	}
-	ret=GrOpcode_NeedMore(op,1);
+	ret=op_code_enlarge_more(op,1);
 	if(ret<0)
 	{
 		goto error;
 	}
-	GrOpcode_Push(op,OP_RETURN);
-	GrModule_SetOpcode(md,op);
+	op_code_push(op,OP_RETURN);
+	module_set_opcode(md,op);
 	return md;
 error:
+	if(md) robject_release(M_TO_R(md));
+	if(op) op_code_free(op);
 	return NULL;
 }
 

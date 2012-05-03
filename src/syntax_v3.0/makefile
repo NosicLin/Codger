@@ -1,16 +1,16 @@
 PROJECT=syntax
 
 SRC=ast_object.c  parser.c yylex.c grammar.tab.c \
-	node_expr.c
+	node_expr.c node_stmts.c
 DEBUG=
-BIN=bytecode.c
+#BIN=test_literal.c codger.c gcheck.c
+BIN=
 
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h  
 INCLUDE=-I. -I./debug   -I../
-
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug \
-	-L../lib/  -lmemory -lobject -lutility_c  -llexical
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
+	-L../lib/ -lrtype -llexical -lvm -lrstd -lobject 
 
 
 
@@ -34,7 +34,6 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 
 
-
 main: obj lib bin $(ALL_OBJ_WITH_PATH) $(BIN_OBJ_NAME_WITH_PATH) \
    	$(BIN_NAME_WITH_PATH)  lib/lib$(PROJECT).a
 
@@ -47,7 +46,7 @@ lib/lib$(PROJECT)debug.a:$(DEBUG_OBJ_NAME_WITH_PATH)
 
 
 bin/%.exe:obj/%.o lib/lib$(PROJECT).a lib/lib$(PROJECT)debug.a 
-	$(CC) $(FLAGS) -o $@ $< -Xlinker "-(" $(LIB) -Xlinker "-)"
+	$(CC) $(FLAGS) -o $@ $< $(LIB)
 
 obj/%.o:%.c
 	$(CC) $(FLAGS) -c -o $@ $< $(INCLUDE) 
@@ -91,4 +90,3 @@ depend:
 	done
 
 -include .$(PROJECT).dep
-

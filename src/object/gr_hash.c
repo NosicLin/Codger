@@ -39,9 +39,9 @@ static inline void ht_set_print(GrHash* h)
 
 
 
-static inline GrHash* ht_malloc()
+static inline GrHash* ht_malloc(long flags)
 {
-	GrHash* h=GrGc_New(GrHash,&Gr_Type_Hash);
+	GrHash* h=GrGc_Alloc(GrHash,&Gr_Type_Hash,flags);
 	if(h==NULL)
 	{
 		GrErr_MemFormat("Can't Alloc Memory For GrHash Object");
@@ -205,9 +205,19 @@ inline int GrHash_Init(GrHash* h)
 	return 0;
 }
 
-GrHash* GrHash_New()
+GrHash* GrHash_GcNew()
 {
-	GrHash* h=ht_malloc();
+	GrHash* h=ht_malloc(GRGC_HEAP_YOUNG);
+	if(h==NULL)
+	{
+		return NULL;
+	}
+	ht_init(h,ht_normal_lookup_func);
+	return h;
+}
+GrHash* GrHash_GcNewFlag(long flags)
+{
+	GrHash* h=ht_malloc(flags);
 	if(h==NULL)
 	{
 		return NULL;

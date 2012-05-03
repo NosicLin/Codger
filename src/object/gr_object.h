@@ -1,6 +1,7 @@
 #ifndef _CODGER_OBJECT_ROBJECT_H_
 #define _CODGER_OBJECT_ROBJECT_H_
 #include<stdio.h>
+#include<assert.h>
 struct gr_type_info;
 
 struct  gr_object 
@@ -22,6 +23,7 @@ static inline GrTypeInfo* GrObject_Type(GrObject* gr)
 
 #define GR_CMP_NOT_SUPPORT -2
 extern GrObject* GR_OPS_NOT_SUPPORT;
+extern struct gr_type_ops GR_TYPE_OPS_NOT_SUPPORT;
 	
 const char* GrObject_Name(GrObject*);
 int GrObject_Cmp(GrObject*,GrObject*,int op);

@@ -9,7 +9,7 @@
 int int_new()
 {
 	long val=rand();
-	GrInt* gs=GrInt_New(val);
+	GrInt* gs=GrInt_GcNew(val);
 	if(gs->i_value!=val)
 	{
 		return 0;
@@ -23,7 +23,7 @@ int int_new()
 int int_positive()
 {
 	long val=rand();
-	GrInt* gs=GrInt_New(val);
+	GrInt* gs=GrInt_GcNew(val);
 	GrInt* gt=GrInt_Positive(gs);
 	if(gt->i_value!=val)
 	{
@@ -38,7 +38,7 @@ int int_positive()
 int int_negative()
 {
 	long val=rand();
-	GrInt* gs=GrInt_New(val);
+	GrInt* gs=GrInt_GcNew(val);
 	GrInt* gt=GrInt_Negative(gs);
 	if(gt->i_value!=-val)
 	{
@@ -53,7 +53,7 @@ int int_negative()
 int int_negated()
 {
 	long val=rand();
-	GrInt* gs=GrInt_New(val);
+	GrInt* gs=GrInt_GcNew(val);
 	GrInt* gt=GrInt_Negated(gs);
 	if(gt->i_value!=~val)
 	{
@@ -70,8 +70,8 @@ int int_mul()
 	long l_val=rand();
 	long r_val=rand();
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Mul(gl,gr);
 
@@ -93,8 +93,8 @@ int int_div_not_zero()
 
 	if(r_val==0) r_val=1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Div(gl,gr);
 
@@ -114,8 +114,8 @@ int int_div_zero()
 	long r_val=0;
 
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Div(gl,gr);
 
@@ -136,8 +136,8 @@ int int_mod_not_zero()
 
 	if(r_val==0) r_val=1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Mod(gl,gr);
 	if(gt->i_value!=l_val%r_val)
@@ -154,8 +154,8 @@ int int_mod_zero()
 	long l_val=rand();
 	long r_val=0;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Mod(gl,gr);
 
@@ -173,8 +173,8 @@ int int_plus()
 {
 	long l_val=rand();
 	long r_val=rand();
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Plus(gl,gr);
 
@@ -193,8 +193,8 @@ int int_minus()
 {
 	long l_val=rand();
 	long r_val=rand();
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Minus(gl,gr);
 	if(gt->i_value!=l_val-r_val)
@@ -213,8 +213,8 @@ int int_lshift_not_negative()
 	long r_val=rand();
 	if(r_val<0) r_val*=-1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_LShift(gl,gr);
 	if(gt->i_value!=l_val<<r_val)
@@ -234,8 +234,8 @@ int int_lshift_negative()
 	long r_val=rand();
 	if(r_val>0) r_val*=-1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_LShift(gl,gr);
 
@@ -256,8 +256,8 @@ int int_rshift_not_negative()
 	long r_val=rand();
 	if(r_val<0) r_val*=-1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_RShift(gl,gr);
 	if(gt->i_value!=l_val>>r_val)
@@ -277,8 +277,8 @@ int int_rshift_negative()
 	long r_val=rand();
 	if(r_val>0) r_val*=-1;
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_RShift(gl,gr);
 
@@ -298,8 +298,8 @@ int int_and()
 	long l_val=rand();
 	long r_val=rand();
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_And(gl,gr);
 	if(gt->i_value!=(l_val&r_val))
@@ -316,8 +316,8 @@ int int_or()
 	long l_val=rand();
 	long r_val=rand();
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Or(gl,gr);
 	if(gt->i_value!=(l_val|r_val))
@@ -335,8 +335,8 @@ int int_xor()
 	long l_val=rand();
 	long r_val=rand();
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	GrInt* gt=GrInt_Xor(gl,gr);
 	if(gt->i_value!=(l_val^r_val))
@@ -355,8 +355,8 @@ int int_cmp()
 	long l_val=rand();
 	long r_val=rand();
 
-	GrInt* gl=GrInt_New(l_val);
-	GrInt* gr=GrInt_New(r_val);
+	GrInt* gl=GrInt_GcNew(l_val);
+	GrInt* gr=GrInt_GcNew(r_val);
 
 	int gt=GrInt_Cmp(gl,gr);
 
@@ -383,7 +383,7 @@ int int_bool()
 		l_val=rand();
 	}
 
-	GrInt* gs=GrInt_New(l_val);
+	GrInt* gs=GrInt_GcNew(l_val);
 	int gt=GrInt_Bool(gs);
 
 	if(gt!=1)
@@ -392,7 +392,7 @@ int int_bool()
 	}
 
 
-	gs=GrInt_New(0);
+	gs=GrInt_GcNew(0);
 
 	gt=GrInt_Bool(gs);
 

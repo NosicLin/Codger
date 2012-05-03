@@ -15,7 +15,7 @@ GrObject* all_value[DEFALULT_SIZE*2];
 
 int test_map_no_exist()
 {
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	int i=0;
 	for(i=0;i<DEFALULT_SIZE;i++)
 	{
@@ -28,7 +28,7 @@ int test_map_no_exist()
 
 int test_find_exist_value()
 {
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	GrObject* key;
 	GrObject* value;
 	int i=0;
@@ -60,7 +60,7 @@ int test_find_exist_value()
 int test_find_no_exist_value()
 {
 	int i=0;
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	GrObject* key;
 	GrObject* value;
 	for(i=0;i<DEFALULT_SIZE;i++)
@@ -91,7 +91,7 @@ int test_find_no_exist_value()
 int test_insert_exist_value()
 {
 	int i=0;
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	GrObject* key;
 	GrObject* value;
 	for(i=0;i<DEFALULT_SIZE;i++)
@@ -128,7 +128,7 @@ int test_del_exist_item()
 {
 	int i=0;
 	int ret;
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	GrObject* key;
 	GrObject* value;
 	for(i=0;i<DEFALULT_SIZE;i++)
@@ -175,7 +175,7 @@ int test_del_no_exist_item()
 
 	int i=0;
 	int ret=0;
-	GrHash* h=GrHash_New();
+	GrHash* h=GrHash_GcNew();
 	GrObject* key;
 	GrObject* value;
 	for(i=0;i<DEFALULT_SIZE;i++)
@@ -251,8 +251,8 @@ int main(int argc,char** argv)
 
 	for(;i<DEFALULT_SIZE*2;i++)
 	{
-		all_keys[i]=(GrObject*)GrInt_New(i);
-		all_value[i]=(GrObject*)GrInt_New(i*10);
+		all_keys[i]=(GrObject*)GrInt_GcNew(i);
+		all_value[i]=(GrObject*)GrInt_GcNew(i*10);
 	}
 
 	Func_Test(test_map_no_exist);

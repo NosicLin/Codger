@@ -6,7 +6,7 @@
 int test_set_and_get_item()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
@@ -17,7 +17,7 @@ int test_set_and_get_item()
 	}
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 
 		c_i=0;
@@ -61,14 +61,14 @@ error:
 int test_get_no_exist_item()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	/* set array value*/
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -95,14 +95,14 @@ error:
 int test_push_back_item()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_New();
+	GrArray* array=GrArray_GcNew();
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	/* push back item */
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Push(array,I_TO_GR(c_i));
 		c_i=NULL;
 		if(r<0)
@@ -144,13 +144,13 @@ error:
 int test_insert_front()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_New();
+	GrArray* array=GrArray_GcNew();
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Insert(array,0,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -205,14 +205,14 @@ error:
 int test_insert_tail()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_New();
+	GrArray* array=GrArray_GcNew();
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Insert(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -267,14 +267,14 @@ error:
 int test_insert_middle()
 {
 	int array_size=1000;
-	GrArray* array=GrArray_New();
+	GrArray* array=GrArray_GcNew();
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int pos=i/2;
 		int r=GrArray_Insert(array,pos,I_TO_GR(c_i));
 		c_i=0;
@@ -343,14 +343,14 @@ int test_remove_front()
 {
 
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	/* set array item from 0 to array_size-1 */
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -400,14 +400,14 @@ int test_remove_tail()
 {
 
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	/* set array item from 0 to array_size-1 */
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -456,14 +456,14 @@ int test_remove_middle()
 {
 
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	/* set array item from 0 to array_size-1 */
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -527,13 +527,13 @@ int test_remove_no_exist_item()
 {
 
 	int array_size=1000;
-	GrArray* array=GrArray_NewWithSize(array_size);
+	GrArray* array=GrArray_GcNewWithSize(array_size);
 	GrInt* c_i=0;
 	int ret=1;
 	int i;
 	for(i=0;i<array_size;i++)
 	{
-		c_i=GrInt_New(i);
+		c_i=GrInt_GcNew(i);
 		int r=GrArray_Set(array,i,I_TO_GR(c_i));
 		c_i=0;
 		if(r<0)
@@ -559,8 +559,8 @@ error:
 int test_plus_two_array()
 {
 	int array_size=1000;
-	GrArray* x=GrArray_NewWithSize(array_size);
-	GrArray* y=GrArray_NewWithSize(array_size);
+	GrArray* x=GrArray_GcNewWithSize(array_size);
+	GrArray* y=GrArray_GcNewWithSize(array_size);
 	GrArray* xy=0;
 	int ret=1;
 	int i;
@@ -568,8 +568,8 @@ int test_plus_two_array()
 	/* set array x,y */
 	for(i=0;i<array_size;i++)
 	{
-		GrInt* x_val=GrInt_New(i*2);
-		GrInt* y_val=GrInt_New(i*2+1);
+		GrInt* x_val=GrInt_GcNew(i*2);
+		GrInt* y_val=GrInt_GcNew(i*2+1);
 		int x_ret=GrArray_Set(x,i,I_TO_GR(x_val));
 		int y_ret=GrArray_Set(y,i,I_TO_GR(y_val));
 		if(x_ret<0||y_ret<0)
