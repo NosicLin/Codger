@@ -22,6 +22,11 @@ struct ast_type_info
 						struct gr_module* md,
 						struct gr_opcode* op,
 						long flags);
+	int (*t_to_oper_and_assign_opcode)(struct ast_object* ab,
+						struct gr_module* md,
+						struct gr_opcode* op,
+						int type,
+						long flags);
 };
 
 typedef struct ast_type_info AstTypeInfo;
@@ -68,6 +73,7 @@ enum AST_NODE_TYPE
 	ATN_DIV_ASSIGN,
 	ATN_MOD_ASSIGN,
 	ATN_PLUS_ASSIGN,
+	ATN_MINUS_ASSIGN,
 	ATN_LSHIFT_ASSIGN,
 	ATN_RSHIFT_ASSIGN,
 	ATN_AND_ASSIGN,
@@ -90,6 +96,21 @@ enum AST_NODE_TYPE
 	ATN_RETURN,
 	ATN_FUNC,
 	ATN_ARG,
+};
+
+
+enum AST_ASSIGN_TYPE 
+{
+	AST_ASSIGN_TYPE_MUL,
+	AST_ASSIGN_TYPE_DIV,
+	AST_ASSIGN_TYPE_MOD,
+	AST_ASSIGN_TYPE_PLUS,
+	AST_ASSIGN_TYPE_MINUS,
+	AST_ASSIGN_TYPE_LSHIFT,
+	AST_ASSIGN_TYPE_RSHIFT,
+	AST_ASSIGN_TYPE_AND,
+	AST_ASSIGN_TYPE_XOR,
+	AST_ASSIGN_TYPE_OR,
 };
 
 #define AST_TYPE_CAST(Hl,Ll,ast_type) \

@@ -79,6 +79,34 @@ static int var_to_opcode(AstObject* ab,GrModule* m,
 	}
 	return 0;
 }
+static int var_to_assign_opcode(AstObject* ab,GrModule* m,
+							GrOpcode* op,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstVar* node=AST_TO_VAR(ab);
+	int ret;
+
+	ret=GrOpcode_NeedMore(op,5);
+	if(ret<0) return -1;
+
+	GrString* symbol=node->v_value;
+	assert(symbol);
+	u_int32_t id=GrModule_MapSymbol(m,S_TO_GR(symbol));
+	if(id==GR_UINT32_MAX) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_STORE_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_STORE_SYMBOL2,id);
+	}
+	return 0;
+}
+
 
 static int upper_var_to_opcode(AstObject* ab,GrModule* m,
 						GrOpcode* op,long flags)
@@ -108,17 +136,198 @@ static int upper_var_to_opcode(AstObject* ab,GrModule* m,
 	return 0;
 }
 
+static int upper_var_to_assign_opcode(AstObject* ab,GrModule* m,
+						GrOpcode* op,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstVar* node=AST_TO_VAR(ab);
+	int ret;
+
+	ret=GrOpcode_NeedMore(op,5);
+	if(ret<0) return -1;
+
+	GrString* symbol=node->v_value;
+	assert(symbol);
+	u_int32_t id=GrModule_MapSymbol(m,S_TO_GR(symbol));
+	if(id==GR_UINT32_MAX) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_STORE_U_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_STORE_U_SYMBOL2,id);
+	}
+	return 0;
+}
+static int var_to_oper_and_assign_opcode(
+		AstObject* ab,GrModule* m,GrOpcode* op,int  type,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstVar* node=AST_TO_VAR(ab);
+	int ret;
+
+	ret=GrOpcode_NeedMore(op,11);
+	if(ret<0) return -1;
+
+	GrString* symbol=node->v_value;
+	assert(symbol);
+	u_int32_t id=GrModule_MapSymbol(m,S_TO_GR(symbol));
+	if(id==GR_UINT32_MAX) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_LOAD_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_LOAD_SYMBOL2,id);
+	}
+
+	switch(type)
+	{
+		case AST_ASSIGN_TYPE_MUL:
+			GrOpcode_Push(op,OP_MUL);
+			break;
+		case AST_ASSIGN_TYPE_DIV:
+			GrOpcode_Push(op,OP_DIV);
+			break;
+		case AST_ASSIGN_TYPE_MOD:
+			GrOpcode_Push(op,OP_MOD);
+			break;
+		case AST_ASSIGN_TYPE_PLUS:
+			GrOpcode_Push(op,OP_PLUS);
+			break;
+		case AST_ASSIGN_TYPE_MINUS:
+			GrOpcode_Push(op,OP_MINUS);
+			break;
+		case AST_ASSIGN_TYPE_LSHIFT:
+			GrOpcode_Push(op,OP_LSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_RSHIFT:
+			GrOpcode_Push(op,OP_RSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_AND:
+			GrOpcode_Push(op,OP_AND);
+			break;
+		case AST_ASSIGN_TYPE_XOR:
+			GrOpcode_Push(op,OP_XOR);
+			break;
+		case AST_ASSIGN_TYPE_OR:
+			GrOpcode_Push(op,OP_OR);
+			break;
+		default:
+			BUG("Unkown Assgin Type");
+			return -1;
+	}
+
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_STORE_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_STORE_SYMBOL2,id);
+	}
+	return 0;
+}
+static int upper_var_to_oper_and_assign_opcode(
+		AstObject* ab,GrModule* m,GrOpcode* op,int  type,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,0);
+	CHECK_NODE_TYPE(ab,ATN_VAR);
+
+	AstVar* node=AST_TO_VAR(ab);
+	int ret;
+
+	ret=GrOpcode_NeedMore(op,11);
+	if(ret<0) return -1;
+
+	GrString* symbol=node->v_value;
+	assert(symbol);
+	u_int32_t id=GrModule_MapSymbol(m,S_TO_GR(symbol));
+	if(id==GR_UINT32_MAX) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_LOAD_U_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_LOAD_U_SYMBOL2,id);
+	}
+
+	switch(type)
+	{
+		case AST_ASSIGN_TYPE_MUL:
+			GrOpcode_Push(op,OP_MUL);
+			break;
+		case AST_ASSIGN_TYPE_DIV:
+			GrOpcode_Push(op,OP_DIV);
+			break;
+		case AST_ASSIGN_TYPE_MOD:
+			GrOpcode_Push(op,OP_MOD);
+			break;
+		case AST_ASSIGN_TYPE_PLUS:
+			GrOpcode_Push(op,OP_PLUS);
+			break;
+		case AST_ASSIGN_TYPE_MINUS:
+			GrOpcode_Push(op,OP_MINUS);
+			break;
+		case AST_ASSIGN_TYPE_LSHIFT:
+			GrOpcode_Push(op,OP_LSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_RSHIFT:
+			GrOpcode_Push(op,OP_RSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_AND:
+			GrOpcode_Push(op,OP_AND);
+			break;
+		case AST_ASSIGN_TYPE_XOR:
+			GrOpcode_Push(op,OP_XOR);
+			break;
+		case AST_ASSIGN_TYPE_OR:
+			GrOpcode_Push(op,OP_OR);
+			break;
+		default:
+			BUG("Unkown Assgin Type");
+			return -1;
+	}
+
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_STORE_U_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_STORE_U_SYMBOL2,id);
+	}
+	return 0;
+
+}
+
 AstTypeInfo Ast_Type_Var=
 {
 	.t_type=ATN_VAR,
 	.t_name="Var",
 	.t_to_opcode=var_to_opcode,
+	.t_to_assign_opcode=var_to_assign_opcode,
+	.t_to_oper_and_assign_opcode=var_to_oper_and_assign_opcode,
 };
 AstTypeInfo Ast_Type_Upper_Var=
 {
 	.t_type=ATN_VAR,
 	.t_name="UpperVar",
 	.t_to_opcode=upper_var_to_opcode,
+	.t_to_assign_opcode=upper_var_to_assign_opcode,
+	.t_to_oper_and_assign_opcode=upper_var_to_oper_and_assign_opcode,
 };
 
 AstObject* AstVar_New(GrString* val)
@@ -985,12 +1194,112 @@ static int square_to_opcode(AstObject* ab,GrModule* m,
 	return 0;
 }
 
+static int square_to_assign_opcode(AstObject* ab,GrModule* m,
+					GrOpcode* op,long flags)
+{
+
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_SQUARE);
+
+	AstObject* expr;
+	AstObject* index;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&expr,&index);
+
+	ret=Ast_ToOpcode(expr,m,op,0);
+	if(ret<0) return -1;
+
+	ret=Ast_ToOpcode(index,m,op,0);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(op,1);
+	if(ret<0) return -1;
+
+	GrOpcode_Push(op,OP_SET_ITEM);
+	return 0;
+}
+
+static int square_to_oper_and_assign_opcode(
+		AstObject* ab,GrModule* m,GrOpcode* op,int type,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,2);
+	CHECK_NODE_TYPE(ab,ATN_SQUARE);
+
+	AstObject* expr;
+	AstObject* index;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&expr,&index);
+
+	ret=Ast_ToOpcode(expr,m,op,0);
+	if(ret<0) return -1;
+
+	ret=Ast_ToOpcode(index,m,op,0);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(op,6);
+	if(ret<0) return -1;
+
+	GrOpcode_Push(op,OP_DUP_DATA3);
+	GrOpcode_Push(op,OP_GET_ITEM);
+
+	switch(type)
+	{
+		case AST_ASSIGN_TYPE_MUL:
+			GrOpcode_Push(op,OP_MUL);
+			break;
+		case AST_ASSIGN_TYPE_DIV:
+			GrOpcode_Push(op,OP_DIV);
+			break;
+		case AST_ASSIGN_TYPE_MOD:
+			GrOpcode_Push(op,OP_MOD);
+			break;
+		case AST_ASSIGN_TYPE_PLUS:
+			GrOpcode_Push(op,OP_PLUS);
+			break;
+		case AST_ASSIGN_TYPE_MINUS:
+			GrOpcode_Push(op,OP_MINUS);
+			break;
+		case AST_ASSIGN_TYPE_LSHIFT:
+			GrOpcode_Push(op,OP_LSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_RSHIFT:
+			GrOpcode_Push(op,OP_RSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_AND:
+			GrOpcode_Push(op,OP_AND);
+			break;
+		case AST_ASSIGN_TYPE_XOR:
+			GrOpcode_Push(op,OP_XOR);
+			break;
+		case AST_ASSIGN_TYPE_OR:
+			GrOpcode_Push(op,OP_OR);
+			break;
+		default:
+			BUG("Unkown Assgin Type");
+			return -1;
+	}
+	GrOpcode_Push(op,OP_DATA_SWAP0_3);
+	GrOpcode_Push(op,OP_DISCARD);
+	GrOpcode_Push(op,OP_SET_ITEM);
+	return 0;
+}
+
+
+
+
 AstTypeInfo Ast_Type_Square=
 {
 	.t_type=ATN_SQUARE,
 	.t_name="GetItem",
 	.t_to_opcode=square_to_opcode,
+	.t_to_assign_opcode=square_to_assign_opcode,
+	.t_to_oper_and_assign_opcode=square_to_oper_and_assign_opcode,
 };
+
 
 
 

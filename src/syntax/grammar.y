@@ -86,6 +86,7 @@ block:stmts{$$=$1;}
 
 stmt:stmt_expr {$$=$1;}
 	|stmt_assign {$$=$1;}
+	|stmt_oper_assign{$$=$1;}
 	|stmt_print {$$=$1;}
 	|stmt_while {$$=$1;}
 	|stmt_if  {$$=$1;}
@@ -404,9 +405,45 @@ stmt_expr:expr
 
 stmt_assign: symbols tASSIGN expr
 	{
-		
+		if(!AstObject_CanAssign($1))
+		{
+			yyerror("Left Can't Assign");
+			return  -1;
+		}
+		AstObject* node=AstNode_New(&Ast_Type_Assign);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
+stmt_oper_assign: symbols oper_assing_operator expr 
+	{
+		if(!AstObject_CanOperAssign($1))
+		{
+			yyerror("Left Can't Assign");
+			return -1;
+		}
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
+	}
+	;
+oper_assing_operator:tAMUL{$$=&Ast_Type_Mul_Assign;}
+	|tADIV{$$=&Ast_Type_Div_Assign;}
+	|tAMOD{$$=&Ast_Type_Mod_Assign;}
+	|tAPLUS{$$=&Ast_Type_Plus_Assign;}
+	|tAMINUS{$$=&Ast_Type_Minus_Assign;}
+	|tALS{$$=&Ast_Type_LShift_Assign;}
+	|tARS{$$=&Ast_Type_RShift_Assign;}
+	|tAAND{$$=&Ast_Type_And_Assign;}
+	|tAXOR{$$=&Ast_Type_Xor_Assign;}
+	|tAOR{$$=&Ast_Type_Or_Assign;}
+	;
+	
+		
 
 stmt_print:kPRINT expr_list
 	{
@@ -427,6 +464,11 @@ stmt_print:kPRINT expr_list
 	;
 stmt_while: kWHILE  expr while_delimter block kEND 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_While);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		$$=node;
 	}
 	;
 while_delimter: tNEWLINE |kDO |tSEMI ;	
@@ -451,15 +493,27 @@ if_delimter:tNEWLINE|kTHEN|tSEMI;
 
 stmt_for: kFOR symbols kIN expr for_delimter block kEND
 	{
+		AstObject* node=AstNode_New(&Ast_Type_For);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		AstNode_Add(node,$6);		
+		$$=node;
 	}
 for_delimter: tNEWLINE|kDO|tSEMI;
 
 stmt_break: kBREAK
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Break);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 stmt_continue: kCONTINUE
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Continue);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 stmt_return: kRETURN expr

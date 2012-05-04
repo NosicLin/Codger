@@ -135,6 +135,9 @@ enum OP_CODES
 	OP_PUSH,   /* move reg0 to stack */
 	OP_DISCARD,
 
+	OP_DUP_DATA3,
+	OP_DATA_SWAP0_3,
+
 	/* func */
 	OP_FUNC_DEFALUT_ARGS,
 #define OP_NEED_PARAM2 OP_GET_ATTR
@@ -173,7 +176,9 @@ enum OP_CODES
 	OP_LOAD_CONST2,  /* load const<id> to reg0,sizeof(id)=4 */
 	OP_LOAD_SYMBOL2,
 	OP_LOAD_U_SYMBOL2,
+
 	OP_STORE_SYMBOL2,
+	OP_STORE_U_SYMBOL2,
 
 
 	OP_CODE_NUM,

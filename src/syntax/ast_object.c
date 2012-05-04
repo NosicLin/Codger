@@ -138,6 +138,29 @@ int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op,long flags)
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 	return ret;
 }
+int Ast_ToOperAssignOpcode(AstObject* ab,GrModule* md,
+							GrOpcode* op,int type,long flags)
+{
+	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
+	{
+		BUG("Syntax Tree Maybe Error");
+		return -1;
+	}
+	if(ab->a_type==NULL)
+	{
+		BUG("AstNodeType Not Find");
+		return -1;
+	}
+	if(ab->a_type->t_to_assign_opcode==NULL)
+	{
+		BUG("No To Assign OpCode Func");
+		return -1;
+	}
+	ab->a_flags|=AST_FLAGS_TO_OPCODE;
+	int ret=ab->a_type->t_to_oper_and_assign_opcode(ab,md,op,type,flags);
+	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
+	return ret;
+}
 
 GrModule*  Ast_ToModule(AstObject* root)
 {
