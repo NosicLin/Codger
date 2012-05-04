@@ -89,12 +89,13 @@ AstTypeInfo Ast_Type_Normal=
 
 
 
-int Ast_ToOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
+int Ast_ToOpcode(AstObject* ab,GrModule* md,GrOpcode* op,long flags)
 {
 	assert(md&&op);
 	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
 	{
-		BUG("Synatx Tree Maybe Error");
+		BUG("Synatx Tree Maybe Error(%s)",
+				ab->a_type==NULL?"Unkown":ab->a_type->t_name);
 		return -1;
 	}
 
@@ -110,12 +111,12 @@ int Ast_ToOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
 	}
 
 	ab->a_flags|=AST_FLAGS_TO_OPCODE;
-	int ret=ab->a_type->t_to_opcode(ab,md,op,0);
+	int ret=ab->a_type->t_to_opcode(ab,md,op,flags);
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 
 	return ret;
 }
-int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
+int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op,long flags)
 {
 	if(ab->a_flags&AST_FLAGS_TO_OPCODE)
 	{
@@ -133,7 +134,7 @@ int Ast_ToAssignOpcode(AstObject* ab,GrModule* md,GrOpcode* op)
 		return -1;
 	}
 	ab->a_flags|=AST_FLAGS_TO_OPCODE;
-	int ret=ab->a_type->t_to_assign_opcode(ab,md,op,0);
+	int ret=ab->a_type->t_to_assign_opcode(ab,md,op,flags);
 	ab->a_flags&=~AST_FLAGS_TO_OPCODE;
 	return ret;
 }
@@ -160,7 +161,7 @@ GrModule*  Ast_ToModule(AstObject* root)
 	{
 		goto error;
 	}
-	ret=Ast_ToOpcode(root,md,op);
+	ret=Ast_ToOpcode(root,md,op,0);
 	if(ret<0)
 	{
 		goto error;

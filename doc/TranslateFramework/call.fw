@@ -1,0 +1,30 @@
+[file]
+	call expr translate framework 
+
+[grammar]
+	<expr> ( arg1,arg2,...,argn)
+
+[translate]
+	{
+		expr
+	}
+	OP_ARRAY_BEGIN
+	{
+		arg1
+	}	
+	OP_ARRAY_PUSH
+	{
+		arg2
+	}
+	OP_ARRAY_PUSH
+	{
+		...
+	}
+	OP_ARRAY_PUSH 
+	{
+		argn
+	}
+	OP_ARRAY_PUSH
+	OP_ARRAY_END
+	OP_CALL
+

@@ -1,0 +1,8 @@
+i=1
+print i
+i="sfdsf"
+print i
+i=2.3 
+print i
+i=[5.214,33]
+print i

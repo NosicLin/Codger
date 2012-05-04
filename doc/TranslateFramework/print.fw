@@ -1,0 +1,27 @@
+[file]
+	print translate framework
+
+[grammar]
+	print <expr1>,<expr2>,...,<exprn>
+
+[translate]
+	{
+		expr1
+	}
+	OP_PRINT
+	{
+		expr2
+	}
+	OP_PRINT
+	{
+		...
+	}
+	OP_PRINT
+	{
+		exprn
+	}
+	OP_PRINT
+	OP_PRINT_LN
+
+
+

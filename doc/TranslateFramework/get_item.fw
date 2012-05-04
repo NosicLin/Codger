@@ -1,0 +1,15 @@
+[file]
+	get item translate framework 
+
+[grammar]
+	<expr1> [ <expr2> ]
+
+[translate]
+	{
+		expr1
+	}
+	{
+		expr2
+	}
+	OP_GET_ITEM
+

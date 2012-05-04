@@ -1,0 +1,11 @@
+[file]
+	expr translate framework
+
+[grammar]
+	<expr>
+
+[translate]
+	{
+		expr
+	}
+	OP_DESCARD

@@ -1,0 +1,4 @@
+print 2,34,5
+
+print s,e,s+3,
+print

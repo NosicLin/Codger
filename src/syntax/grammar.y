@@ -46,17 +46,31 @@ AstTree : block{parser_set_root($1);} ;
 
 stmts:stmt 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
+		
 	}
 	|stmt_delimiter 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 
 	|stmt_delimiter stmt 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
 	}
 
 	|stmts stmt_delimiter stmt 
 	{
+		AstNode_Add($1,$3);
+		$$=$1;
 	}
 	|stmts stmt_delimiter {$$=$1;}
 	;
@@ -64,6 +78,9 @@ stmts:stmt
 block:stmts{$$=$1;}
 	|
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 
@@ -122,10 +139,22 @@ literal: tINTEGER
 	;
 identifier:tID
 	{
+		GrString* gs=GrString_GcNewFlag(yl_cur_string(),GRGC_HEAP_STATIC);
+		if(gs==NULL) return AST_MEM_FAILED;
+		
+		AstObject* node=AstVar_New(gs);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
-global_id:tDOLLAR tID
+upper_id:tDOLLAR tID
 	{
+		GrString* gs=GrString_GcNewFlag(yl_cur_string(),GRGC_HEAP_STATIC);
+		if(gs==NULL) return AST_MEM_FAILED;
+		
+		AstObject* node=AstUpperVar_New(gs);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 
@@ -137,18 +166,35 @@ expr_list:expr_list_pre {$$=$1;}
 
 expr_list_pre:expr 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Normal);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
 	}
 	|expr_list_pre tCOMMA expr 
 	{
+		AstNode_Add($1,$3);
+		$$=$1;
 	}
 	;
 
 
 array:l_sb expr_list r_sb 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Array);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
 	}
 	|l_sb r_sb 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Array);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* expr=AstNode_New(&Ast_Type_Normal);
+		if(expr==NULL) return AST_MEM_FAILED;
+		
+		AstNode_Add(node,expr);
+		$$=node;
 	}
 
 l_sb :tL_SB{yl_ignore_newline();};
@@ -160,18 +206,37 @@ primary_expr: literal {$$=$1;}
 	|tL_RB expr tR_RB {$$=$2;}  /* '(' expr ')' */
 	|identifier{$$=$1;}
 	|array {$$=$1;}
-	|global_id{$$=$1;}
+	|upper_id{$$=$1;}
 	;
 
 postfix_expr: primary_expr{$$=$1;}
 	|postfix_expr l_sb expr r_sb 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Square);
+		if(node==NULL) return -1;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	|postfix_expr l_rb expr_list r_rb
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Call);
+		if(node==NULL) return -1;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
+		
 	}
 	|postfix_expr l_rb r_rb 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Call);
+		if(node==NULL) return -1;
+		AstObject* expr_list=AstNode_New(&Ast_Type_Normal);
+		if(expr_list==NULL) return -1;
+		
+		AstNode_Add(node,$1);
+		AstNode_Add(node,expr_list);
+		$$=node;
 	}
 	;
 symbols:postfix_expr{$$=$1;}
@@ -179,54 +244,88 @@ symbols:postfix_expr{$$=$1;}
 unary_expr:postfix_expr{$$=$1;}
 	|unary_operator unary_expr 
 	{  
+		AstObject* node=AstNode_New($1);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
 	}   
 	;
-unary_operator:tPLUS{}
-	|tMINUS{}
-	|tNEGATED{}
+unary_operator:tPLUS{$$=&Ast_Type_Positive;}
+	|tMINUS{$$=&Ast_Type_Negative;}
+	|tNEGATED{$$=&Ast_Type_Negated;}
 	;
 
 multiply_expr: unary_expr {$$=$1;}
 	|multiply_expr multiply_operator unary_expr
 	{
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
-multiply_operator:tMUL{}
-	|tDIV {}
-	|tMOD {}
+multiply_operator:tMUL{$$=&Ast_Type_Mul;}
+	|tDIV {$$=&Ast_Type_Div;}
+	|tMOD {$$=&Ast_Type_Mod;}
 	;
 
 additive_expr:multiply_expr{$$=$1;}
 	|additive_expr additive_operator multiply_expr
 	{
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
-additive_operator:tPLUS {}
-	|tMINUS{}
+additive_operator:tPLUS {$$=&Ast_Type_Plus;}
+	|tMINUS{$$=&Ast_Type_Minus;}
 	;
 
 shift_expr:additive_expr{}
 	|shift_expr shift_operator additive_expr
 	{
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
-shift_operator:tLS{}
-	|tRS{}
+shift_operator:tLS{$$=&Ast_Type_LShift;}
+	|tRS{$$=&Ast_Type_RShift;}
 	;
 
 
 bit_and_expr:shift_expr{$$=$1;}
 	|bit_and_expr tAND shift_expr{
+		AstObject* node=AstNode_New(&Ast_Type_And);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
 bit_xor_expr:bit_and_expr{$$=$1;}
 	|bit_xor_expr tXOR bit_and_expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Xor);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
 bit_or_expr:bit_xor_expr{$$=$1;}
 	|bit_or_expr tOR bit_xor_expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Or);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
 
@@ -234,23 +333,33 @@ bit_or_expr:bit_xor_expr{$$=$1;}
 relational_expr:bit_or_expr{$$=$1;} 
 	|relational_expr relational_operator bit_or_expr
 	{
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;	
 
-relational_operator:tLT{}
-	|tLE{}
-	|tGE{}
-	|tGT{}
+relational_operator:tLT{$$=&Ast_Type_Lt;}
+	|tLE{$$=&Ast_Type_Le;}
+	|tGE{$$=&Ast_Type_Ge;}
+	|tGT{$$=&Ast_Type_Gt}
 	;
 
 
 equal_expr:relational_expr{$$=$1;}
 	|equal_expr equal_operator relational_expr
 	{
+		AstObject* node=AstNode_New($2);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
-equal_operator:tEQ{}
-	|tNE {}
+equal_operator:tEQ{$$=&Ast_Type_Eq;}
+	|tNE {$$=&Ast_Type_Ne;}
 	;
 
 
@@ -258,16 +367,31 @@ equal_operator:tEQ{}
 logic_not_expr:equal_expr{$$=$1;}
 	|kNOT logic_not_expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Logic_Not);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+		
 	}
 	;
 logic_and_expr:logic_not_expr{$$=$1;}
 	|logic_and_expr kAND logic_not_expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Logic_And);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;	
 logic_or_expr:logic_and_expr{$$=$1;}
 	|logic_or_expr kOR logic_and_expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Logic_Or);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
 
@@ -286,6 +410,19 @@ stmt_assign: symbols tASSIGN expr
 
 stmt_print:kPRINT expr_list
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Print);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+	|kPRINT
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Print);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* expr_list=AstNode_New(&Ast_Type_Normal);
+		if(expr_list==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,expr_list);
+		$$=node;
 	}
 	;
 stmt_while: kWHILE  expr while_delimter block kEND 

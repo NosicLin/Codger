@@ -80,8 +80,8 @@ static inline void AstNode_Del(AstObject* father,AstObject* chirld)
 
 
 /* used for generate byte code */
-int Ast_ToOpcode(AstObject* ab,GrModule* m,GrOpcode* op);
-int Ast_ToAssignOpcode(AstObject* ab,GrModule* m,GrOpcode* op);
+int Ast_ToOpcode(AstObject* ab,GrModule* m,GrOpcode* op,long );
+int Ast_ToAssignOpcode(AstObject* ab,GrModule* m,GrOpcode* op,long );
 GrModule* Ast_ToModule(AstObject* root);
 
 
