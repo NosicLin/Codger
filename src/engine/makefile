@@ -1,12 +1,11 @@
-PROJECT=object
+PROJECT=engine
 
-SRC=gr_int.c gr_object.c gr_hash.c gr_array.c gr_string.c \
-	gr_opcode.c gr_scope.c gr_module.c gr_consts.c \
-	gr_func.c
+SRC=eg_codger.c eg_sframe.c eg_thread.c  except.c
+
 
 DEBUG=
 
-BIN=int_unit.c hash_unit.c array_unit.c
+BIN= codger.c
 
 
 
@@ -30,7 +29,8 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../  
-LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  -L../lib -lmemory -lengine
+LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  -L../lib -lmemory \
+	-llexical -lobject -lutility_c -lsyntax
 
 
 

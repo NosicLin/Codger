@@ -234,8 +234,13 @@ static int int_rich_eq(GrObject* l,GrObject* r)
 
 
 
-static struct gr_operator_ops int_operator_ops=
+
+static struct gr_type_ops int_type_ops=
 {
+	.t_hash=(GrHashFunc)GrInt_Hash,
+	.t_print=(GrPrintFunc)GrInt_Print,
+	.t_rich_eq=int_rich_eq,
+
 	.t_negative=(GrUnaryFunc)GrInt_Negative,
 	.t_positive=(GrUnaryFunc)GrInt_Positive,
 	.t_negated=(GrUnaryFunc)GrInt_Negated,
@@ -259,17 +264,8 @@ static struct gr_operator_ops int_operator_ops=
 	.t_bool=(GrBoolFunc)GrInt_Bool,
 };
 
-static struct gr_type_ops int_type_ops=
-{
-	.t_operator=&int_operator_ops,
-	.t_hash=(GrHashFunc)GrInt_Hash,
-	.t_print=(GrPrintFunc)GrInt_Print,
-	.t_rich_eq=int_rich_eq,
-};
-
 struct gr_type_info Gr_Type_Int=
 {
-	//.t_class=Gr_Int_Class;
 	.t_name="IntObject",
 	.t_size=sizeof(GrInt),
 	.t_ops=&int_type_ops,
@@ -278,10 +274,31 @@ struct gr_type_info Gr_Type_Int=
 
 static struct gr_type_ops bool_type_ops=
 {
-	.t_operator=&int_operator_ops,
 	.t_hash=(GrHashFunc)GrInt_Hash,
 	.t_print=(GrPrintFunc)GrBool_Print,
 	.t_rich_eq=int_rich_eq,
+
+	.t_negative=(GrUnaryFunc)GrInt_Negative,
+	.t_positive=(GrUnaryFunc)GrInt_Positive,
+	.t_negated=(GrUnaryFunc)GrInt_Negated,
+
+	.t_mul=int_mul,
+	.t_div=int_div,
+	.t_mod=int_mod,
+
+	.t_plus=int_plus,
+	.t_minus=int_minus,
+
+	.t_lshift=int_lshift,
+	.t_rshift=int_rshift,
+
+	.t_and=int_and,
+	.t_xor=int_xor,
+	.t_or=int_or,
+
+	.t_cmp=int_cmp,
+
+	.t_bool=(GrBoolFunc)GrInt_Bool,
 };
 struct gr_type_info Gr_Type_Bool=
 {
@@ -291,18 +308,9 @@ struct gr_type_info Gr_Type_Bool=
 };
 
 
-GrInt* Gr_False=0;
-GrInt* Gr_True=0;
 
 int GrModule_IntInit()
 {
-	Gr_False=GrGc_AllocStatic(GrInt,&Gr_Type_Bool);
-	if(Gr_False==NULL) return -1;
-	Gr_False->i_value=0;
-
-	Gr_True=GrGc_AllocStatic(GrInt,&Gr_Type_Bool);
-	if(Gr_True==NULL) return -1;
-	Gr_True->i_value=1;
 
 	return 0;
 }

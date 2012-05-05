@@ -1,0 +1,12 @@
+func a(x,y=3,z=3)
+	d=z+y+z
+	print d
+end
+
+a(3)
+
+a=func(x,y,z,*s) do 
+	x+y 
+end 
+
+a(3,3)

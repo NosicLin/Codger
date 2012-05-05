@@ -36,6 +36,26 @@ ssize_t GrObject_NotSupportHash(GrObject*);
 #define GR_PRINT_NEWLINE (0x1l<<2)
 int GrObject_Print(GrObject*,FILE*,long);
 
+GrObject* GrObject_Positive(GrObject*);
+GrObject* GrObject_Negative(GrObject*);
+GrObject* GrObject_Negated(GrObject*);
+GrObject* GrObject_Mul(GrObject* ,GrObject*);
+GrObject* GrObject_Div(GrObject* ,GrObject*);
+GrObject* GrObject_Mod(GrObject* ,GrObject*);
+GrObject* GrObject_Plus(GrObject* ,GrObject*);
+GrObject* GrObject_Minus(GrObject* ,GrObject*);
+GrObject* GrObject_LShift(GrObject* ,GrObject*);
+GrObject* GrObject_RShift(GrObject* ,GrObject*);
+GrObject* GrObject_And(GrObject* ,GrObject*);
+GrObject* GrObject_Xor(GrObject* ,GrObject*);
+GrObject* GrObject_Or(GrObject* ,GrObject*);
+int GrObject_Lt(GrObject*,GrObject*);
+int GrObject_Le(GrObject*,GrObject*);
+int GrObject_Ge(GrObject*,GrObject*);
+int GrObject_Gt(GrObject*,GrObject*);
+int GrObject_Eq(GrObject*,GrObject*);
+int GrObject_Ne(GrObject*,GrObject*);
+
 
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 

@@ -354,19 +354,16 @@ static GrObject* ga_plus(GrObject* x,GrObject* y)
 }
 
 
-static struct gr_operator_ops array_operator_ops=
+
+static struct gr_type_ops array_type_ops=
 {
+	.t_hash=GrObject_NotSupportHash,
+	.t_print=(GrPrintFunc)GrArray_Print,
+
 	.t_get_item=ga_get_item,
 	.t_set_item=ga_set_item,
 	.t_plus=ga_plus,
 	.t_bool=(GrBoolFunc)GrArray_Bool,
-};
-
-static struct gr_type_ops array_type_ops=
-{
-	.t_operator=&array_operator_ops,
-	.t_hash=GrObject_NotSupportHash,
-	.t_print=(GrPrintFunc)GrArray_Print,
 };
 
 struct gr_type_info Gr_Type_Array=

@@ -29,5 +29,11 @@ inline int GrScope_Init(GrScope* s,GrScope* upper)
 	s->s_upper=upper;
 	return 0;
 }
+GrTypeInfo Gr_Type_Scope=
+{
+	.t_name="ScopeObject",
+	.t_size=sizeof(GrScope),
+	.t_ops=&GR_TYPE_OPS_NOT_SUPPORT,
+};
 
 

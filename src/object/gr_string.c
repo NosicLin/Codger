@@ -90,7 +90,7 @@ GrString* GrString_GcNewEscWithQuote(const char* str)
 	GrString* gs=gs_malloc();
 	if(gs==NULL) return NULL;
 
-	if(gs_init(gs,str+2,length-4)<0)
+	if(gs_init(gs,str+1,length-2)<0)
 	{
 		return NULL;
 	}
@@ -100,7 +100,7 @@ GrString* GrString_GcNewEscWithQuote(const char* str)
 int GrString_InitEscWithQuote(GrString* gs ,const char* str)
 {
 	ssize_t length=strlen(str);
-	return gs_init(gs,str+2,length-4);
+	return gs_init(gs,str+1,length-2);
 }
 
 int GrString_Init(GrString* gs,const char* str)
@@ -223,20 +223,17 @@ static GrObject* gs_get_item(GrObject* x,GrObject* y)
 	return NULL;
 }
 					
-static struct gr_operator_ops string_ops_ops=
+
+static struct gr_type_ops string_type_ops=
 {
+	.t_hash=(GrHashFunc)GrString_Hash,
+	.t_print=(GrPrintFunc)GrString_Print,
+	.t_rich_eq=gs_rich_eq,
+
 	.t_get_item=gs_get_item,
 	.t_plus=gs_plus,
 	.t_cmp=gs_cmp,
 	.t_bool=(GrBoolFunc)GrString_Bool,
-};
-
-static struct gr_type_ops string_type_ops=
-{
-	.t_operator=&string_ops_ops,
-	.t_hash=(GrHashFunc)GrString_Hash,
-	.t_print=(GrPrintFunc)GrString_Print,
-	.t_rich_eq=gs_rich_eq,
 };
 
 struct gr_type_info Gr_Type_String=

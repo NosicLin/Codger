@@ -15,8 +15,8 @@ extern struct gr_type_info Gr_Type_Int;
 extern struct gr_type_info Gr_Type_Bool;
 
 /* boolean is a specific type of GrInt */
-extern GrInt* Gr_False;
-extern GrInt* Gr_True;
+extern GrObject* Gr_False;
+extern GrObject* Gr_True;
 
 
 

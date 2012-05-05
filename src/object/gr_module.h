@@ -17,7 +17,7 @@ struct gr_module
 
 	GrArray* m_consts_pool;
 	GrArray* m_symbols_pool;
-	GrArray* m_opcode_pool;
+	GrArray* m_opcodes_pool;
 
 	GrString* m_name;
 	GrHash* m_attrs;

@@ -50,7 +50,7 @@ int GrModule_Init(GrModule* m)
 	m->m_consts_pool=consts_pool;
 
 	m->m_symbols_pool=symbols_pool;
-	m->m_opcode_pool=opcode_pool;
+	m->m_opcodes_pool=opcode_pool;
 	m->m_attrs=attrs;
 	m->m_name=NULL;
 	m->m_codes=NULL;
@@ -61,12 +61,12 @@ error:
 }
 u_int32_t GrModule_MapOpcode(GrModule* m,GrOpcode* op)
 {
-	if(GrArray_Push(m->m_opcode_pool,OPCODE_TO_GR(op))<0)
+	if(GrArray_Push(m->m_opcodes_pool,OPCODE_TO_GR(op))<0)
 	{
 		return GR_MODULE_MAP_ERR;
 	}
 	
-	return GrArray_Size(m->m_opcode_pool)-1;
+	return GrArray_Size(m->m_opcodes_pool)-1;
 }
 
 u_int32_t GrModule_MapConst(GrModule* m,GrObject* g)
@@ -149,13 +149,13 @@ int GrModule_WriteToFile(GrModule* m,FILE* f,long flags)
 	GrOpcode_WriteToFile(m->m_codes,f,1);
 	fprintf(f,"}\n");
 
-	size=GrArray_Size(m->m_opcode_pool);
+	size=GrArray_Size(m->m_opcodes_pool);
 
 	for(i=0;i<size;i++)
 	{
-		cur=GrArray_Get(m->m_opcode_pool,i);
+		cur=GrArray_Get(m->m_opcodes_pool,i);
 		GrOpcode* op=(GrOpcode*)cur;
-		fprintf(f,"@OpCode Func(%s) \n{\n",op->o_name->s_value);
+		fprintf(f,"@OpCode<%d> Func(%s) \n{\n",i,op->o_name->s_value);
 
 		GrOpcode_WriteToFile(op,f,1);
 		fprintf(f,"}\n");

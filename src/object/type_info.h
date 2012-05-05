@@ -27,14 +27,11 @@ typedef GrObject* (*GrNewFunc)(GrObject*);
 typedef int (*GrPrintFunc)(GrObject*,FILE*);
 typedef int (*GrSetItemFunc)(GrObject*,GrObject*,GrObject*);
 typedef GrObject* (*GrGetItemFunc)(GrObject*,GrObject*);
+typedef GrObject* (*GrCallFunc)(GrObject*,GrObject*);
 
 typedef int (*GrDestructFunc)(GrObject*);
 struct gr_type_ops
 {
-	struct gr_operator_ops* t_operator;
-	struct gr_operator_ops* t_operator_inverse;
-	struct gr_type_cast* t_type_cast;
-
 	GrHashFunc t_hash;
 	GrCmpFunc t_rich_eq;
 
@@ -50,19 +47,16 @@ struct gr_type_ops
 	GrNewFunc t_new;
 
 	GrDestructFunc t_destruct;
-};
-typedef struct gr_type_ops GrTypeOps;
 
 
-
-struct gr_operator_ops 
-{
+	GrCallFunc t_call;
 	GrSetItemFunc t_set_item;
 	GrGetItemFunc t_get_item;
 
 	GrUnaryFunc t_negative;
 	GrUnaryFunc t_positive;
 	GrUnaryFunc t_negated;
+	GrBoolFunc t_bool;
 
 	GrBinaryFunc t_mul;
 	GrBinaryFunc t_div;
@@ -80,18 +74,24 @@ struct gr_operator_ops
 
 	GrCmpFunc t_cmp;
 
-	GrBoolFunc t_bool;
+	/* for reverse  */
+	GrBinaryFunc t_mul_reverse;
+	GrBinaryFunc t_div_reverse;
+	GrBinaryFunc t_mod_reverse;
+
+	GrBinaryFunc t_plus_reverse;
+	GrBinaryFunc t_minus_reverse;
+
+	GrBinaryFunc t_lshift_reverse;
+	GrBinaryFunc t_rshift_reverse;
+
+	GrBinaryFunc t_and_reverse;
+	GrBinaryFunc t_xor_reverse;
+	GrBinaryFunc t_or_reverse;
+
+	GrCmpFunc t_cmp_reverse;
 
 };
-typedef struct gr_operator_ops GrOperatorOps;
-
-struct gr_type_cast
-{
-	GrObject* (*t_float)(GrObject*);
-	GrObject* (*t_int)(GrObject*);
-	GrObject* (*t_long)(GrObject*);
-	GrObject* (*t_string)(GrObject*);
-};
-typedef struct gr_type_cast GrTypeCast;
+typedef struct gr_type_ops GrTypeOps;
 
 #endif /*_CODGER_OBJECT_TYPE_INFO_H_*/

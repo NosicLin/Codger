@@ -1,12 +1,12 @@
-#include"parser.h"
-#include"yylex.h"
+#include<syntax/parser.h>
+#include<syntax/yylex.h>
 #include<object/gr_module.h>
 #include<object/gr_opcode.h>
 #include<object/gr_consts.h>
 #include<memory/memory.h>
 #include<memory/gc.h>
-#include"ast_object.h"
-
+#include"eg_thread.h"
+#include"eg_sframe.h"
 
 int main(int argc,char** argv)
 {
@@ -50,11 +50,21 @@ int main(int argc,char** argv)
 		goto error;
 	}
 	GrModule_SetName(module,module_name);
-	GrModule_WriteToFile(module,stdout,0);
+
+	EgThread* thread=EgThread_New();
+	if(thread==NULL) goto error;
+
+	EgSframe* sf=EgSframe_NewFromModule(module);
+	if(sf==NULL) goto error;
+
+	EgThread_PushSframe(thread,sf);
+	sf=NULL;
+
+	EgThread_Run(thread);
+
 error:
 	if(root) AstTree_Free(root);
 	if(sc) sc_destory(sc);
+	if(thread) EgThread_Delete(thread);
 	return 0;
-
 }
-

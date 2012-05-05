@@ -11,7 +11,7 @@ struct gr_scope
 };
 typedef struct gr_scope GrScope;
 
-GrTypeInfo Gr_Type_Scope;
+extern GrTypeInfo Gr_Type_Scope;
 
 GrScope* GrScope_GcNew(GrScope*);
 int GrScope_Init(GrScope*,GrScope*);

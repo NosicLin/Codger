@@ -194,8 +194,9 @@ GrModule*  Ast_ToModule(AstObject* root)
 	{
 		goto error;
 	}
-	GrOpcode_Push(op,OP_RETURN);
+	GrOpcode_Push(op,OP_RETURN_NIL);
 	GrModule_SetOpcode(md,op);
+	GrOpcode_SetModule(op,md);
 	return md;
 error:
 	return NULL;

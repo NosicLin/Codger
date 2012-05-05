@@ -6,6 +6,7 @@
 #include<object/gr_int.h>
 #include<object/gr_string.h>
 #include<memory/gc.h>
+#include<object/gr_consts.h>
 /* I don't want to use void* for default symbol type
  * but if not,i will give every symbol a type,
  * so awfull 
@@ -63,7 +64,7 @@ stmts:stmt
 	{
 		AstObject* node=AstNode_New(&Ast_Type_Stmts);
 		if(node==NULL) return AST_MEM_FAILED;
-		AstNode_Add(node,$1);
+		AstNode_Add(node,$2);
 		$$=node;
 	}
 
@@ -93,7 +94,6 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_for {$$=$1;}
 	|stmt_break{$$=$1;}
 	|stmt_continue{$$=$1;}
-	|stmt_func{$$=$1;}
 	|stmt_return{$$=$1;}
 	;
 
@@ -127,13 +127,13 @@ literal: tINTEGER
 	}
 	| kFALSE
 	{
-		AstObject* node=AstLiteral_New(I_TO_GR(Gr_False));
+		AstObject* node=AstLiteral_New(Gr_False);
 		if(node==NULL) return AST_MEM_FAILED;
 		$$=node;
 	}
 	| kTRUE
 	{
-		AstObject* node=AstLiteral_New(I_TO_GR(Gr_True));
+		AstObject* node=AstLiteral_New(Gr_True);
 		if(node==NULL) return AST_MEM_FAILED;
 		$$=node;
 	}
@@ -208,6 +208,8 @@ primary_expr: literal {$$=$1;}
 	|identifier{$$=$1;}
 	|array {$$=$1;}
 	|upper_id{$$=$1;}
+	|func_declare{$$=$1;}
+	|lambda_delare{$$=$1;}
 	;
 
 postfix_expr: primary_expr{$$=$1;}
@@ -477,14 +479,33 @@ while_delimter: tNEWLINE |kDO |tSEMI ;
 stmt_if:if_pre kEND {$$=$1;}
 	|if_pre kELSE if_delimter block kEND
 	{
+		AstObject* sub_node=AstNode_New(&Ast_Type_Else);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(sub_node,$4);
+		AstNode_Add($1,sub_node);
+		$$=$1;
 	}
 	;
 
 if_pre:kIF expr if_delimter block
 	{
+		AstObject* node=AstNode_New(&Ast_Type_If);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* sub_node=AstNode_New(&Ast_Type_If_Elif);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(sub_node,$2);
+		AstNode_Add(sub_node,$4);
+		AstNode_Add(node,sub_node);
+		$$=node;
 	}
 	|if_pre  kELIF expr if_delimter block
 	{
+		AstObject* sub_node=AstNode_New(&Ast_Type_If_Elif);
+		if(sub_node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(sub_node,$3);
+		AstNode_Add(sub_node,$5);
+		AstNode_Add($1,sub_node);
+		$$=$1;
 	}
 	;
 
@@ -526,26 +547,49 @@ stmt_return: kRETURN expr
 
 
 
-stmt_func:func_declare{$$=$1;};
-
 
 func_declare:kFUNC identifier l_rb args_list r_rb func_delimeter block kEND 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Func);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		AstNode_Add(node,$7);
+		$$=node;
 	}
 	;
+lambda_delare:kFUNC l_rb args_list r_rb func_delimeter block kEND 
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Func);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstObject* name=AstVar_New(GR_TO_S(Gr_Const_S_Lambda));
+		if(name==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,name);
+		AstNode_Add(node,$3);
+		AstNode_Add(node,$6);
+		$$=node;
+	}
 
-
-func_delimeter:tNEWLINE|tCOMMA;
+func_delimeter:tNEWLINE|tCOMMA|kDO;
 
 
 args_list:arg
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Normal);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
 	}
 	|args_list tCOMMA arg 
 	{
+		AstNode_Add($1,$3);
+		$$=$1;
 	}
 	|
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Normal);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 		 
@@ -556,19 +600,25 @@ arg:simply_arg{$$=$1;}
  
 simply_arg:identifier
 	{
-		
+		AstObject* node=AstArg_New(ARG_SIMPLY,((AstVar*)($1))->v_value);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 default_arg:identifier tASSIGN expr 
 	{
+		AstObject* node=AstArg_New(ARG_DEFAULT_VALUE,((AstVar*)($1))->v_value);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$3);
+		$$=node;
 	}
 	;
 
 many_args:tMUL identifier 
 	{
-	}
-	|tMUL
-	{
+		AstObject* node=AstArg_New(ARG_MANY,((AstVar*)($2))->v_value);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 	

@@ -12,6 +12,7 @@
 #define GR_OPCODE_FLAGS_DEFAULT_ARG (0x1l<<1)
 
 
+struct gr_module;
 
 struct  gr_opcode 
 {
@@ -24,6 +25,8 @@ struct  gr_opcode
 
 	GrString* o_name;
 	GrArray* o_args_name;
+
+	struct gr_module* o_module;
 
 	ssize_t o_size;
 	ssize_t o_cap;
@@ -61,6 +64,7 @@ static inline void GrOpcode_SetName(GrOpcode*,GrString* name);
 static inline void GrOpcode_SetFlags(GrOpcode*,long);
 static inline void GrOpcode_ClrFlags(GrOpcode*,long);
 static inline void GrOpcode_SetArgName(GrOpcode*,GrArray*);
+static inline void GrOpcode_SetModule(GrOpcode*,struct gr_module*);
 
 static inline int GrOpcode_Verify(GrObject*);
 
@@ -126,23 +130,29 @@ enum OP_CODES
 	OP_ARRAY_BEGIN,
 	OP_ARRAY_PUSH,
 	OP_ARRAY_END,
+
 	/* engine op */
 	OP_EXIT,
 	OP_RETURN,
+	OP_RETURN_NIL,
 
 	/* Data op */
 	OP_STORE,  /* move reg0 to symbol<id> */
 	OP_PUSH,   /* move reg0 to stack */
 	OP_DISCARD,
 
+	OP_DUP_DATA1,
 	OP_DUP_DATA3,
 	OP_DATA_SWAP0_3,
 
-	/* func */
+	/*func object*/
+	OP_FUNC_BEGIN,
 	OP_FUNC_DEFALUT_ARGS,
 #define OP_NEED_PARAM2 OP_GET_ATTR
 	OP_GET_ATTR,
 	OP_SET_ATTR,
+
+	OP_FUNC_OPCODE,
 
 	OP_LOAD_CONST,  /* load const<id> to reg0,sizeof(id)=2 */
 	OP_LOAD_SYMBOL,

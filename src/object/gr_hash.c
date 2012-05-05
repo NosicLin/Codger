@@ -388,19 +388,15 @@ int GrHash_Print(GrHash* h,FILE* f)
 	return 0;
 }
 
-static struct gr_operator_ops hash_operator_ops=
-{
-	.t_set_item=(GrSetItemFunc)GrHash_Map,
-	.t_get_item=(GrGetItemFunc)GrHash_Lookup,
-	.t_bool=(GrBoolFunc)GrHash_Bool,
-};
-
 static struct gr_type_ops hash_type_ops=
 {
-	.t_operator=&hash_operator_ops,
 	.t_hash=GrObject_NotSupportHash,
 	.t_print=(GrPrintFunc)GrHash_Print,
 	.t_destruct=(GrDestructFunc)GrHash_Destruct,
+
+	.t_set_item=(GrSetItemFunc)GrHash_Map,
+	.t_get_item=(GrGetItemFunc)GrHash_Lookup,
+	.t_bool=(GrBoolFunc)GrHash_Bool,
 };
 
 struct gr_type_info Gr_Type_Hash=

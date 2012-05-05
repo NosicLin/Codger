@@ -10,6 +10,8 @@ int GrObject_Cmp(GrObject*,GrObject*,int op);
 
 int GrObject_RichEq(GrObject* x,GrObject* y)
 {
+	return GrObject_Eq(x,y);
+	/*
 	int ret;
 	GrTypeInfo* t_x=GrObject_Type(x);
 	GrTypeInfo* t_y=GrObject_Type(y);
@@ -30,6 +32,7 @@ int GrObject_RichEq(GrObject* x,GrObject* y)
 		}
 	}
 	return x==y;
+	*/
 }
 
 
@@ -113,6 +116,338 @@ struct gr_type_ops GR_TYPE_OPS_NOT_SUPPORT=
 {
 	
 };
+
+
+GrObject* GrObject_Positive(GrObject* gs)
+{
+	GrObject* ret;
+	struct gr_type_ops* t_ops=GrObject_Type(gs)->t_ops;
+	if(!t_ops->t_positive)
+	{
+		goto defalut_action;
+	}
+	ret=t_ops->t_positive(gs);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s Positive Func",
+					GrObject_Name(gs));
+		}
+
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("%s Not Support Operand '+'",GrObject_Name(gs));
+	return NULL;
+}
+
+
+GrObject* GrObject_Negative(GrObject* gs)
+{
+	GrObject* ret;
+	struct gr_type_ops* t_ops=GrObject_Type(gs)->t_ops;
+	if(!t_ops->t_negative)
+	{
+		goto defalut_action;
+	}
+	ret=t_ops->t_negative(gs);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s Positive Func",
+					GrObject_Name(gs));
+		}
+
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("%s Not Support Operand '-'",GrObject_Name(gs));
+	return NULL;
+}
+
+GrObject* GrObject_Negated(GrObject* gs)
+{
+	GrObject* ret;
+	struct gr_type_ops* t_ops=GrObject_Type(gs)->t_ops;
+	if(!t_ops->t_negated)
+	{
+		goto defalut_action;
+	}
+	ret=t_ops->t_negated(gs);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s Positive Func",
+					GrObject_Name(gs));
+		}
+
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("%s Not Support Operand '~'",GrObject_Name(gs));
+	return NULL;
+}
+
+
+/*FIXME not suggest to use marocs,but for quick build */
+
+#define Gr_OBJECT_BINARY_OPS(H,M,L,S) \
+GrObject* GrObject_##M(GrObject* x,GrObject* y) \
+{ \
+	GrObject* ret; \
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops; \
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops; \
+	if(!x_ops->t_##L) \
+	{ \
+		goto reverse; \
+	} \
+	ret=x_ops->t_##L(x,y); \
+	if(ret==NULL)  \
+	{ \
+		if(!GrExcept_Happened()) \
+		{ \
+			GrErr_BugFromat("Interal Bug For %s and %s"#M"Func", \
+					GrObject_Name(x),GrObject_Name(y)); \
+		} \
+		return NULL; \
+	} \
+	if(ret==GR_OPS_NOT_SUPPORT) \
+	{\
+		goto reverse; \
+	} \
+	return ret; \
+reverse: \
+	if(!y_ops->t_##L##_reverse) \
+	{ \
+		goto defalut_action; \
+	} \
+	ret=y_ops->t_##L##_reverse(y,x); \
+	if(ret==NULL) \
+	{ \
+		if(!GrExcept_Happened()) \
+		{ \
+			GrErr_BugFromat("Interal Bug For %s and %s"#M"Reverse Func", \
+					GrObject_Name(x),GrObject_Name(y)); \
+			return NULL; \
+		} \
+	} \
+	if(ret==GR_OPS_NOT_SUPPORT) \
+	{ \
+		goto defalut_action; \
+	}\
+	return ret; \
+defalut_action: \
+	GrErr_TypeFormat("Not Support Operand '"#S"' For '%s' and '%s'", \
+				GrObject_Name(x),GrObject_Name(y)); \
+	return NULL; \
+}
+
+
+Gr_OBJECT_BINARY_OPS(MUL,Mul,mul,*);
+Gr_OBJECT_BINARY_OPS(DIV,Div,div,/);
+Gr_OBJECT_BINARY_OPS(MOD,Mod,mod,%%);
+Gr_OBJECT_BINARY_OPS(PLUS,Plus,plus,+);
+Gr_OBJECT_BINARY_OPS(MINUS,Minus,minus,-);
+Gr_OBJECT_BINARY_OPS(LSHIFT,LShift,lshift,<<);
+Gr_OBJECT_BINARY_OPS(RSHIFT,RShift,rshift,>>);
+Gr_OBJECT_BINARY_OPS(AND,And,and,&);
+Gr_OBJECT_BINARY_OPS(XOR,Xor,xor,^);
+Gr_OBJECT_BINARY_OPS(OR,Or,or,|);
+
+int GrObject_Lt(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==-1;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==-1;
+defalut_action:
+	GrErr_TypeFormat("Not Support Operand '<' For '%s' and '%s'",
+			GrObject_Name(x),GrObject_Name(y));
+	return GR_CMP_NOT_SUPPORT;
+}
+
+
+int GrObject_Le(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==-1||ret==0;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==-1||ret==0;
+defalut_action:
+	GrErr_TypeFormat("Not Support Operand '<=' For '%s' and '%s'",
+			GrObject_Name(x),GrObject_Name(y));
+	return GR_CMP_NOT_SUPPORT;
+}
+
+int GrObject_Ge(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==1||ret==0;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==1||ret==0;
+defalut_action:
+	GrErr_TypeFormat("Not Support Operand '>=' For '%s' and '%s'",
+			GrObject_Name(x),GrObject_Name(y));
+	return GR_CMP_NOT_SUPPORT;
+}
+
+int GrObject_Gt(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==1;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==1;
+defalut_action:
+	GrErr_TypeFormat("Not Support Operand '>' For '%s' and '%s'",
+			GrObject_Name(x),GrObject_Name(y));
+	return GR_CMP_NOT_SUPPORT;
+}
+
+
+
+int GrObject_Eq(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==0;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==0;
+defalut_action:
+	return x==y;
+}
+
+int GrObject_Ne(GrObject* x,GrObject* y)
+{
+	int ret;
+	struct gr_type_ops* x_ops=GrObject_Type(x)->t_ops;
+	struct gr_type_ops* y_ops=GrObject_Type(y)->t_ops;
+	if(!x_ops->t_cmp)
+	{
+		goto  reverse;
+	}
+	ret=x_ops->t_cmp(x,y);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto reverse;
+	}
+	return ret==-1||ret==1;
+reverse:
+	if(!y_ops->t_cmp_reverse(y,x))
+	{
+		goto defalut_action;
+	}
+	ret=y_ops->t_cmp_reverse(y,x);
+	if(ret==GR_CMP_NOT_SUPPORT)
+	{
+		goto defalut_action;
+	}
+	return ret==-1||ret==1;
+defalut_action:
+	return x!=y;
+}
+
 
 
 

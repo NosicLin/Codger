@@ -65,6 +65,7 @@ int GrOpcode_Init(GrOpcode* op)
 	op->o_flags=0;
 	op->o_name=0;
 	op->o_args_name=0;
+	op->o_module=0;
 	return 0;
 }
 
@@ -150,19 +151,24 @@ static char* s_op_name[]=
 	/* engine op */
 	"OP_EXIT",
 	"OP_RETURN",
+	"OP_RETURN_NIL",
 
 	/* Data op */
 	"OP_STORE",  /* move reg0 to symbol<id> */
 	"OP_PUSH",   /* move reg0 to stack */
 	"OP_DISCARD",
 
+	"OP_DUP_DATA1",
 	"OP_DUP_DATA3",
 	"OP_DATA_SWAP0_3",
 
+	"OP_FUNC_BEGIN",
 	"OP_FUNC_DEFALUT_ARGS",
 
 	"OP_GET_ATTR",
 	"OP_SET_ATTR",
+
+	"OP_FUNC_OPCODE",
 
 	"OP_LOAD_CONST",  /* load const<id> to reg0,sizeof(id)=2 */
 	"OP_LOAD_SYMBOL",
@@ -219,11 +225,11 @@ int GrOpcode_WriteToFile(GrOpcode* op,FILE* f,int indent)
 	fprintf(f,"Flags:");
 	if(op->o_flags&GR_OPCODE_FLAG_MANY_ARG)
 	{
-		fprintf(f,"DEFAULT_ARGS ");
+		fprintf(f,"MANY_ARGS");
 	}
 	if(op->o_flags&GR_OPCODE_FLAGS_DEFAULT_ARG)
 	{
-		fprintf(f,"MANY_ARGS ");
+		fprintf(f,"DEFAULT_ARGS");
 	}
 	if(op->o_flags==0)
 	{

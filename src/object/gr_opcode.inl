@@ -104,6 +104,10 @@ static inline void GrOpcode_SetName(GrOpcode* op,GrString* name)
 {
 	op->o_name=name;
 }
+static inline void GrOpcode_SetModule(GrOpcode* op,struct gr_module* m)
+{
+	op->o_module=m;
+}
 
 static inline int GrOpcode_Verify(GrObject* g)
 {
