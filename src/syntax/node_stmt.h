@@ -23,13 +23,13 @@ extern AstTypeInfo Ast_Type_Or_Assign;
 
 extern AstTypeInfo Ast_Type_For;
 extern AstTypeInfo Ast_Type_While;
-
-
 extern AstTypeInfo Ast_Type_If;
 extern AstTypeInfo Ast_Type_If_Elif;
 extern AstTypeInfo Ast_Type_Else;
-extern AstTypeInfo Ast_Type_Return;
 extern AstTypeInfo Ast_Type_Func;
+
+
+extern AstTypeInfo Ast_Type_Return;
 
 
 enum ARG_TYPE

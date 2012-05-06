@@ -1,0 +1,13 @@
+
+a=10
+func f()
+	$a=20
+	print $a
+end
+
+print a
+
+f()
+print a
+
+

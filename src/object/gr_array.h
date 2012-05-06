@@ -18,6 +18,16 @@ struct gr_array
 typedef struct gr_array GrArray;
 extern GrTypeInfo Gr_Type_Array;
 
+struct gr_array_iter
+{
+	INHERIT_GROBJECT;
+	GrArray* i_host;
+	size_t i_cur_pos;
+};
+
+typedef struct gr_array_iter GrArrayIter;
+extern GrTypeInfo Gr_Type_Array_Iter;
+
 
 GrArray* GrArray_GcNew();
 GrArray* GrArray_GcNewFlag(long);
@@ -36,6 +46,11 @@ int GrArray_Insert(GrArray*,ssize_t index,GrObject* item);
 int GrArray_Remove(GrArray*,ssize_t index);
 
 GrArray* GrArray_Plus(GrArray* ,GrArray*);
+
+GrArrayIter* GrArray_Iter(GrArray*);
+
+GrArrayIter* GrArrayIter_GcNew(GrArray* host);
+GrObject* GrArrayIter_Next(GrArrayIter* iter);
 
 static inline ssize_t GrArray_Size(GrArray* ga)
 {

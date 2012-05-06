@@ -402,6 +402,10 @@ expr :logic_or_expr{$$=$1;} ;
 
 stmt_expr:expr 
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Expr);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
 	} 
 	;
 
@@ -539,9 +543,16 @@ stmt_continue: kCONTINUE
 	;
 stmt_return: kRETURN expr
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Return);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
 	}
 	|kRETURN
 	{
+		AstObject* node=AstNode_New(&Ast_Type_Return);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	;
 

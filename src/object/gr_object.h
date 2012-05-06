@@ -55,7 +55,15 @@ int GrObject_Ge(GrObject*,GrObject*);
 int GrObject_Gt(GrObject*,GrObject*);
 int GrObject_Eq(GrObject*,GrObject*);
 int GrObject_Ne(GrObject*,GrObject*);
+int GrObject_Bool(GrObject*);
 
+GrObject* GrObject_GetItem(GrObject*,GrObject*);
+int GrObject_SetItem(GrObject*,GrObject*,GrObject*);
+
+GrObject* GrObject_Iter(GrObject*);
+GrObject* GrObject_IterNext(GrObject*);
+
+GrObject* GrObject_Call(GrObject*,GrObject*);
 
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 

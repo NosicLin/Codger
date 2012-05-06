@@ -1,0 +1,16 @@
+func make_counter(begin)
+	a=func(x)
+		$begin+=x
+		return $begin
+	end 
+	return a
+end 
+
+q1=make_counter(10)
+q2=make_counter(10)
+
+print q1(3),q1(3),q2(3)
+
+q3=make_counter(20)
+print q3(3),q3(10),q3(20)
+

@@ -4,6 +4,7 @@
 #include<engine/except.h>
 #include<utility_c/marocs.h>
 #include"gr_int.h"
+#include"gr_consts.h"
 
 #define GR_ARRAY_FLAG_PRINT 0x1l
 
@@ -24,6 +25,7 @@ static inline int ga_init(GrArray* ga,size_t size)
 	GrObject** obs;
 	ga->a_flags=0;
 	ga->a_size=size;
+	int i;
 
 	if(size<=GR_ARRAY_SMALL_SIZE)
 	{
@@ -41,6 +43,12 @@ static inline int ga_init(GrArray* ga,size_t size)
 		ga->a_cap=size;
 		ga->a_objects=obs;
 	}
+
+	for(i=0;i<size;i++)
+	{
+		ga->a_objects[i]=Gr_Object_Nil;
+	}
+
 	return 0;
 }
 
@@ -240,6 +248,12 @@ int GrArray_Remove(GrArray* ga,ssize_t index)
 }
 
 
+GrArrayIter* GrArray_Iter(GrArray* ga)
+{
+	return GrArrayIter_GcNew(ga);
+}
+
+
 GrArray* GrArray_Plus(GrArray* x ,GrArray* y)
 {
 	ssize_t x_size=x->a_size;
@@ -360,6 +374,7 @@ static struct gr_type_ops array_type_ops=
 	.t_hash=GrObject_NotSupportHash,
 	.t_print=(GrPrintFunc)GrArray_Print,
 
+	.t_iter=(GrIterFunc)GrArray_Iter,
 	.t_get_item=ga_get_item,
 	.t_set_item=ga_set_item,
 	.t_plus=ga_plus,
@@ -375,6 +390,40 @@ struct gr_type_info Gr_Type_Array=
 
 
 
+GrArrayIter* GrArrayIter_GcNew(GrArray* host)
+{
+	GrArrayIter* iter=GrGc_New(GrArrayIter,&Gr_Type_Array_Iter);
+	if(iter==NULL)
+	{
+		GrErr_MemFormat("Can't Alloc Memory For ArrayIterObject");
+		return NULL;
+	}
+	iter->i_host=host;
+	iter->i_cur_pos=0;
+	return iter;
+}
+GrObject* GrArrayIter_Next(GrArrayIter* iter)
+{
+	if(iter->i_cur_pos>=GrArray_Size(iter->i_host))
+	{
+		GrExcept_IterStop();
+		return NULL;
+	}
+
+	return iter->i_host->a_objects[iter->i_cur_pos++];
+}
+
+static struct gr_type_ops array_iter_type_ops=
+{
+	.t_iter_next=(GrIterNextFunc)GrArrayIter_Next,
+};
+
+GrTypeInfo Gr_Type_Array_Iter=
+{
+	.t_name="ArrayIterObject",
+	.t_size=sizeof(GrArrayIter),
+	.t_ops=&array_iter_type_ops,
+};
 
 
 

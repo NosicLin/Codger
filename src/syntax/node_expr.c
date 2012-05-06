@@ -172,7 +172,7 @@ static int var_to_oper_and_assign_opcode(
 	AstVar* node=AST_TO_VAR(ab);
 	int ret;
 
-	ret=GrOpcode_NeedMore(op,11);
+	ret=GrOpcode_NeedMore(op,12);
 	if(ret<0) return -1;
 
 	GrString* symbol=node->v_value;
@@ -188,6 +188,7 @@ static int var_to_oper_and_assign_opcode(
 	{
 		GrOpcode_Push5(op,OP_LOAD_SYMBOL2,id);
 	}
+	GrOpcode_Push(op,OP_DATA_SWAP0_1);
 
 	switch(type)
 	{
@@ -246,7 +247,7 @@ static int upper_var_to_oper_and_assign_opcode(
 	AstVar* node=AST_TO_VAR(ab);
 	int ret;
 
-	ret=GrOpcode_NeedMore(op,11);
+	ret=GrOpcode_NeedMore(op,12);
 	if(ret<0) return -1;
 
 	GrString* symbol=node->v_value;
@@ -263,6 +264,7 @@ static int upper_var_to_oper_and_assign_opcode(
 		GrOpcode_Push5(op,OP_LOAD_U_SYMBOL2,id);
 	}
 
+	GrOpcode_Push(op,OP_DATA_SWAP0_1);
 	switch(type)
 	{
 		case AST_ASSIGN_TYPE_MUL:
@@ -1240,11 +1242,12 @@ static int square_to_oper_and_assign_opcode(
 	ret=Ast_ToOpcode(index,m,op,0);
 	if(ret<0) return -1;
 
-	ret=GrOpcode_NeedMore(op,6);
+	ret=GrOpcode_NeedMore(op,7);
 	if(ret<0) return -1;
 
 	GrOpcode_Push(op,OP_DUP_DATA3);
 	GrOpcode_Push(op,OP_GET_ITEM);
+	GrOpcode_Push(op,OP_DATA_SWAP0_1);
 
 	switch(type)
 	{

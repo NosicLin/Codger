@@ -46,4 +46,8 @@ EgSframe* EgSframe_NewFromModule(GrModule* m)
 	return sf;
 }
 
+void EgSframe_Free(EgSframe* f)
+{
+	GrMem_Free(f);
+}
 

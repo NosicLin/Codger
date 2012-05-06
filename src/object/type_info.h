@@ -28,6 +28,8 @@ typedef int (*GrPrintFunc)(GrObject*,FILE*);
 typedef int (*GrSetItemFunc)(GrObject*,GrObject*,GrObject*);
 typedef GrObject* (*GrGetItemFunc)(GrObject*,GrObject*);
 typedef GrObject* (*GrCallFunc)(GrObject*,GrObject*);
+typedef GrObject* (*GrIterFunc)(GrObject*);
+typedef GrObject* (*GrIterNextFunc)(GrObject*);
 
 typedef int (*GrDestructFunc)(GrObject*);
 struct gr_type_ops
@@ -37,8 +39,8 @@ struct gr_type_ops
 
 	GrPrintFunc t_print;
 
-	GrObject* (*t_iter)(GrObject*);
-	GrObject* (*t_iter_next)(GrObject*);
+	GrIterFunc t_iter;
+	GrIterNextFunc t_iter_next;
 
 	int (*t_set_attr)(GrObject*,GrObject* s,GrObject* v,long flags);
 	int (*t_get_attr)(GrObject*,GrObject* s,long flags);

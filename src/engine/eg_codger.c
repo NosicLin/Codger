@@ -10,7 +10,6 @@ int EgCodger_StartThread(EgThread* eg)
 		return EG_THREAD_EXIT_NORMAL;
 	}
 
-	EgThread_RestoreContex(eg,eg->t_fstack);
 	ret=EgThread_Run(eg);
 	return ret;
 }

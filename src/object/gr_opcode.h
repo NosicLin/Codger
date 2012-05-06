@@ -9,7 +9,7 @@
 #define GR_OPCODE_DEBUG 
 
 #define GR_OPCODE_FLAG_MANY_ARG 0x1l
-#define GR_OPCODE_FLAGS_DEFAULT_ARG (0x1l<<1)
+#define GR_OPCODE_FLAG_DEFAULT_ARG (0x1l<<1)
 
 
 struct gr_module;
@@ -66,11 +66,13 @@ static inline void GrOpcode_ClrFlags(GrOpcode*,long);
 static inline void GrOpcode_SetArgName(GrOpcode*,GrArray*);
 static inline void GrOpcode_SetModule(GrOpcode*,struct gr_module*);
 
+
 static inline int GrOpcode_Verify(GrObject*);
 
 #include"gr_opcode.inl"
 
 int GrOpcode_WriteToFile(GrOpcode* ,FILE* f,int indent);
+const char* GrOpcode_Name(u_int8_t );
 
 #ifdef GR_OPCODE_DEBUG 
 static inline GrObject* OPCODE_TO_GR(GrOpcode* op)
@@ -107,12 +109,12 @@ enum OP_CODES
 	OP_LSHIFT,
 	OP_RSHIFT,
 	OP_AND,
-	OP_OR,
 	OP_XOR,
+	OP_OR,
 	OP_LT,
 	OP_LE,
-	OP_NE,
 	OP_EQ,
+	OP_NE,
 	OP_GE,
 	OP_GT,
 	OP_BOOL_NOTAKE,
@@ -131,23 +133,23 @@ enum OP_CODES
 	OP_ARRAY_PUSH,
 	OP_ARRAY_END,
 
+	/*func object*/
+	OP_FUNC_BEGIN,
+	OP_FUNC_DEFALUT_ARGS,
+
+
+	/* Data op */
+	OP_DISCARD,
+	OP_DUP_DATA1,
+	OP_DUP_DATA3,
+	OP_DATA_SWAP0_1,
+	OP_DATA_SWAP0_3,
+
 	/* engine op */
 	OP_EXIT,
 	OP_RETURN,
 	OP_RETURN_NIL,
 
-	/* Data op */
-	OP_STORE,  /* move reg0 to symbol<id> */
-	OP_PUSH,   /* move reg0 to stack */
-	OP_DISCARD,
-
-	OP_DUP_DATA1,
-	OP_DUP_DATA3,
-	OP_DATA_SWAP0_3,
-
-	/*func object*/
-	OP_FUNC_BEGIN,
-	OP_FUNC_DEFALUT_ARGS,
 #define OP_NEED_PARAM2 OP_GET_ATTR
 	OP_GET_ATTR,
 	OP_SET_ATTR,

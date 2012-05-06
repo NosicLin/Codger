@@ -5,11 +5,13 @@
 #include<utility_c/marocs.h>
 #include<memory/gc.h>
 #include<memory/memory.h>
+#include"gr_string.h"
 
 #define DEFALULT_PERTURB_SHIFT 5
 #define GR_HASH_PRINT_FLAG 0x1l
-static GrObject __dummy;
-static GrObject* dummy=&__dummy;
+static GrObject __Gr_Hash_Dummy;
+
+GrObject* Gr_Hash_Dummy=&__Gr_Hash_Dummy;
 
 static inline void ht_init(GrHash* h,GrHashLookUpFunc f)
 {
@@ -69,8 +71,8 @@ static GrHashEntry* ht_normal_lookup_func(GrHash* h,GrObject* key,
 	{
 		return p;
 	}
-	/* if p->e_key is dummy, mean this slot used before,but deleted */
-	if(p->e_key==dummy)
+	/* if p->e_key is Gr_Hash_Dummy, mean this slot used before,but deleted */
+	if(p->e_key==Gr_Hash_Dummy)
 	{
 		freeslot=p;
 	}
@@ -100,7 +102,7 @@ static GrHashEntry* ht_normal_lookup_func(GrHash* h,GrObject* key,
 		{
 			return freeslot==NULL?p:freeslot;
 		}
-		if(p->e_key==dummy&&freeslot!=NULL)
+		if(p->e_key==Gr_Hash_Dummy&&freeslot!=NULL)
 		{
 			freeslot=p;
 		}
@@ -184,7 +186,7 @@ static int ht_resize(GrHash* h,ssize_t minisize)
 		if(p->e_key!=NULL)
 		{
 			i--;
-			if(p->e_key!=dummy)
+			if(p->e_key!=Gr_Hash_Dummy)
 			{
 				ht_simple_insert(h,p->e_key,p->e_code,p->e_value);
 			}
@@ -241,7 +243,7 @@ int GrHash_Map(GrHash* h,GrObject* key,GrObject* value)
 {
 	ssize_t code=GrObject_Hash(key);
 	ssize_t used=h->h_used;
-	int ret;
+	int ret=0;
 	GrHashEntry* p=h->h_look_up(h,key,code);
 	if(p==NULL)
 	{
@@ -252,7 +254,7 @@ int GrHash_Map(GrHash* h,GrObject* key,GrObject* value)
 		h->h_fill++;
 		h->h_used++;
 	}
-	if(p->e_key==dummy)
+	if(p->e_key==Gr_Hash_Dummy)
 	{
 		h->h_used++;
 		p->e_key=NULL;
@@ -283,7 +285,7 @@ GrObject* GrHash_Lookup(GrHash* h,GrObject* key)
 	{
 		return NULL;
 	}
-	if(p->e_key==NULL||p->e_key==dummy)
+	if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
 	{
 		GrErr_KeyFormat("Hash Object Not Map Key");
 		return NULL;
@@ -291,6 +293,24 @@ GrObject* GrHash_Lookup(GrHash* h,GrObject* key)
 	assert(p->e_value);
 	return p->e_value;
 }
+GrObject* GrHash_LookupName(GrHash* h,GrObject* key)
+{
+	assert(GrString_Verify(key));
+	ssize_t code=GrObject_Hash(key);
+	GrHashEntry* p=h->h_look_up(h,key,code);
+	if(p==NULL)
+	{
+		return NULL;
+	}
+	if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
+	{
+		GrErr_NameFormat("Name '%s' Is Not Define",GR_TO_S(key)->s_value);
+		return NULL;
+	}
+	assert(p->e_value);
+	return p->e_value;
+}
+
 
 GrHashEntry* GrHash_GetEntry(GrHash* h,GrObject* key)
 {
@@ -315,12 +335,12 @@ int GrHash_Del(GrHash* h,GrObject* key)
 	{
 		return -1;
 	}
-	if(p->e_key==NULL||p->e_key==dummy)
+	if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
 	{
 		GrErr_KeyFormat("Hash Object Not Map Key");
 		return -1;
 	}
-	p->e_key=dummy;
+	p->e_key=Gr_Hash_Dummy;
 	p->e_value=NULL;
 	return 0;
 }
@@ -354,7 +374,7 @@ int GrHash_Print(GrHash* h,FILE* f)
 	int print_first=0;
 	while(!print_first)
 	{
-		if(p->e_key==NULL||p->e_key==dummy)
+		if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
 		{
 			continue;
 			p++;
@@ -369,7 +389,7 @@ int GrHash_Print(GrHash* h,FILE* f)
 	}
 	while(i>0)
 	{
-		if(p->e_key==NULL||p->e_key==dummy)
+		if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
 		{
 			p++;
 			continue;

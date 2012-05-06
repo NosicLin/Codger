@@ -32,6 +32,8 @@ typedef struct gr_hash GrHash;
 
 
 extern GrTypeInfo Gr_Type_Hash;
+
+extern GrObject* Gr_Hash_Dummy;
 /* all hash table used gc module for memory alloc, so can't free memory
  * by your self, this is also explain why I don't provide GrHash_Free,
  * if your want to used hash table for another used,not interative with 
@@ -46,6 +48,7 @@ int GrHash_Init();
 
 int GrHash_Map(GrHash* h,GrObject* key,GrObject* value);
 GrObject* GrHash_Lookup(GrHash* h,GrObject* key);
+GrObject* GrHash_LookupName(GrHash* h,GrObject* key);
 GrHashEntry* GrHash_GetEntry(GrHash* h,GrObject* key);
 
 int GrHash_Del(GrHash* h,GrObject* key);

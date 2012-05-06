@@ -448,12 +448,144 @@ defalut_action:
 	return x!=y;
 }
 
+GrObject* GrObject_GetItem(GrObject* host,GrObject* index)
+{
+	GrObject* ret;
+	struct gr_type_ops* host_ops=GrObject_Type(host)->t_ops;
+	if(!host_ops->t_get_item)
+	{
+		goto defalut_action;
+	}
+	ret=host_ops->t_get_item(host,index);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' GetItem Func",
+					GrObject_Name(host));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Not Support GetItem",GrObject_Name(host));
+	return NULL;
+}
+
+int GrObject_SetItem(GrObject* host,GrObject* index,GrObject* value)
+{
+	int ret;
+	struct gr_type_ops* host_ops=GrObject_Type(host)->t_ops;
+	if(!host_ops->t_set_item)
+	{
+		goto defalut_action;
+	}
+	ret=host_ops->t_set_item(host,index,value);
+	if(ret<0)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' SetItem Func",
+					GrObject_Name(host));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Not Support SetItem",GrObject_Name(host));
+	return -1;
+}
 
 
+int GrObject_Bool(GrObject* g)
+{
+	int ret;
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_bool)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_bool(g);
+	if(ret<0)
+	{	
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' Bool Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	return 1;
+}
 
+GrObject* GrObject_Iter(GrObject* g)
+{
+	GrObject* ret;
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_iter)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_iter(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' Iter Func",
+					GrObject_Name(g));
+		}
+	}
 
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Iterator",GrObject_Name(g));
+	return NULL;
+}
 
+GrObject* GrObject_IterNext(GrObject* g)
+{
+	GrObject* ret;
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_iter_next)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_iter_next(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' IterNext Func",
+					GrObject_Name(g));
+		}
 
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Iterator Next",GrObject_Name(g));
+	return NULL;
+}
 
+GrObject* GrObject_Call(GrObject* g,GrObject* args)
+{
+	GrObject* ret;
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_call)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_call(g,args);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' Call Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Call",GrObject_Name(g));
+	return NULL;
+}
 
 

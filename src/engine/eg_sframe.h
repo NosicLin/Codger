@@ -21,7 +21,7 @@ typedef struct eg_sframe EgSframe;
 
 EgSframe* EgSframe_NewFromFunc(GrFunc*);
 EgSframe* EgSframe_NewFromModule(GrModule*);
-void EgSFrame_Free(EgSframe* );
+void EgSframe_Free(EgSframe* );
 
 int EgsFrame_ClearCache();
 int GrModule_EgSframeInit();

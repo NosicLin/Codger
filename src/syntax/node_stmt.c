@@ -639,11 +639,11 @@ static int if_to_opcode(AstObject* ab,GrModule* m,
 		{
 			GrOpcode_SetCode3(op,i,OP_JUMPR_FORWARD,if_end-i);
 		}
-		if(i>=OP_NEED_PARAM4)
+		if(cur>=OP_NEED_PARAM4)
 		{
 			i+=4;
 		}
-		else if(i>=OP_NEED_PARAM2)
+		else if(cur>=OP_NEED_PARAM2)
 		{
 			i+=2;
 		}
@@ -774,7 +774,7 @@ static int func_to_opcode(AstObject* ab,GrModule* m,
 		}
 		if(cur->a_type==ARG_DEFAULT_VALUE)
 		{
-			flags|=GR_OPCODE_FLAGS_DEFAULT_ARG;
+			flags|=GR_OPCODE_FLAG_DEFAULT_ARG;
 			arg_nu++;
 
 			CHECK_SUB_NODE_NUM(arg,1);
@@ -784,7 +784,7 @@ static int func_to_opcode(AstObject* ab,GrModule* m,
 
 			ret=GrOpcode_NeedMore(op,1);
 			if(ret<0) return -1;
-			GrOpcode_Push(op,OP_PUSH);
+			GrOpcode_Push(op,OP_ARRAY_PUSH);
 		}
 		if(cur->a_type==ARG_MANY)
 		{
@@ -855,45 +855,43 @@ AstObject* AstArg_New(int type,GrString* name)
 	return (AstObject*)node;
 }
 
+
+static int return_to_opcode(AstObject* ab,GrModule* m,
+						GrOpcode* op, long flags)
+{
+
+	CHECK_NODE_TYPE(ab,ATN_RETURN);
+
+	AstObject* expr;
+	int ret;
+
+	if(ab->a_chirldren.next!=&ab->a_chirldren)
+	{
+		CHECK_SUB_NODE_NUM(ab,1);
+		AstNode_GetSub1(ab,&expr);
+		ret=Ast_ToOpcode(expr,m,op,flags);
+		if(ret<0) return -1;
 		
+		ret=GrOpcode_NeedMore(op,1);
+		if(ret<0) return -1;
 
+		GrOpcode_Push(op,OP_RETURN);
+	}
+	else 
+	{
+		CHECK_SUB_NODE_NUM(ab,0);
+		ret=GrOpcode_NeedMore(op,1);
+		if(ret<0) return -1;
+		GrOpcode_Push(op,OP_RETURN_NIL);
+	}
+	return 0;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+AstTypeInfo Ast_Type_Return=
+{
+	.t_type=ATN_RETURN,
+	.t_name="Return",
+	.t_to_opcode=return_to_opcode,
+};
+		
 
