@@ -6,6 +6,8 @@
 #include<memory/gc.h>
 #include<memory/memory.h>
 #include"gr_string.h"
+#include"gr_consts.h"
+#include"gr_util.h"
 
 #define DEFALULT_PERTURB_SHIFT 5
 #define GR_HASH_PRINT_FLAG 0x1l
@@ -369,7 +371,7 @@ int GrHash_Print(GrHash* h,FILE* f)
 	{
 		ht_set_print(h);
 	}
-	fprintf(f,"{");
+	fprintf(f,"{\n");
 
 	int print_first=0;
 	while(!print_first)
@@ -380,8 +382,9 @@ int GrHash_Print(GrHash* h,FILE* f)
 			p++;
 		}
 		i--;
+		fprintf(f,"\t");
 		GrObject_Print(p->e_key,f,0);
-		fprintf(f,"->");
+		fprintf(f,"  =>  ");
 		assert(p->e_value);
 		GrObject_Print(p->e_value,f,0);
 		print_first=1;
@@ -395,14 +398,15 @@ int GrHash_Print(GrHash* h,FILE* f)
 			continue;
 		}
 		i--;
-		fprintf(f,",");
+		fprintf(f,"\n");
+		fprintf(f,"\t");
 		GrObject_Print(p->e_key,f,0);
-		fprintf(f,"->");
+		fprintf(f,"  =>  ");
 		assert(p->e_value);
 		GrObject_Print(p->e_value,f,0);
 		p++;
 	}
-	fprintf(f,"}");
+	fprintf(f,"\n}");
 
 	ht_clr_print(h);
 	return 0;
@@ -410,7 +414,7 @@ int GrHash_Print(GrHash* h,FILE* f)
 
 static struct gr_type_ops hash_type_ops=
 {
-	.t_hash=GrObject_NotSupportHash,
+	.t_hash=GrUtil_HashNotSupport,
 	.t_print=(GrPrintFunc)GrHash_Print,
 	.t_destruct=(GrDestructFunc)GrHash_Destruct,
 

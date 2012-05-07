@@ -57,6 +57,11 @@ int GrHash_Bool(GrHash* h);
 
 int GrHash_Verify(GrObject* h);
 
+static inline int GrHashEntry_Valid(GrHashEntry* h)
+{
+	return (h->e_key!=NULL&&h->e_key!=Gr_Hash_Dummy);
+}
+
 #ifdef GR_HASH_DEBUG
 static inline GrObject* HASH_TO_R(GrHash* h)
 {

@@ -7,6 +7,7 @@
 #include<memory/gc.h>
 #include"eg_thread.h"
 #include"eg_sframe.h"
+#include"object/gr_int.h"
 
 int main(int argc,char** argv)
 {
@@ -14,12 +15,15 @@ int main(int argc,char** argv)
 
 	GrModule_MemInit();
 	GrModule_GcInit();
+	GrModule_IntInit();
 	GrModule_ConstsInit();
 
 	Scanner* sc=0;
 	AstObject* root=0;
 	GrModule* module=0;
 	GrString* module_name=0;
+	EgThread* thread=0;
+	EgSframe* sf=0;
 	int ret=0;
 	if(argc!=2)
 	{
@@ -51,10 +55,10 @@ int main(int argc,char** argv)
 	}
 	GrModule_SetName(module,module_name);
 
-	EgThread* thread=EgThread_New();
+	thread=EgThread_New();
 	if(thread==NULL) goto error;
 
-	EgSframe* sf=EgSframe_NewFromModule(module);
+	sf=EgSframe_NewFromModule(module);
 	if(sf==NULL) goto error;
 
 	EgThread_PushSframe(thread,sf);

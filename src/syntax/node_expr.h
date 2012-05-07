@@ -31,6 +31,8 @@ AST_TYPE_CAST(VAR,Var,ATN_VAR);
 extern AstTypeInfo Ast_Type_Call;
 extern AstTypeInfo Ast_Type_Square;
 
+extern AstTypeInfo Ast_Type_Period;
+
 extern AstTypeInfo Ast_Type_Positive;
 extern AstTypeInfo Ast_Type_Negative;
 extern AstTypeInfo Ast_Type_Negated;

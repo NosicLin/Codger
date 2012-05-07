@@ -1,0 +1,5 @@
+print 1.add(3)
+
+
+print 4.mul(4)
+print 3.mul(3).mul(3).add(3).add(6)

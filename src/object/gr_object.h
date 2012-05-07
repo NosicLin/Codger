@@ -29,7 +29,6 @@ const char* GrObject_Name(GrObject*);
 int GrObject_Cmp(GrObject*,GrObject*,int op);
 int GrObject_RichEq(GrObject*,GrObject*);
 ssize_t GrObject_Hash(GrObject*);
-ssize_t GrObject_NotSupportHash(GrObject*);
 
 #define GR_PRINT_SPACE 0x1l
 #define GR_PRINT_TAB (0x1l<<1)
@@ -63,7 +62,11 @@ int GrObject_SetItem(GrObject*,GrObject*,GrObject*);
 GrObject* GrObject_Iter(GrObject*);
 GrObject* GrObject_IterNext(GrObject*);
 
-GrObject* GrObject_Call(GrObject*,GrObject*);
+GrObject* GrObject_Call(GrObject*,GrObject*,GrObject*);
+
+GrObject* GrObject_GetAttr(GrObject*,GrObject*,long);
+
+int GrObject_SetAttr(GrObject*,GrObject*,GrObject*,long);
 
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 

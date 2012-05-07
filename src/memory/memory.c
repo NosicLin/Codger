@@ -216,7 +216,6 @@ void* Gr_MemAlloc(size_t size)
 
 void Gr_MemFree(void* ptr)
 {
-	assert(!((unsigned long)ptr&GR_MEM_ALIGN_LOW_MASK));
 
 	register struct block_header* b=(struct block_header*)ptr;
 	register struct page_header* h=(struct page_header*)GR_PAGE_ROUND_UPPER(ptr);
@@ -245,6 +244,8 @@ void Gr_MemFree(void* ptr)
 		Gr_Free(ptr);
 		return;
 	}
+
+	assert(!((unsigned long)ptr&GR_MEM_ALIGN_LOW_MASK));
 
 	BUG_ON(h->p_slot_idx>=GR_MEM_MAX_SLOT_NU,"h->p_slot_idx=%d,Max=%d",
 					h->p_slot_idx,GR_MEM_MAX_SLOT_NU);

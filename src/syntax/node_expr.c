@@ -1,7 +1,7 @@
 #include"node_expr.h"
 #include<utility_c/marocs.h>
 #define GR_UINT32_MAX 0xffffffff
-
+#define AST_OPCODE_FLAG_CALL 0x1
 static int literal_to_opcode(AstObject* ab,GrModule* md,GrOpcode* op,long flags)
 {
 	CHECK_SUB_NODE_NUM(ab,0);
@@ -1135,7 +1135,7 @@ static int call_to_opcode(AstObject* ab,GrModule* m,
 
 	AstNode_GetSub2(ab,&expr,&arg_list);
 
-	ret=Ast_ToOpcode(expr,m,op,0);
+	ret=Ast_ToOpcode(expr,m,op,AST_OPCODE_FLAG_CALL);
 	if(ret<0) return -1;
 
 	ret=GrOpcode_NeedMore(op,1);
@@ -1302,6 +1302,208 @@ AstTypeInfo Ast_Type_Square=
 	.t_to_assign_opcode=square_to_assign_opcode,
 	.t_to_oper_and_assign_opcode=square_to_oper_and_assign_opcode,
 };
+
+
+
+static int period_to_opcode(AstObject* ab,GrModule* m,
+					GrOpcode* op,long flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_PERIOD);
+	CHECK_SUB_NODE_NUM(ab,2);
+
+	AstObject* expr;
+	AstObject* identifer;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&expr,&identifer);
+
+
+	GrString* attr_name=AST_TO_VAR(identifer)->v_value;
+
+	assert(attr_name);
+
+	u_int32_t id=GrModule_MapSymbol(m,(GrObject*)attr_name);
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=Ast_ToOpcode(expr,m,op,0);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(op,7);
+	if(ret<0) return -1;
+
+
+	if(flags&AST_OPCODE_FLAG_CALL)
+	{
+		GrOpcode_Push(op,OP_DUP_DATA1);
+		GrOpcode_Push(op,OP_SET_HOST);
+	}
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_GET_ATTR,id);
+	}
+	else 
+	{
+		GrOpcode_Push5(op,OP_GET_ATTR2,id);
+	}
+	return 0;
+}
+
+static int  period_to_assign_opcode(AstObject* ab,GrModule* m,
+					GrOpcode* op,long flags)
+{
+
+	CHECK_NODE_TYPE(ab,ATN_PERIOD);
+	CHECK_SUB_NODE_NUM(ab,2);
+
+	AstObject* expr;
+	AstObject* identifer;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&expr,&identifer);
+
+
+	GrString* attr_name=AST_TO_VAR(identifer)->v_value;
+
+	assert(attr_name);
+
+
+	u_int32_t id=GrModule_MapSymbol(m,(GrObject*)attr_name);
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=Ast_ToOpcode(expr,m,op,5);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(op,5);
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_SET_ATTR,id);
+	}
+	else 
+	{
+		GrOpcode_Push5(op,OP_SET_ATTR2,id);
+	}
+
+	return 0;
+}
+
+
+static int  period_to_oper_and_assign_code(AstObject* ab,
+		GrModule* m,GrOpcode* op,int type,long flags)
+{
+
+	CHECK_NODE_TYPE(ab,ATN_PERIOD);
+	CHECK_SUB_NODE_NUM(ab,2);
+
+	AstObject* expr;
+	AstObject* identifer;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&expr,&identifer);
+
+
+	GrString* attr_name=AST_TO_VAR(identifer)->v_value;
+
+	assert(attr_name);
+
+
+	u_int32_t id=GrModule_MapSymbol(m,(GrObject*)attr_name);
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=Ast_ToOpcode(expr,m,op,5);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(op,14);
+	if(ret<0) return -1;
+
+
+	GrOpcode_Push(op,OP_DUP_DATA2);
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_GET_ATTR,id);
+	}
+	else 
+	{
+		GrOpcode_Push5(op,OP_GET_ATTR2,id);
+	}
+
+	switch(type)
+	{
+		case AST_ASSIGN_TYPE_MUL:
+			GrOpcode_Push(op,OP_MUL);
+			break;
+		case AST_ASSIGN_TYPE_DIV:
+			GrOpcode_Push(op,OP_DIV);
+			break;
+		case AST_ASSIGN_TYPE_MOD:
+			GrOpcode_Push(op,OP_MOD);
+			break;
+		case AST_ASSIGN_TYPE_PLUS:
+			GrOpcode_Push(op,OP_PLUS);
+			break;
+		case AST_ASSIGN_TYPE_MINUS:
+			GrOpcode_Push(op,OP_MINUS);
+			break;
+		case AST_ASSIGN_TYPE_LSHIFT:
+			GrOpcode_Push(op,OP_LSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_RSHIFT:
+			GrOpcode_Push(op,OP_RSHIFT);
+			break;
+		case AST_ASSIGN_TYPE_AND:
+			GrOpcode_Push(op,OP_AND);
+			break;
+		case AST_ASSIGN_TYPE_XOR:
+			GrOpcode_Push(op,OP_XOR);
+			break;
+		case AST_ASSIGN_TYPE_OR:
+			GrOpcode_Push(op,OP_OR);
+			break;
+		default:
+			BUG("Unkown Assgin Type");
+			return -1;
+	}
+
+	GrOpcode_Push(op,OP_DATA_SWAP0_2);
+	GrOpcode_Push(op,OP_DISCARD);
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_SET_ATTR,id);
+	}
+	else 
+	{
+		GrOpcode_Push5(op,OP_SET_ATTR2,id);
+	}
+	return 0;
+}
+
+
+AstTypeInfo Ast_Type_Period=
+{
+	.t_type=ATN_PERIOD,
+	.t_name="Period",
+	.t_to_opcode=period_to_opcode,
+	.t_to_assign_opcode=period_to_assign_opcode,
+	.t_to_oper_and_assign_opcode=period_to_oper_and_assign_code,
+};
+	
+
+
 
 
 

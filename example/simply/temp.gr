@@ -1,5 +1,0 @@
-if ok
-	print  "Program Ok"
-else 
-	print  "Program Failed"
-end 

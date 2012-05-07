@@ -5,6 +5,7 @@
 #include<utility_c/marocs.h>
 #include"gr_int.h"
 #include"gr_consts.h"
+#include"gr_util.h"
 
 #define GR_ARRAY_FLAG_PRINT 0x1l
 
@@ -371,7 +372,7 @@ static GrObject* ga_plus(GrObject* x,GrObject* y)
 
 static struct gr_type_ops array_type_ops=
 {
-	.t_hash=GrObject_NotSupportHash,
+	.t_hash=GrUtil_HashNotSupport,
 	.t_print=(GrPrintFunc)GrArray_Print,
 
 	.t_iter=(GrIterFunc)GrArray_Iter,

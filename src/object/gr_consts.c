@@ -2,26 +2,38 @@
 #include<memory/gc.h>
 #include"gr_string.h"
 #include"gr_int.h"
+#include<stdio.h>
 
-GrObject* Gr_Const_S_Lambda=0;
-GrObject* Gr_Const_S_This=0;
+GrObject* Gr_Const_String_lambda=0;
+GrObject* Gr_Const_String_this=0;
 GrObject* Gr_False=0;
 GrObject* Gr_True=0;
 GrObject* Gr_Object_Nil=0;
 
+int nil_print(GrObject* x,FILE* f)
+{
+	fprintf(f,"Nil");
+	return 0;
+}
+
+static struct gr_type_ops nil_type_ops=
+{
+	.t_print=nil_print,
+};
+
 GrTypeInfo Gr_Type_Nil=
 {
 	.t_name="NilObject",
-	.t_ops=&GR_TYPE_OPS_NOT_SUPPORT,
+	.t_ops=&nil_type_ops,
 	.t_size=sizeof(GrObject),
 };
 int GrModule_ConstsInit()
 {
-	Gr_Const_S_Lambda=(GrObject*)GrString_GcNewFlag("#lambda",GRGC_HEAP_STATIC);
-	if(Gr_Const_S_Lambda==NULL) return -1;
+	Gr_Const_String_lambda=(GrObject*)GrString_GcNewFlag("#lambda",GRGC_HEAP_STATIC);
+	if(Gr_Const_String_lambda==NULL) return -1;
 
-	Gr_Const_S_This=(GrObject*)GrString_GcNewFlag("This",GRGC_HEAP_STATIC);
-	if(Gr_Const_S_This==NULL) return -1;
+	Gr_Const_String_this=(GrObject*)GrString_GcNewFlag("this",GRGC_HEAP_STATIC);
+	if(Gr_Const_String_this==NULL) return -1;
 
 	Gr_False=(GrObject*)GrGc_AllocStatic(GrInt,&Gr_Type_Bool);
 	if(Gr_False==NULL) return -1;
@@ -43,3 +55,4 @@ int GrModule_ConstExit()
 {
 	return 0;
 }
+

@@ -1,0 +1,17 @@
+a=3
+print  a.add(3).add(4).add(4).mul(4) ,56
+print 3.add(3).add(4).add(4).mul(4) ,56
+
+print 2*3.add(4) ,14
+
+print 2.neg() ,-1
+print 3.invert() ,-4
+print (3+4).mul(3+4) ,49
+print 4.div(3),1
+print 9.sub(4),5
+print 10.add(4),14
+print 3.lshift(4),48
+print 8.rshift(2),2
+print 3.xor(4),7
+
+

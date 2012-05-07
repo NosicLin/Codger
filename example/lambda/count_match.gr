@@ -1,0 +1,38 @@
+func countMatching(array,value)
+	count=0
+	for i in  array 
+		if i==value 
+			count+=1
+		end 
+	end 
+	return count
+end 
+
+print countMatching([1,3,3,4,5],3)
+
+func count(array,match)
+	counted=0
+	for i in array 
+		if match(i)
+			counted+=1
+		end 
+	end 
+	return counted
+end 
+
+f=func(num)
+	return num==3
+end 
+print count([1,3,3,4,5],f)
+
+func eq(a,b)
+	return a==b
+end 
+
+func makeEq(a)
+	return func(b) 
+		return $eq($a,b)
+	end 
+end 
+
+print count([1,3,3,4,5],makeEq(3))

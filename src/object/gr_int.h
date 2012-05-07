@@ -80,6 +80,8 @@ static inline int GrInt_Verify(GrObject*);
 static inline int GrBool_Print(GrInt*,FILE* f);
 #include"gr_int.inl"
 
+struct gr_class* GrInt_GetIntClass();
+
 
 
 #ifdef GR_INT_DEBUG

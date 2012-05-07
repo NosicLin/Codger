@@ -14,3 +14,12 @@ print q1(3),q1(3),q2(3)
 q3=make_counter(20)
 print q3(3),q3(10),q3(20)
 
+
+func add_counter(q,value)
+	return q(value)
+end 
+
+print add_counter(q3,10)
+
+print q3(10)
+

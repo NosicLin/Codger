@@ -163,6 +163,15 @@ void EgThread_SFrameReturn(EgThread* eg)
 	}while(0)
 
 
+#define DATA_SWAP(x,y) \
+	do{ \
+		r0=dstack[sp-x-1]; \
+		dstack[sp-x-1]=dstack[sp-y-1]; \
+		dstack[sp-y-1]=r0; \
+	}while(0)
+
+
+
 
 
 int  EgThread_Run(EgThread* e)
@@ -182,11 +191,13 @@ int  EgThread_Run(EgThread* e)
 	register u_int8_t cur_code;	/* instruction register*/
 	register u_int32_t rd; 		/* data register */
 	u_int32_t rs; 				/* status register */
+	GrObject* rh=Gr_Object_Nil;
 	register GrObject* acc;		
 	register GrObject* r0;
 	register GrObject* r1;
 	register GrObject* r2;
 	
+
 
 
 	/* frame relative */
@@ -240,7 +251,9 @@ next_instruct:
 			UNPACK_TWO_OP;
 			eg->t_sp=sp;
 			eg->t_pc=pc;
-			acc=GrObject_Call(r0,r1);
+			r2=rh;
+			rh=Gr_Object_Nil;
+			acc=GrObject_Call(r0,r2,r1);
 			ACC_PUSH;
 			goto next_instruct;
 		case OP_SET_ITEM:
@@ -421,21 +434,29 @@ next_instruct:
 			REF_ONE_OP;
 			R0_PUSH;
 			goto next_instruct;
+		case OP_DUP_DATA2:
+			REF_TWO_OP;
+			R0_PUSH;
+			R1_PUSH;
+			goto next_instruct;
 		case OP_DUP_DATA3:
 			REF_THREE_OP;
 			R0_PUSH;
 			R1_PUSH;
 			R2_PUSH;
 			goto next_instruct;
-		case OP_DATA_SWAP0_3:
-			r0=dstack[sp-1];
-			dstack[sp-1]=dstack[sp-4];
-			dstack[sp-4]=r0;
-			goto next_instruct;
 		case OP_DATA_SWAP0_1:
-			r0=dstack[sp-1];
-			dstack[sp-1]=dstack[sp-2];
-			dstack[sp-2]=r0;
+			DATA_SWAP(0,1);
+			goto next_instruct;
+		case OP_DATA_SWAP0_2:
+			DATA_SWAP(0,2);
+			goto next_instruct;
+		case OP_DATA_SWAP0_3:
+			DATA_SWAP(0,3);
+			goto next_instruct;
+		case OP_SET_HOST:
+			UNPACK_ONE_OP;
+			rh=r0;
 			goto next_instruct;
 
 		/* frame op */
@@ -454,10 +475,16 @@ next_instruct:
 
 		/* OP_NEED_PARAM2 OPCODE */
 		case OP_GET_ATTR:
-			assert(0);
+			UNPACK_ONE_OP;
+			r1=symbols_pool[rd];
+			acc=GrObject_GetAttr(r0,r1,0);
+			ACC_PUSH;
+			goto next_instruct;
 		case OP_SET_ATTR:
-			assert(0);
-
+			UNPACK_TWO_OP;
+			r2=symbols_pool[rd];
+			GrObject_SetAttr(r1,r2,r0,0);
+			goto next_instruct;
 		case OP_FUNC_OPCODE:
 			REF_ONE_OP;
 			GrFunc_SetOpcode((GrFunc*)r0,(GrOpcode*)(opcodes_pool[rd]));

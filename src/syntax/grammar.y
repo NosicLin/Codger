@@ -241,6 +241,14 @@ postfix_expr: primary_expr{$$=$1;}
 		AstNode_Add(node,expr_list);
 		$$=node;
 	}
+	|postfix_expr tPERIOD identifier
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Period);
+		if(node==NULL) return -1;
+		AstNode_Add(node,$1);
+		AstNode_Add(node,$3);
+		$$=node;
+	}
 	;
 symbols:postfix_expr{$$=$1;}
 
@@ -573,7 +581,7 @@ lambda_delare:kFUNC l_rb args_list r_rb func_delimeter block kEND
 	{
 		AstObject* node=AstNode_New(&Ast_Type_Func);
 		if(node==NULL) return AST_MEM_FAILED;
-		AstObject* name=AstVar_New(GR_TO_S(Gr_Const_S_Lambda));
+		AstObject* name=AstVar_New(GR_TO_S(Gr_Const_String_lambda));
 		if(name==NULL) return AST_MEM_FAILED;
 		AstNode_Add(node,name);
 		AstNode_Add(node,$3);

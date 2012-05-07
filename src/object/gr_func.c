@@ -38,7 +38,7 @@ GrFunc* GrFunc_GcNewFlag(long flags)
 }
 
 
-GrObject* GrFunc_Call(GrFunc* gf,GrArray* args)
+GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 {
 	int args_nu=GrArray_Size(args);
 
@@ -112,6 +112,8 @@ GrObject* GrFunc_Call(GrFunc* gf,GrArray* args)
 		ret=GrHash_Map(scope->s_table,name,(GrObject*)many_args);
 		if(ret<0) goto error;
 	}
+	ret=GrHash_Map(scope->s_table,Gr_Const_String_this,host);
+	if(ret<0) goto error;
 
 	EgThread* t=EgThread_GetSelf();
 	EgThread_PushSframe(t,ef);

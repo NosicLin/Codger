@@ -1,6 +1,7 @@
 #include"gr_object.h"
 #include<engine/except.h>
 #include<assert.h>
+#include"gr_string.h"
 
 static GrObject __gr_ops_not_support;
 GrObject* GR_OPS_NOT_SUPPORT=&__gr_ops_not_support;
@@ -43,6 +44,8 @@ ssize_t GrObject_Hash(GrObject* x)
 	assert(x);
 	GrTypeInfo* t_x=GrObject_Type(x);
 	ssize_t ret;
+	assert(t_x);
+	assert(t_x->t_ops);
 	if(t_x->t_ops->t_hash!=0)
 	{
 		ret=t_x->t_ops->t_hash(x);
@@ -62,11 +65,6 @@ ssize_t GrObject_Hash(GrObject* x)
 	}
 }
 
-ssize_t GrObject_NotSupportHash(GrObject* x)
-{
-	GrErr_HashFormat("%s Not Support Hash");
-	return -1;
-}
 int GrObject_Print(GrObject* x,FILE* f,long flags)
 {
 	GrTypeInfo* t_x=GrObject_Type(x);
@@ -273,7 +271,7 @@ int GrObject_Lt(GrObject* x,GrObject* y)
 	}
 	return ret==-1;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -306,7 +304,7 @@ int GrObject_Le(GrObject* x,GrObject* y)
 	}
 	return ret==-1||ret==0;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -338,7 +336,7 @@ int GrObject_Ge(GrObject* x,GrObject* y)
 	}
 	return ret==1||ret==0;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -370,7 +368,7 @@ int GrObject_Gt(GrObject* x,GrObject* y)
 	}
 	return ret==1;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -404,7 +402,7 @@ int GrObject_Eq(GrObject* x,GrObject* y)
 	}
 	return ret==0;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -434,7 +432,7 @@ int GrObject_Ne(GrObject* x,GrObject* y)
 	}
 	return ret==-1||ret==1;
 reverse:
-	if(!y_ops->t_cmp_reverse(y,x))
+	if(!y_ops->t_cmp_reverse)
 	{
 		goto defalut_action;
 	}
@@ -565,7 +563,7 @@ defalut_action:
 	return NULL;
 }
 
-GrObject* GrObject_Call(GrObject* g,GrObject* args)
+GrObject* GrObject_Call(GrObject* g,GrObject* host,GrObject* args)
 {
 	GrObject* ret;
 	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
@@ -573,7 +571,7 @@ GrObject* GrObject_Call(GrObject* g,GrObject* args)
 	{
 		goto defalut_action;
 	}
-	ret=g_ops->t_call(g,args);
+	ret=g_ops->t_call(g,host,args);
 	if(ret==NULL)
 	{
 		if(!GrExcept_Happened())
@@ -587,5 +585,63 @@ defalut_action:
 	GrErr_TypeFormat("'%s' Can't Call",GrObject_Name(g));
 	return NULL;
 }
+
+
+GrObject* GrObject_GetAttr(GrObject* g,GrObject* k,long perm)
+{
+	GrObject* ret;
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_get_attr)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_get_attr(g,k,perm);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' GetAttr Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	assert(GrString_Verify(k));
+	GrErr_TypeFormat("'%s' Has No Attr '%s'",
+			GrObject_Name(g),((GrString*)k)->s_value);
+	return NULL;
+}
+
+int  GrObject_SetAttr(GrObject* g,GrObject* k,GrObject* v,long perm)
+{
+	int ret;
+
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_set_attr)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_set_attr(g,k,v,perm);
+	if(ret<0)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For '%s' GetAttr Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	assert(GrString_Verify(k));
+	GrErr_TypeFormat("'%s' Has No Attr '%s'",
+			GrObject_Name(g),((GrString*)k)->s_value);
+	return -1;
+}
+
+
+
+
+
+
 
 
