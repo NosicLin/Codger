@@ -1,0 +1,17 @@
+class shape
+	attr a=3
+	attr b=4
+	attr width
+end 
+
+class rectangle inherit shape
+	attr width
+	attr height
+
+	func area()
+		return this.width* this.width
+	end 
+end 
+
+
+

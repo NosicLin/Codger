@@ -4,6 +4,8 @@
 #include"gr_hash.h"
 #include"gr_symbol.h"
 #include"gr_util.h"
+#include"gr_instance.h"
+#include<memory/memory.h>
 
 
 GrClass* GrClass_GcNew()
@@ -20,11 +22,20 @@ GrClass* GrClass_GcNew()
 	{
 		return NULL;
 	}
-	c->c_symbols=NULL;
+	c->c_symbols=h;
 
 	GrHash* t=GrHash_GcNew();
 	if(t==NULL) return NULL;
 
+	GrTypeInfo* i_type=GrMem_Alloc(sizeof(*i_type));
+	if(i_type==NULL) return NULL;
+
+	i_type->t_class=c;
+	i_type->t_name="InstanceObject";
+	i_type->t_ops=&instance_type_ops;
+	i_type->t_size=sizeof(GrInstance);
+
+	c->c_instance_type=i_type;
 	c->c_template=t;
 	c->c_inhert=NULL;
 	return c;
@@ -101,18 +112,44 @@ GrObject* GrClass_GetAttr(GrClass* s,GrObject* k)
 }
 
 
-int  GrClass_AddAttr(GrClass* s,GrSymbol* k,GrObject* v)
+int  GrClass_AddAttr(GrClass* s,GrObject* k,GrObject* v)
 {
-	return GrHash_Map(s->c_symbols,(GrObject*)k,v);
+	assert(GrSymbol_Verify(k));
+	return GrHash_Map(s->c_symbols,k,v);
 }
+
+
+int GrClass_TemplateAdd(GrClass* s,GrObject* k,GrObject* v)
+{
+	assert(GrSymbol_Verify(k));
+	return GrHash_Map(s->c_template,k,v);
+}
+
+int GrClass_SetInherit(GrClass* c,GrObject* g)
+{
+	if(!GrClass_Verify(g))
+	{
+		GrErr_TypeFormat("Can't Inherit '%s'",GrObject_Name(g));
+		return -1;
+	}
+	c->c_inhert=(GrClass*)g;
+	return 0;
+}
+
 	
 
-GrObject* GrClass_CreateInstance(GrClass* s)
+GrInstance* GrClass_CreateInstance(GrClass* s)
 {
 
-	return NULL;
+	GrInstance* is=GrInstance_GcNew(s->c_instance_type);
+	return is;
 }
 
+GrInstance* GrClass_CreateInstanceFlag(GrClass* s,long f)
+{
+	GrInstance* is=GrInstance_GcNewFlag(s->c_instance_type,f);
+	return is;
+}
 
 static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 {
@@ -146,6 +183,7 @@ static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 
 static GrObject* class_get_attr(GrClass* s,GrObject* k,long perm)
 {
+	assert(k);
 	GrHashEntry* entry=GrHash_GetEntry(s->c_symbols,k);
 
 	if(!GrHashEntry_Valid(entry))
@@ -171,8 +209,6 @@ static GrObject* class_get_attr(GrClass* s,GrObject* k,long perm)
 	}
 	return entry->e_value;
 }
-
-
 
 
 static struct gr_type_ops class_type_ops=

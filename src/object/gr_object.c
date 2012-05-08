@@ -640,7 +640,7 @@ defalut_action:
 
 
 
-
+int GrObject_Create(GrObject* g,GrObject*)
 
 
 

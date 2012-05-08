@@ -6,6 +6,7 @@
 #include<stdio.h>
 #include<object/gr_consts.h>
 #include<object/gr_func.h>
+#include<object/gr_class.h>
 #define EG_THREAD_DEFALUT_DATA_SIZE (1024*8) 
 
 static EgThread* eg_thread_cur=0;
@@ -159,6 +160,7 @@ void EgThread_SFrameReturn(EgThread* eg)
 			consts_pool=cur_module->m_consts_pool->a_objects; \
 			symbols_pool=cur_module->m_symbols_pool->a_objects; \
 			opcodes_pool=cur_module->m_opcodes_pool->a_objects; \
+			attrs_pool=cur_module->m_attrs_pool->a_objects; \
 		} \
 	}while(0)
 
@@ -209,6 +211,7 @@ int  EgThread_Run(EgThread* e)
 	GrObject** consts_pool=0;
 	GrObject** symbols_pool=0;
 	GrObject** opcodes_pool=0;
+	GrObject** attrs_pool=0;
 	EgSframe* cur_frame=0;
 
 
@@ -247,6 +250,10 @@ next_instruct:
 
 	switch(cur_code)
 	{
+		case OP_NEW:
+			UNPACK_ONE_OP,
+			acc=GrObject_Create(r0);
+			goto next_instruct;
 		case OP_CALL:
 			UNPACK_TWO_OP;
 			eg->t_sp=sp;
@@ -425,8 +432,22 @@ next_instruct:
 			GrFunc_SetDefaultArgs((GrFunc*)r0,(GrArray*)r1);
 			sp--;
 			goto next_instruct;
+		case OP_CLASS_BEGIN:
+			acc=(GrObject*)GrClass_GcNew();
+			ACC_PUSH;
+			goto next_instruct;
+		case OP_CLASS_INHERIT:
+			REF_TWO_OP;
+			GrClass_SetInherit((GrClass*)r0,r1);
+			sp--;
+			goto next_instruct;
+
 
 		/* Data op */
+		case OP_LOAD_NIL:
+			acc=Gr_Object_Nil;
+			ACC_PUSH;
+			goto next_instruct;
 		case OP_DISCARD:
 			sp--;
 			goto next_instruct;
@@ -485,6 +506,20 @@ next_instruct:
 			r2=symbols_pool[rd];
 			GrObject_SetAttr(r1,r2,r0,0);
 			goto next_instruct;
+		case OP_CLASS_TEMPLATE:
+			REF_TWO_OP;
+			r2=attrs_pool[rd];
+			GrClass_TemplateAdd((GrClass*)r0,r2,r1);
+			sp--;
+			goto next_instruct;
+
+		case OP_CLASS_ATTR:
+			REF_TWO_OP;
+			r2=attrs_pool[rd];
+			GrClass_AddAttr((GrClass*)r0,r2,r1);
+			sp--;
+			goto next_instruct;
+
 		case OP_FUNC_OPCODE:
 			REF_ONE_OP;
 			GrFunc_SetOpcode((GrFunc*)r0,(GrOpcode*)(opcodes_pool[rd]));

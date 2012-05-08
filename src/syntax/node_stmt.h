@@ -31,6 +31,10 @@ extern AstTypeInfo Ast_Type_Func;
 
 extern AstTypeInfo Ast_Type_Return;
 
+extern AstTypeInfo Ast_Type_Method;
+extern AstTypeInfo Ast_Type_Attr;
+extern AstTypeInfo Ast_Type_Attr_Default;
+
 
 enum ARG_TYPE
 {
@@ -50,6 +54,27 @@ typedef struct ast_arg AstArg;
 AstObject* AstArg_New(int type,GrString* name);
 AST_TYPE_CAST(ARG,Arg,ATN_ARG);
 
+
+struct ast_class
+{
+	INHERIT_AST_OBJECT;
+	AstObject* c_inherit;
+};
+
+typedef struct ast_class AstClass;
+AstObject* AstClass_New(AstObject* );
+AST_TYPE_CAST(CLASS,Class,ATN_CLASS);
+
+struct ast_class_stmt
+{
+	INHERIT_AST_OBJECT;
+	long c_flags;
+};
+typedef struct ast_class_stmt AstClassStmt;
+AST_TYPE_CAST(CLASS_STMT,ClassStmt,ATN_CLASS_STMT);
+
+AstObject* AstClassStmt_New();
+void AstClassStmt_SetFlag(AstClassStmt* ,long);
 
 
 

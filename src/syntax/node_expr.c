@@ -1503,6 +1503,32 @@ AstTypeInfo Ast_Type_Period=
 };
 	
 
+static int new_to_opcode(AstObject* ab,GrModule* m,
+				GrOpcode* op,long flags)
+{
+	CHECK_SUB_NODE_NUM(ab,1);
+	CHECK_NODE_TYPE(ab,ATN_NEW);
+
+	AstObject* sub_expr;
+	int ret;
+
+	AstNode_GetSub1(ab,&sub_expr);
+
+	Ast_ToOpcode(sub_expr,m,op,0);
+
+	ret=GrOpcode_NeedMore(op,1);
+	if(ret<0) return -1;
+
+	GrOpcode_Push(op,OP_NEW);
+	return 0;
+}
+
+AstTypeInfo Ast_Type_New=
+{
+	.t_type=ATN_NEW,
+	.t_name="New",
+	.t_to_opcode=new_to_opcode,
+};
 
 
 

@@ -1,6 +1,7 @@
 #include"gr_module.h"
 #include<memory/gc.h>
 #include<engine/except.h>
+#include"gr_symbol.h"
 
 GrModule* GrModule_GcNew()
 {
@@ -41,16 +42,21 @@ int GrModule_Init(GrModule* m)
 	GrArray* symbols_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
 	if(symbols_pool==NULL) goto error;
 
-	GrArray* opcode_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
-	if(opcode_pool==NULL) goto error;
+	GrArray* opcodes_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	if(opcodes_pool==NULL) goto error;
+	GrArray* attrs_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	if(attrs_pool==NULL) goto error;
 
 	GrHash* attrs=GrHash_GcNewFlag(GRGC_HEAP_OLD);
+	if(attrs_pool==NULL) goto error ;
+
 	if(attrs==NULL) goto error;
 
 	m->m_consts_pool=consts_pool;
-
 	m->m_symbols_pool=symbols_pool;
-	m->m_opcodes_pool=opcode_pool;
+	m->m_opcodes_pool=opcodes_pool;
+	m->m_attrs_pool=attrs_pool;
+
 	m->m_attrs=attrs;
 	m->m_name=NULL;
 	m->m_codes=NULL;
@@ -145,6 +151,20 @@ int GrModule_WriteToFile(GrModule* m,FILE* f,long flags)
 	}
 	fprintf(f,"\n}\n");
 
+	size=GrArray_Size(m->m_attrs_pool);
+	fprintf(f,"@AttrNum %d \n{\n\t",size);
+	for(i=0;i<size;i++)
+	{
+		cur=GrArray_Get(m->m_attrs_pool,i);
+		GrObject_Print(cur,f,0);
+		fprintf(f," ");
+		if((i+1)%10==0)
+		{
+			fprintf(f,"\n\t");
+		}
+	}
+	fprintf(f,"\n}\n");
+
 	fprintf(f,"@OpCode Module(%s) \n{\n",m->m_name->s_value);
 	GrOpcode_WriteToFile(m->m_codes,f,1);
 	fprintf(f,"}\n");
@@ -173,6 +193,17 @@ GrTypeInfo Gr_Type_Module=
 };
 
 
+
+u_int32_t GrModule_MapAttr(GrModule* m,GrString* g ,long flags)
+{
+	GrSymbol* s=GrSymbol_GcNewFlag(g,flags,GRGC_HEAP_STATIC);
+
+	if(GrArray_Push(m->m_attrs_pool,(GrObject*) s)<0)
+	{
+		return GR_MODULE_MAP_ERR;
+	}
+	return GrArray_Size(m->m_attrs_pool)-1;
+}
 
 
 

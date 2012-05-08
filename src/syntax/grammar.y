@@ -7,6 +7,7 @@
 #include<object/gr_string.h>
 #include<memory/gc.h>
 #include<object/gr_consts.h>
+#include<object/gr_class.h>
 /* I don't want to use void* for default symbol type
  * but if not,i will give every symbol a type,
  * so awfull 
@@ -34,9 +35,9 @@
 %token tSEMI tNEWLINE 
 
 /* keyword */
-%token kAND kAS kAttr kBREAK kCATCH kCLASS kCONTINUE kDO kELIF 
+%token kAND kAS kATTR kBREAK kCATCH kCLASS kCONTINUE kDO kELIF 
 %token kELSE kEND kFINALLY kFOR kFROM kFUNC kIF  kIMPORT kIN 
-%token kINHRIT kNOT kOR kPRINT kRETURN kTHEN kTO KTRY kVFUNC kWHILE 
+%token kINHRIT kNEW kNOT kOR kPRINT kRETURN kSTATIC kTHEN kTO KTRY kVFUNC kWHILE 
 %token kTRUE kFALSE 
 
 
@@ -95,6 +96,7 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_break{$$=$1;}
 	|stmt_continue{$$=$1;}
 	|stmt_return{$$=$1;}
+	|class_declare{$$=$1;}
 	;
 
 stmt_delimiter:tNEWLINE| tSEMI;
@@ -260,6 +262,14 @@ unary_expr:postfix_expr{$$=$1;}
 		AstNode_Add(node,$2);
 		$$=node;
 	}   
+	|kNEW unary_expr l_rb args_list r_rb
+	{
+		AstObject* node=AstNode_New(&Ast_Type_New);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		$$=node;
+	}
 	;
 unary_operator:tPLUS{$$=&Ast_Type_Positive;}
 	|tMINUS{$$=&Ast_Type_Negative;}
@@ -641,3 +651,116 @@ many_args:tMUL identifier
 	}
 	;
 	
+
+class_declare: kCLASS identifier kINHRIT identifier stmt_delimiter class_block kEND
+	{
+		AstObject* node=AstClass_New($4);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$6);
+		$$=node;
+	}
+	|kCLASS identifier stmt_delimiter class_block kEND
+	{
+		AstObject* node=AstClass_New(NULL);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		$$=node;
+	}
+	;
+
+class_block:class_stmts{$$=$1;}
+	|
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
+;
+
+
+class_stmts:class_stmt_decorate
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$1);
+		$$=node;
+	}
+
+	|stmt_delimiter
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
+	}
+	|stmt_delimiter class_stmt_decorate
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Stmts);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+	|class_stmts stmt_delimiter class_stmt_decorate
+	{
+		AstNode_Add($1,$3);
+		$$=$1;
+	}
+	|class_stmts stmt_delimiter{$$=$1;}
+	;
+
+class_stmt_decorate:class_stmt
+	{
+		AstObject* node=AstClassStmt_New();
+
+		if(node==NULL) return AST_MEM_FAILED;
+
+		AstNode_Add(node,$1);
+		$$=node;
+	}
+	| kSTATIC class_stmt
+	{
+		AstObject* node=AstClassStmt_New();
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),GR_CLASS_STATIC);
+		$$=node;
+	}
+	;
+
+
+class_stmt:attr_stmt{$$=$1;}
+	|method_stmt{$$=$1;}
+	;
+
+attr_stmt:kATTR identifier
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Attr);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+
+	|kATTR identifier tASSIGN expr 
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Attr_Default);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		$$=node;
+	}
+	;
+method_stmt:kFUNC identifier l_rb args_list r_rb func_delimeter block kEND
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Method);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		AstNode_Add(node,$7);
+		$$=node;
+	}
+	;
+
+
+
+

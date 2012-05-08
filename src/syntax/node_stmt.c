@@ -1,6 +1,7 @@
 #include"node_stmt.h"
 #include<memory/gc.h>
 #include"node_expr.h"
+#include<object/gr_class.h>
 
 static int print_to_opcode(AstObject* ab,GrModule* m,
 							GrOpcode* op,long flags)
@@ -894,4 +895,389 @@ AstTypeInfo Ast_Type_Return=
 	.t_to_opcode=return_to_opcode,
 };
 		
+
+static int class_to_opcode(AstObject* ab,GrModule* m,
+			GrOpcode* op,long flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_CLASS);
+	CHECK_SUB_NODE_NUM(ab,2);
+
+	AstClass* a_c=AST_TO_CLASS(ab);
+	AstObject* inhert=a_c->c_inherit;
+
+	AstObject* name;
+	AstObject* block;
+
+	int ret;
+
+	AstNode_GetSub2(ab,&name,&block);
+
+
+	u_int32_t id=GrModule_MapSymbol(m,
+				(GrObject*)((AST_TO_VAR(name)->v_value)));
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,7);
+	if(ret<0) return -1;
+
+	GrOpcode_Push(op,OP_CLASS_BEGIN);
+
+	if(inhert!=NULL)
+	{
+		u_int32_t inhert_id=GrModule_MapSymbol(m,
+				(GrObject*)(AST_TO_VAR(inhert)->v_value));
+		if(inhert_id==GR_MODULE_MAP_ERR)
+		{
+			return -1;
+		}
+		if(GrOpcode_OpdataSize16(inhert_id))
+		{
+			GrOpcode_Push3(op,OP_LOAD_SYMBOL,inhert_id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_LOAD_SYMBOL,inhert_id);
+		}
+		GrOpcode_Push(op,OP_CLASS_INHERIT);
+	}
+
+	ret=Ast_ToOpcode(block,m,op,0);
+	if(ret<0) return -1;
+	
+	ret=GrOpcode_NeedMore(op,5);
+	if(ret<0) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_STORE_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_STORE_SYMBOL2,id);
+	}
+
+	return 0;
+}
+
+AstTypeInfo Ast_Type_Class=
+{
+	.t_name="Class",
+	.t_type=ATN_CLASS,
+	.t_to_opcode=class_to_opcode,
+};
+
+AstObject* AstClass_New(AstObject* inhert)
+{
+	AstClass* node=AstNode_NewType(AstClass,&Ast_Type_Class);
+	if(node==NULL) return NULL;
+
+	node->c_inherit=inhert;
+
+	return (AstObject*)node;
+}
+
+
+static int attr_to_opcode(AstObject* ab,GrModule* m,
+			GrOpcode* op,long flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_ATTR);
+	CHECK_SUB_NODE_NUM(ab,1);
+
+	AstObject* name;
+	AstNode_GetSub1(ab,&name);
+
+	int ret;
+
+	u_int32_t id=GrModule_MapAttr(m, AST_TO_VAR(name)->v_value,
+							flags&GR_CLASS_PERM_MASK);
+
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,6);
+	if(ret<0) return -1;
+
+	GrOpcode_Push(op,OP_LOAD_NIL);
+
+	if(flags&GR_CLASS_STATIC)
+	{
+		if(GrOpcode_OpdataSize16(id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_ATTR,id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_ATTR2,id);
+		}
+	}
+	else 
+	{
+		if(GrOpcode_OpdataSize16(id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_TEMPLATE,id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_TEMPLATE2,id);
+		}
+	}
+	return 0;
+}
+
+AstTypeInfo Ast_Type_Attr=
+{
+	.t_name="Attr",
+	.t_type=ATN_ATTR,
+	.t_to_opcode=attr_to_opcode,
+};
+
+
+static int attr_default_to_opcode(AstObject* ab,GrModule* m,
+				GrOpcode* op,long flags)
+{
+
+	CHECK_NODE_TYPE(ab,ATN_ATTR_DEFAULT);
+	CHECK_SUB_NODE_NUM(ab,2);
+
+	AstObject* name;
+	AstObject* expr;
+	AstNode_GetSub2(ab,&name,&expr);
+
+	int ret;
+
+	u_int32_t id=GrModule_MapAttr(m,
+							AST_TO_VAR(name)->v_value,
+							flags&GR_CLASS_PERM_MASK);
+
+
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,6);
+	if(ret<0) return -1;
+
+	ret=Ast_ToOpcode(expr,m,op,0);
+	if(ret<0) return ret;
+
+
+	if(flags&GR_CLASS_STATIC)
+	{
+		if(GrOpcode_OpdataSize16(id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_ATTR,id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_ATTR2,id);
+		}
+	}
+	else 
+	{
+		if(GrOpcode_OpdataSize16(id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_TEMPLATE,id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_TEMPLATE2,id);
+		}
+	}
+	return 0;
+}
+
+
+AstTypeInfo Ast_Type_Attr_Default=
+{
+	.t_type=ATN_ATTR_DEFAULT,
+	.t_name="AttrDefault",
+	.t_to_opcode=attr_default_to_opcode,
+};
+
+
+static int method_to_opcode(AstObject* ab,GrModule* m,
+				GrOpcode* op,long f)
+{
+	CHECK_NODE_TYPE(ab,ATN_METHOD);
+	CHECK_SUB_NODE_NUM(ab,3);
+	AstObject* func_name;
+	AstObject* arg_list;
+	AstObject* block;
+
+	AstObject* arg;
+
+	AstNode_GetSub3(ab,&func_name,&arg_list,&block);
+
+	GrOpcode* func_codes=GrOpcode_GcNewFlag(GRGC_HEAP_STATIC);
+	if(func_codes==NULL) return -1;
+
+	u_int32_t codes_id=GrModule_MapOpcode(m,func_codes);
+	if(codes_id==GR_MODULE_MAP_ERR) return -1;
+	assert(GrOpcode_OpdataSize16(codes_id));
+
+	int ret;
+	ret=GrOpcode_NeedMore(op,4);
+	GrOpcode_Push(op,OP_FUNC_BEGIN);
+	GrOpcode_Push3(op,OP_FUNC_OPCODE,codes_id);
+	GrOpcode_Push(op,OP_ARRAY_BEGIN);
+
+	
+	GrArray* arg_names=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
+	int arg_min_nu=0;
+	int arg_nu=0;
+	long flags=0;
+
+	list_for_each_entry(arg,&arg_list->a_chirldren,a_sibling)
+	{
+		CHECK_NODE_TYPE(arg,ATN_ARG);
+		AstArg* cur=AST_TO_ARG(arg);
+		AstObject* expr;
+		GrString* name;
+
+		name=cur->a_name;
+		ret=GrArray_Push(arg_names,S_TO_GR(name));
+		if(ret<0) return -1;
+
+		if(cur->a_type==ARG_SIMPLY)
+		{
+			CHECK_SUB_NODE_NUM(arg,0);
+			arg_min_nu++;
+			arg_nu++;
+		}
+		if(cur->a_type==ARG_DEFAULT_VALUE)
+		{
+			flags|=GR_OPCODE_FLAG_DEFAULT_ARG;
+			arg_nu++;
+
+			CHECK_SUB_NODE_NUM(arg,1);
+			AstNode_GetSub1(arg,&expr);
+			ret=Ast_ToOpcode(expr,m,op,0);
+			if(ret<0) return -1;
+
+			ret=GrOpcode_NeedMore(op,1);
+			if(ret<0) return -1;
+			GrOpcode_Push(op,OP_ARRAY_PUSH);
+		}
+		if(cur->a_type==ARG_MANY)
+		{
+			flags|=GR_OPCODE_FLAG_MANY_ARG;
+		}
+	}
+	ret=GrOpcode_NeedMore(op,8);
+	if(ret<0) return -1;
+	GrOpcode_Push(op,OP_ARRAY_END);
+	GrOpcode_Push(op,OP_FUNC_DEFALUT_ARGS);
+
+	u_int32_t func_id=GrModule_MapAttr(m,
+					AST_TO_VAR(func_name)->v_value,
+			 		 f&GR_CLASS_PERM_MASK);
+
+	if(func_id==GR_MODULE_MAP_ERR) return -1;
+
+	if(f&GR_CLASS_STATIC)
+	{
+		if(GrOpcode_OpdataSize16(func_id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_ATTR,func_id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_ATTR2,func_id);
+		}
+	}
+	else 
+	{
+		if(GrOpcode_OpdataSize16(func_id))
+		{
+			GrOpcode_Push3(op,OP_CLASS_TEMPLATE,func_id);
+		}
+		else
+		{
+			GrOpcode_Push5(op,OP_CLASS_TEMPLATE2,func_id);
+		}
+	}
+
+	GrOpcode_SetName(func_codes,AST_TO_VAR(func_name)->v_value);
+	GrOpcode_SetArgNu(func_codes,arg_nu);
+	GrOpcode_SetArgMin(func_codes,arg_min_nu);
+	GrOpcode_SetFlags(func_codes,flags);
+	GrOpcode_SetArgName(func_codes,arg_names);
+	GrOpcode_SetModule(func_codes,m);
+
+
+	ret=Ast_ToOpcode(block,m,func_codes,0);
+	if(ret<0) return -1;
+
+	ret=GrOpcode_NeedMore(func_codes,1);
+	if(ret<0) return -1;
+	GrOpcode_Push(func_codes,OP_RETURN_NIL);
+
+	return 0;
+
+}
+
+AstTypeInfo Ast_Type_Method=
+{
+	.t_type=ATN_METHOD,
+	.t_name="Method",
+	.t_to_opcode=method_to_opcode,
+};
+
+
+
+static int class_stmt_to_opcode(AstObject* ab, GrModule* m,
+					GrOpcode* op,long flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_CLASS_STMT);
+	CHECK_SUB_NODE_NUM(ab,1);
+
+	AstObject* stmt;
+	int ret;
+
+	AstNode_GetSub1(ab,&stmt);
+
+	AstClassStmt* c_stmt=AST_TO_CLASS_STMT(ab);
+
+
+	ret=Ast_ToOpcode(stmt,m,op,c_stmt->c_flags);
+	if(ret<0) return -1;
+	return 0;
+}
+
+AstTypeInfo Ast_Type_Class_Stmt=
+{
+	.t_type=ATN_CLASS_STMT,
+	.t_name="ClassStmt",
+	.t_to_opcode=class_stmt_to_opcode,
+};
+
+AstObject* AstClassStmt_New()
+{
+	AstClassStmt* node=AstNode_NewType(AstClassStmt,&Ast_Type_Class_Stmt);
+	if(node==NULL) return NULL;
+
+	node->c_flags=0;
+
+	return (AstObject*)node;
+}
+
+void AstClassStmt_SetFlag(AstClassStmt* s ,long f)
+{
+	s->c_flags=f;
+}
+
+
+
+
+
+
+
+
+	
 

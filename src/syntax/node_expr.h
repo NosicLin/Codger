@@ -32,6 +32,7 @@ extern AstTypeInfo Ast_Type_Call;
 extern AstTypeInfo Ast_Type_Square;
 
 extern AstTypeInfo Ast_Type_Period;
+extern AstTypeInfo Ast_Type_New;
 
 extern AstTypeInfo Ast_Type_Positive;
 extern AstTypeInfo Ast_Type_Negative;

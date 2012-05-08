@@ -1,0 +1,17 @@
+shape_name="shape"
+class shape 
+	attr width=0
+	attr height=0
+	static attr name=shape_name
+	static func getName()
+		return this.name
+	end 
+end 
+
+print shape.name
+shape.name="another_shape"
+print shape.name
+
+print shape.getName()
+
+print 1.add(3).add(4)

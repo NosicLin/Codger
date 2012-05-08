@@ -18,6 +18,7 @@ struct gr_module
 	GrArray* m_consts_pool;
 	GrArray* m_symbols_pool;
 	GrArray* m_opcodes_pool;
+	GrArray* m_attrs_pool;
 
 	GrString* m_name;
 	GrHash* m_attrs;
@@ -37,6 +38,7 @@ int GrModule_Init(GrModule* );
 u_int32_t GrModule_MapOpcode(GrModule*,GrOpcode*);
 u_int32_t GrModule_MapConst(GrModule*,GrObject*);
 u_int32_t GrModule_MapSymbol(GrModule*,GrObject*);
+u_int32_t GrModule_MapAttr(GrModule*,GrString*,long);
 
 
 int GrModule_SetName(GrModule*,GrString*);
