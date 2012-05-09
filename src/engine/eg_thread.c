@@ -83,8 +83,10 @@ void EgThread_SFrameReturn(EgThread* eg)
 	/* push return value to data stack */
 	if(eg->t_fstack)
 	{
+		assert(eg->t_relval);
 		eg->t_dstack[eg->t_fstack->f_sp++]=eg->t_relval;
 	}
+	eg->t_relval=NULL;
 	EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
 
 	EgSframe_Free(f);
@@ -250,10 +252,6 @@ next_instruct:
 
 	switch(cur_code)
 	{
-		case OP_NEW:
-			UNPACK_ONE_OP,
-			acc=GrObject_Create(r0);
-			goto next_instruct;
 		case OP_CALL:
 			UNPACK_TWO_OP;
 			eg->t_sp=sp;
@@ -486,11 +484,17 @@ next_instruct:
 			goto over;
 		case OP_RETURN:
 			UNPACK_ONE_OP;
-			eg->t_relval=r0;
+			if(eg->t_relval==NULL)
+			{
+				eg->t_relval=r0;
+			}
 			EgThread_SFrameReturn(eg);
 			goto next_instruct;
 		case OP_RETURN_NIL:
-			eg->t_relval=Gr_Object_Nil;
+			if(eg->t_relval==NULL)
+			{
+				eg->t_relval=Gr_Object_Nil;
+			}
 			EgThread_SFrameReturn(eg);
 			goto next_instruct;
 

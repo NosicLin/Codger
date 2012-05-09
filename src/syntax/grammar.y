@@ -262,14 +262,6 @@ unary_expr:postfix_expr{$$=$1;}
 		AstNode_Add(node,$2);
 		$$=node;
 	}   
-	|kNEW unary_expr l_rb args_list r_rb
-	{
-		AstObject* node=AstNode_New(&Ast_Type_New);
-		if(node==NULL) return AST_MEM_FAILED;
-		AstNode_Add(node,$2);
-		AstNode_Add(node,$4);
-		$$=node;
-	}
 	;
 unary_operator:tPLUS{$$=&Ast_Type_Positive;}
 	|tMINUS{$$=&Ast_Type_Negative;}

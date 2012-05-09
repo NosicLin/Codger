@@ -5,6 +5,9 @@
 /* string const */
 extern GrObject* Gr_Const_String_lambda;
 extern GrObject* Gr_Const_String_this;
+extern GrObject* Gr_Const_String_unkown;
+extern GrObject* Gr_Const_String_init;
+
 extern GrObject* Gr_Const_String_mul;
 extern GrObject* Gr_Const_String_div;
 extern GrObject* Gr_Const_String_mod;

@@ -4,6 +4,7 @@
 #include"gr_hash.h"
 #include"gr_string.h"
 #include"gr_symbol.h"
+#include"gr_array.h"
 #include"gr_instance.h"
 
 #define GR_CLASS_PERM_MASK ((0x1l<<3)-1)
@@ -50,8 +51,7 @@ int GrClass_AddAttr(GrClass*,GrObject*,GrObject*);
 int GrClass_TemplateAdd(GrClass*,GrObject*,GrObject*);
 
 
-GrInstance* GrClass_CreateInstance(GrClass*);
-GrInstance* GrClass_CreateInstanceFlag(GrClass*,long);
+GrInstance* GrClass_Call(GrClass*,GrObject*,GrArray*);
 
 
 

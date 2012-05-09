@@ -95,7 +95,6 @@ enum OP_CODES
 {
 	OP_UNKOWN=0,
 	/* expr op */
-	OP_NEW,
 	OP_CALL,
 	OP_SET_ITEM, 
 	OP_GET_ITEM,

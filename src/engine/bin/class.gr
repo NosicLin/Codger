@@ -1,17 +1,25 @@
 shape_name="shape"
+
 class shape 
 	attr width=0
 	attr height=0
-	static attr name=shape_name
-	static func getName()
-		return this.name
+
+
+	func init(x,y=4)
+		this.width=x
+		this.height=y
+	end 
+		
+	func area()
+		return this.width* this.height;
 	end 
 end 
 
-print shape.name
-shape.name="another_shape"
-print shape.name
+c1=shape(3)
+print c1.area()
 
-print shape.getName()
+c2=shape(4,5)
+print c2.area()
+print c1.area()
 
-print 1.add(3).add(4)
+

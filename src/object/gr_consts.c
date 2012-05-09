@@ -6,6 +6,8 @@
 
 GrObject* Gr_Const_String_lambda=0;
 GrObject* Gr_Const_String_this=0;
+GrObject* Gr_Const_String_unkown=0;
+GrObject* Gr_Const_String_init=0;
 GrObject* Gr_False=0;
 GrObject* Gr_True=0;
 GrObject* Gr_Object_Nil=0;
@@ -34,6 +36,12 @@ int GrModule_ConstsInit()
 
 	Gr_Const_String_this=(GrObject*)GrString_GcNewFlag("this",GRGC_HEAP_STATIC);
 	if(Gr_Const_String_this==NULL) return -1;
+
+	Gr_Const_String_unkown=(GrObject*)GrString_GcNewFlag("unkown",GRGC_HEAP_STATIC);
+	if(Gr_Const_String_unkown==NULL) return -1;
+
+	Gr_Const_String_init=(GrObject*)GrString_GcNewFlag("init",GRGC_HEAP_STATIC);
+	if(Gr_Const_String_init==NULL) return -1;
 
 	Gr_False=(GrObject*)GrGc_AllocStatic(GrInt,&Gr_Type_Bool);
 	if(Gr_False==NULL) return -1;

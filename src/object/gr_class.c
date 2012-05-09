@@ -5,7 +5,11 @@
 #include"gr_symbol.h"
 #include"gr_util.h"
 #include"gr_instance.h"
+#include"gr_array.h"
 #include<memory/memory.h>
+#include"gr_consts.h"
+#include"gr_func.h"
+#include<engine/eg_thread.h>
 
 
 GrClass* GrClass_GcNew()
@@ -38,6 +42,7 @@ GrClass* GrClass_GcNew()
 	c->c_instance_type=i_type;
 	c->c_template=t;
 	c->c_inhert=NULL;
+	c->c_name=(GrString*)Gr_Const_String_unkown;
 	return c;
 }
 
@@ -138,18 +143,42 @@ int GrClass_SetInherit(GrClass* c,GrObject* g)
 
 	
 
-GrInstance* GrClass_CreateInstance(GrClass* s)
+GrInstance* GrClass_Call(GrClass* s,GrObject* host,GrArray* args)
 {
 
+	size_t arg_nu=GrArray_Size(args);
 	GrInstance* is=GrInstance_GcNew(s->c_instance_type);
+	GrHashEntry* entry=GrHash_GetEntry(s->c_template,Gr_Const_String_init);
+	/* class has no construct, so arg_nu will be 0*/
+	if(!GrHashEntry_Valid(entry))
+	{
+		if(arg_nu!=0)
+		{
+			GrErr_ArgsFormat("%s Construct Take 0 Args,But %d Gived",
+					s->c_name->s_value,arg_nu);
+			return NULL;
+		}
+
+		return is;
+	}
+
+	assert(entry->e_value);
+
+	GrObject* init=entry->e_value;
+
+	if(!GrFunc_Verify(init))
+	{
+		return is;
+	}
+	EgThread* t=EgThread_GetSelf();
+	t->t_relval=(GrObject*)is;
+	if(GrFunc_Call((GrFunc*)init,(GrObject*)is,args)==NULL)
+	{
+		return NULL;
+	}
 	return is;
 }
 
-GrInstance* GrClass_CreateInstanceFlag(GrClass* s,long f)
-{
-	GrInstance* is=GrInstance_GcNewFlag(s->c_instance_type,f);
-	return is;
-}
 
 static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 {
@@ -213,7 +242,7 @@ static GrObject* class_get_attr(GrClass* s,GrObject* k,long perm)
 
 static struct gr_type_ops class_type_ops=
 {
-	.t_new=(GrNewFunc)GrClass_CreateInstance,
+	.t_call=(GrCallFunc)GrClass_Call,
 	.t_get_attr=(GrGetAttrFunc)class_get_attr,
 	.t_set_attr=(GrSetAttrFunc)class_set_attr,
 };

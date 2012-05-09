@@ -1503,6 +1503,7 @@ AstTypeInfo Ast_Type_Period=
 };
 	
 
+/*
 static int new_to_opcode(AstObject* ab,GrModule* m,
 				GrOpcode* op,long flags)
 {
@@ -1533,6 +1534,7 @@ AstTypeInfo Ast_Type_New=
 
 
 
+*/
 
 
 

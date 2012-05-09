@@ -197,7 +197,6 @@ const char* GrOpcode_Name(u_int8_t i)
 	switch(i)
 	{
 		OP_CODE_MAP_NAME(OP_UNKOWN);
-		OP_CODE_MAP_NAME(OP_NEW);
 		OP_CODE_MAP_NAME(OP_CALL);
 		OP_CODE_MAP_NAME(OP_SET_ITEM);
 		OP_CODE_MAP_NAME(OP_GET_ITEM);
