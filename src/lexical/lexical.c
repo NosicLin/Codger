@@ -4,7 +4,6 @@
 #include <string.h>
 #include "token.h"
 
-#define KEYWORD_NUM (TOKEN_FALSE-TOKEN_AND+1)
 struct state lex_state_err=
 {
 	"lex_state_err",
@@ -250,6 +249,9 @@ struct keyword key_words[]=
 	{"not",TOKEN_NOT},
 	{"or",TOKEN_OR},
 	{"print",TOKEN_PRINT},
+	{"private",TOKEN_PRIVATE},
+	{"protected",TOKEN_PROTECTED},
+	{"public",TOKEN_PUBLIC},
 	{"return",TOKEN_RETURN},
 	{"static",TOKEN_STATIC},
 	{"then",TOKEN_THEN},

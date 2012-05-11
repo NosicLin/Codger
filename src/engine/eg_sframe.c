@@ -2,6 +2,7 @@
 #include<memory/memory.h>
 #include"except.h"
 #include<string.h>
+#include<object/gr_consts.h>
 
 EgSframe* EgSframe_NewFromFunc(GrFunc* func)
 {
@@ -19,6 +20,7 @@ EgSframe* EgSframe_NewFromFunc(GrFunc* func)
 		GrMem_Free(sf);
 		return NULL;
 	}
+	sf->f_host=Gr_Object_Nil;
 	sf->f_scope=sc;
 	sf->f_codes=func->f_codes;
 	return sf;
@@ -41,6 +43,7 @@ EgSframe* EgSframe_NewFromModule(GrModule* m)
 		GrMem_Free(sf);
 		return NULL;
 	}
+	sf->f_host=Gr_Object_Nil;
 	sf->f_scope=sc;
 	sf->f_codes=m->m_codes;
 	return sf;

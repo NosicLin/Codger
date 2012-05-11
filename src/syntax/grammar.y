@@ -37,7 +37,7 @@
 /* keyword */
 %token kAND kAS kATTR kBREAK kCATCH kCLASS kCONTINUE kDO kELIF 
 %token kELSE kEND kFINALLY kFOR kFROM kFUNC kIF  kIMPORT kIN 
-%token kINHRIT kNEW kNOT kOR kPRINT kRETURN kSTATIC kTHEN kTO KTRY kVFUNC kWHILE 
+%token kINHRIT kNEW kNOT kOR kPRINT kPRIVATE kPROTECTED kPUBLIC kRETURN kSTATIC kTHEN kTO KTRY kVFUNC kWHILE 
 %token kTRUE kFALSE 
 
 
@@ -707,19 +707,44 @@ class_stmt_decorate:class_stmt
 
 		if(node==NULL) return AST_MEM_FAILED;
 
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),GR_CLASS_PROTECTED);
 		AstNode_Add(node,$1);
 		$$=node;
 	}
+	| access_control class_stmt
+	{
+		AstObject* node=AstClassStmt_New();
+		if(node==NULL) return AST_MEM_FAILED;
+
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),(long)$1);
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+		
 	| kSTATIC class_stmt
 	{
 		AstObject* node=AstClassStmt_New();
 		if(node==NULL) return AST_MEM_FAILED;
 		AstNode_Add(node,$2);
 		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),GR_CLASS_STATIC);
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),GR_CLASS_PROTECTED);
+		$$=node;
+	}
+	| kSTATIC access_control class_stmt
+	{
+		AstObject* node=AstClassStmt_New();
+		if(node==NULL) return AST_MEM_FAILED;
+
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),GR_CLASS_STATIC);
+		AstClassStmt_SetFlag(AST_TO_CLASS_STMT(node),(long)$1);
+		AstNode_Add(node,$2);
 		$$=node;
 	}
 	;
-
+access_control:kPUBLIC{$$=(void*)GR_CLASS_PUBLIC;}
+	|kPROTECTED{$$=(void*)GR_CLASS_PROTECTED;}
+	|kPRIVATE{$$=(void*)GR_CLASS_PRIVATE;}
+;
 
 class_stmt:attr_stmt{$$=$1;}
 	|method_stmt{$$=$1;}

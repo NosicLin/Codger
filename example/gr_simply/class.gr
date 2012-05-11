@@ -1,0 +1,18 @@
+class rectangle
+	attr width
+	attr height
+	func init(w,h)
+		this.width=w
+		this.height=h
+	end 
+	func area()
+		return this.width*this.height
+	end
+end 
+
+
+c1=rectangle(3,4)
+print c1.area()
+
+c2=rectangle(5,6)
+print c2.area()	

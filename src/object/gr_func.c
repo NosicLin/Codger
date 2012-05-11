@@ -40,6 +40,7 @@ GrFunc* GrFunc_GcNewFlag(long flags)
 
 GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 {
+	assert(host);
 	int args_nu=GrArray_Size(args);
 
 	GrOpcode* op=gf->f_codes;
@@ -115,6 +116,7 @@ GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 	ret=GrHash_Map(scope->s_table,Gr_Const_String_this,host);
 	if(ret<0) goto error;
 
+	ef->f_host=host;
 	EgThread* t=EgThread_GetSelf();
 	EgThread_PushSframe(t,ef);
 

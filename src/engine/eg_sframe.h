@@ -13,6 +13,8 @@ struct  eg_sframe
 	struct eg_thread* f_thread;
 	GrScope* f_scope;
 	GrOpcode* f_codes;
+
+	GrObject* f_host;
 	size_t f_pc;
 	size_t f_sp;
 };

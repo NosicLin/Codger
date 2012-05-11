@@ -116,23 +116,28 @@ int GrInstance_SetAttr(GrInstance* ic,GrObject* k,GrObject* v)
 
 static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 {
+	assert(GrString_Verify(k));
 	GrHashEntry* entry;
 	entry=GrHash_GetEntry(ic->i_symbols,k);
 	if(entry==NULL) return -1;
+
+	GrClass* cl=GrObject_Type((GrObject*)ic)->t_class;
+	assert(cl);
+
 	if(GrHashEntry_Valid(entry))
 	{
 		assert(GrSymbol_Verify(entry->e_key));
-		if(GrUtil_CheckSetAttr((GrSymbol*)(entry->e_key),perm)<0)
+		if(!GrUtil_CheckSetAttr((GrSymbol*)(entry->e_key),perm))
 		{
-			GrErr_NameFormat("Access Has No Perm");
+			GrErr_PermFormat("'%s' Symbol In %s.Instance Is %s",
+					((GrString*)k)->s_value,cl->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
 			return -1;
 		}
 		entry->e_value=v;
 		return 0;
 	}
 
-	GrClass* cl=GrObject_Type((GrObject*)ic)->t_class;
-	assert(cl);
 
 	entry=GrHash_GetEntry(cl->c_template,k);
 	if(entry==NULL) return -1;
@@ -140,76 +145,74 @@ static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 	if(GrHashEntry_Valid(entry))
 	{
 		assert(GrSymbol_Verify(entry->e_key));
-		if(GrUtil_CheckSetAttr((GrSymbol*)(entry->e_key),perm)<0)
+		if(!GrUtil_CheckSetAttr((GrSymbol*)(entry->e_key),perm))
 		{
-			GrErr_NameFormat("Access Has No Perm");
+			GrErr_PermFormat("'%s' Symbol In %s.Instance Is %s",
+					((GrString*)k)->s_value,cl->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
+
 			return -1;
 		}
 		GrHash_Map(ic->i_symbols,entry->e_key,v);
 		return 0;
 	}
 
-	if(GrString_Verify(k))
-	{
-		GrErr_NameFormat("%s Instance Has No Symbol '%s'",
-				cl->c_name->s_value,GR_TO_S(k)->s_value);
-		return -1;
-	}
-	else
-	{
-		GrErr_NameFormat("%s Instance Has No Such Symbol",
-				cl->c_name->s_value);
-		return -1;
-	}
+	GrErr_NameFormat("%s Instance Has No Symbol '%s'",
+			cl->c_name->s_value,GR_TO_S(k)->s_value);
+	return -1;
 }
 
 
 static GrObject* gi_get_attr(GrInstance* ic, GrObject* k,long perm)
 {
+	assert(GrString_Verify(k));
 	GrHashEntry* entry;
 
+	/* first find from instance symbols */
 	entry=GrHash_GetEntry(ic->i_symbols,k);
 
 	if(entry==NULL) return NULL;
-	if(GrHashEntry_Valid(entry))
-	{
-		assert(GrSymbol_Verify(entry->e_key));
-		if(GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm)<0)
-		{
-			GrErr_NameFormat("Access Has No Perm");
-			return NULL;
-		}
-		return entry->e_value;
-	}
 
+
+	/* get instance class */
 	GrClass* cl=GrObject_Type((GrObject*)ic)->t_class;
 	assert(cl);
 
-	entry=GrHash_GetEntry(cl->c_template,k);
-	if(entry==NULL) return NULL;
 	if(GrHashEntry_Valid(entry))
 	{
 		assert(GrSymbol_Verify(entry->e_key));
-		if(GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm)<0)
+		if(!GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm))
 		{
-			GrErr_NameFormat("Access Has No Perm");
+			GrErr_PermFormat("'%s' Symbol In %s.Instance Is %s",
+					((GrString*)k)->s_value,cl->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
 			return NULL;
 		}
 		return entry->e_value;
 	}
 
-	if(GrString_Verify(k))
+
+	/* if symbol not in instance symbol,
+	 * then find it from class template */ 
+	entry=GrHash_GetEntry(cl->c_template,k);
+	if(entry==NULL) return NULL;
+
+	if(GrHashEntry_Valid(entry))
 	{
-		GrErr_NameFormat("%s Instance Has No Symbol '%s'",
-				cl->c_name->s_value,GR_TO_S(k)->s_value);
-		return NULL;
+		assert(GrSymbol_Verify(entry->e_key));
+		if(!GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm)<0)
+		{
+			GrErr_PermFormat("'%s' Symbol In %s.Instance Is %s",
+					((GrString*)k)->s_value,cl->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
+			return NULL;
+		}
+		return entry->e_value;
 	}
-	else
-	{
-		GrErr_NameFormat("%s Instance Has No Such Symbol",
-				cl->c_name->s_value);
-		return NULL;
-	}
+
+	GrErr_NameFormat("%s Instance Has No Symbol '%s'",
+			cl->c_name->s_value,GR_TO_S(k)->s_value);
+	return NULL;
 }
 
 int GrInstance_Print(GrInstance* ic,FILE* f)

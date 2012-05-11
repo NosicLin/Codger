@@ -1,5 +1,6 @@
 #ifndef _CODGER_OBJECT_CLASS_H_
 #define _CODGER_OBJECT_CLASS_H_
+
 #include"gr_object.h"
 #include"gr_hash.h"
 #include"gr_string.h"
@@ -42,6 +43,11 @@ static inline void GrClass_SetTemplate(GrClass* c,GrHash* t)
 static inline int GrClass_Verify(GrObject* g)
 {
 	return GrObject_Type(g)==&Gr_Type_Class;
+}
+
+static inline void GrClass_SetName(GrClass* g,GrString* name)
+{
+	g->c_name=name;
 }
 
 int GrClass_SetAttr(GrClass*,GrObject*,GrObject*);

@@ -1,5 +1,6 @@
 #include"gr_symbol.h"
 #include<memory/gc.h>
+#include"gr_class.h"
 #include<engine/except.h>
 
 
@@ -72,6 +73,25 @@ ssize_t GrSymbol_Hash(GrSymbol* sy)
 	assert(sy->s_name);
 	return GrString_Hash(sy->s_name);
 }
+
+char* GrSymbol_PermName(GrSymbol* sy)
+{
+	if(sy->s_flags&GR_CLASS_PUBLIC)
+	{
+		return "public";
+	}
+	if(sy->s_flags&GR_CLASS_PROTECTED)
+	{
+		return "protected";
+	}
+	if(sy->s_flags&GR_CLASS_PRIVATE)
+	{
+		return "private";
+	}
+	return "public";
+}
+
+
 
 static int symbol_cmp(GrObject* x,GrObject* y)
 {

@@ -72,6 +72,11 @@ void GrErr_NameFormat(const char* s,...)
 	GR_EXCEPT_FORMAT_MSG;
 	GrExcept_SetException(Gr_Err_Name,"NameErr",s_format_buf);
 }
+void GrErr_PermFormat(const char* s,...)
+{
+	GR_EXCEPT_FORMAT_MSG;
+	GrExcept_SetException(Gr_Err_Name,"NameErr",s_format_buf);
+}
 void GrErr_TypeFormat(const char* s,...)
 {
 	GR_EXCEPT_FORMAT_MSG;

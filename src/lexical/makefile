@@ -5,7 +5,8 @@ SRC=lexical.c sl_integer.c  sl_float.c sl_number.c sl_operator.c \
 DEBUG=driver.c
 BIN=unit_float.c unit_integer.c in_integer.c in_float.c \
    	in_number.c in_operator.c unit_number.c in_merge.c \
-	test_lex_file.c test_scanner.c test_key_words.c
+	test_lex_file.c test_scanner.c test_key_words.c \
+	check_keywords.c
 
 
 OBJ_NAME=$(SRC:%.c=%.o) 

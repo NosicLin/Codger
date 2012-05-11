@@ -20,6 +20,7 @@ struct eg_thread
 	size_t t_sp;
 	size_t t_pc;
 
+
 	GrObject* t_relval;
 };
 

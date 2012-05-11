@@ -430,10 +430,6 @@ next_instruct:
 			GrFunc_SetDefaultArgs((GrFunc*)r0,(GrArray*)r1);
 			sp--;
 			goto next_instruct;
-		case OP_CLASS_BEGIN:
-			acc=(GrObject*)GrClass_GcNew();
-			ACC_PUSH;
-			goto next_instruct;
 		case OP_CLASS_INHERIT:
 			REF_TWO_OP;
 			GrClass_SetInherit((GrClass*)r0,r1);
@@ -502,13 +498,18 @@ next_instruct:
 		case OP_GET_ATTR:
 			UNPACK_ONE_OP;
 			r1=symbols_pool[rd];
-			acc=GrObject_GetAttr(r0,r1,0);
+			acc=GrObject_GetAttr(r0,r1,cur_frame->f_host==r0);
 			ACC_PUSH;
 			goto next_instruct;
 		case OP_SET_ATTR:
 			UNPACK_TWO_OP;
 			r2=symbols_pool[rd];
-			GrObject_SetAttr(r1,r2,r0,0);
+			GrObject_SetAttr(r1,r2,r0,cur_frame->f_host==r1);
+			goto next_instruct;
+		case OP_CLASS_BEGIN:
+			acc=(GrObject*)GrClass_GcNew();
+			GrClass_SetName((GrClass*)acc,(GrString*)(symbols_pool[rd]));
+			ACC_PUSH;
 			goto next_instruct;
 		case OP_CLASS_TEMPLATE:
 			REF_TWO_OP;

@@ -915,15 +915,23 @@ static int class_to_opcode(AstObject* ab,GrModule* m,
 
 	u_int32_t id=GrModule_MapSymbol(m,
 				(GrObject*)((AST_TO_VAR(name)->v_value)));
+
 	if(id==GR_MODULE_MAP_ERR)
 	{
 		return -1;
 	}
 
-	ret=GrOpcode_NeedMore(op,7);
+	ret=GrOpcode_NeedMore(op,11);
 	if(ret<0) return -1;
 
-	GrOpcode_Push(op,OP_CLASS_BEGIN);
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_CLASS_BEGIN,id);
+	}
+	else 
+	{
+		GrOpcode_Push5(op,OP_CLASS_BEGIN2,id);
+	}
 
 	if(inhert!=NULL)
 	{

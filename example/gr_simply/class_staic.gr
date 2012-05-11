@@ -1,0 +1,8 @@
+class dog
+	static attr name="Animal Dog"
+	static func getName()
+		return this.name;
+	end 
+end 
+
+print dog.getName()

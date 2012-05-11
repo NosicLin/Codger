@@ -157,6 +157,9 @@ int GrModule_WriteToFile(GrModule* m,FILE* f,long flags)
 	{
 		cur=GrArray_Get(m->m_attrs_pool,i);
 		GrObject_Print(cur,f,0);
+		assert(GrSymbol_Verify(cur));
+		fprintf(f,"(%lx)",((GrSymbol*)cur)->s_flags);
+
 		fprintf(f," ");
 		if((i+1)%10==0)
 		{

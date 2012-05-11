@@ -45,6 +45,29 @@ int GrUtil_FillInnerMethodsFlag(GrHash* h,GrInnerFuncEntry* es,long flags)
 
 GrObject* GrUtil_BaseTypeGetAttr(GrObject* g,GrObject* k,long perm)
 {
+	assert(GrString_Verify(k));
+	GrTypeInfo* g_type=GrObject_Type(g);
+
+	GrClass* g_class=g_type->t_class;
+
+	BUG_ON(g_class==NULL,"%s.t_class Filed Not Init",GrObject_Name(g));
+
+	GrHashEntry* entry=GrHash_GetEntry(g_class->c_template,k);
+	assert(GrSymbol_Verify(entry->e_key));
+	if(!GrHashEntry_Valid(entry))
+	{
+		GrErr_NameFormat("%s Has No Symbol '%s'",
+				GrObject_Name(g),((GrString*)k)->s_value);
+		return NULL;
+	}
+
+
+	return entry->e_value;
+}
+
+int GrUtil_BaseTypeSetAttr(GrObject* g,GrObject* k,GrObject* v,long perm)
+{
+	assert(GrString_Verify(k));
 	GrTypeInfo* g_type=GrObject_Type(g);
 
 	GrClass* g_class=g_type->t_class;
@@ -54,36 +77,14 @@ GrObject* GrUtil_BaseTypeGetAttr(GrObject* g,GrObject* k,long perm)
 	GrHashEntry* entry=GrHash_GetEntry(g_class->c_template,k);
 	if(!GrHashEntry_Valid(entry))
 	{
-		if(GrString_Verify(k))
-		{
-			GrErr_NameFormat("%s Has No Symbol '%s'",
-					GrObject_Name(g),((GrString*)k)->s_value);
-			return NULL;
-		}
-		else 
-		{
-			GrErr_NameFormat("%s' Hash No Such Symbol",GrObject_Name(g));
-			return NULL;
-		}
+		GrErr_NameFormat("%s Has No Symbol '%s'",
+				GrObject_Name(g),((GrString*)k)->s_value);
+		return -1;
 	}
-	assert(GrSymbol_Verify(entry->e_key));
-	if(!GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm))
-	{
-		return NULL;
-	}
-	return entry->e_value;
-}
 
-int GrUtil_BaseTypeSetAttr(GrObject* g,GrObject* k,GrObject* v,long perm)
-{
-	if(GrString_Verify(k))
-	{
-		GrErr_NameFormat("%s Has No Symbol '%s'",GrObject_Name(g),((GrString*)k)->s_value);
-	}
-	else
-	{
-		GrErr_NameFormat("%s Hash No Such Symbol",GrObject_Name(g));
-	}
+	GrErr_PermFormat("%s Symbol In '%s' Is Protected",
+			((GrString*)k)->s_value,GrObject_Name(g));
+
 	return -1;
 }
 
@@ -91,10 +92,52 @@ int GrUtil_BaseTypeSetAttr(GrObject* g,GrObject* k,GrObject* v,long perm)
 
 int GrUtil_CheckSetAttr(GrSymbol* sy,long perm)
 {
+	//printf("perm=%lx\n",perm);
+	long flags=sy->s_flags;
+	if(perm)
+	{
+		return 1;
+	}
+	else
+	{
+		if(flags&GR_CLASS_PRIVATE)
+		{
+			return 0;
+		}
+		if(flags&GR_CLASS_PROTECTED)
+		{
+			return 0;
+		}
+		if(flags&GR_CLASS_PUBLIC)
+		{
+			return 1;
+		}
+	}
 	return 1;
 }
 int GrUtil_CheckGetAttr(GrSymbol* sy,long perm)
 {
+	//printf("perm=%lx\n",perm);
+	long flags=sy->s_flags;
+	if(perm)
+	{
+		return 1;
+	}
+	else
+	{
+		if(flags&GR_CLASS_PRIVATE)
+		{
+			return 0;
+		}
+		if(flags&GR_CLASS_PROTECTED)
+		{
+			return 1;
+		}
+		if(flags&GR_CLASS_PUBLIC)
+		{
+			return 1;
+		}
+	}
 	return 1;
 }
 

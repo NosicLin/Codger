@@ -26,6 +26,7 @@ static inline int GrSymbol_Verify(GrObject* g)
 {
 	return GrObject_Type(g)==&Gr_Type_Symbol;
 }
+char* GrSymbol_PermName(GrSymbol*);
 
 
 

@@ -182,27 +182,24 @@ GrInstance* GrClass_Call(GrClass* s,GrObject* host,GrArray* args)
 
 static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 {
+	assert(GrString_Verify(k));
 	GrHashEntry* entry=GrHash_GetEntry(s->c_symbols,k);
 
 	if(!GrHashEntry_Valid(entry))
 	{
-		if(GrString_Verify(k))
-		{
-			GrErr_NameFormat("ClassObject Has No Symbol '%s'",
-					((GrString*)k)->s_value);
-			return -1;
-		}
-		else
-		{
-			GrErr_NameFormat("ClassObject Has No Such Symbol");
-			return -1;
-		}
+		GrErr_NameFormat("ClassObject '%s' Has No Symbol '%s'",
+				s->c_name->s_value,((GrString*)k)->s_value);
+		return -1;
 	}
 
 	assert(GrSymbol_Verify(entry->e_key));
 
 	if(!GrUtil_CheckSetAttr((GrSymbol*)(entry->e_key),perm))
 	{
+		GrErr_PermFormat("'%s' Symbol In ClassObject '%s' Is %s",
+					((GrString*)k)->s_value,s->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
+
 		return -1;
 	}
 
@@ -213,27 +210,25 @@ static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 static GrObject* class_get_attr(GrClass* s,GrObject* k,long perm)
 {
 	assert(k);
+	assert(GrString_Verify(k));
 	GrHashEntry* entry=GrHash_GetEntry(s->c_symbols,k);
 
 	if(!GrHashEntry_Valid(entry))
 	{
-		if(GrString_Verify(k))
-		{
-			GrErr_NameFormat("ClassObject Has No Symbol '%s'",
-					((GrString*)k)->s_value);
-			return NULL;
-		}
-		else
-		{
-			GrErr_NameFormat("ClassObject Has No Such Symbol");
-			return NULL;
-		}
+		assert(GrString_Verify(k));
+		GrErr_NameFormat("ClassObject '%s' Has No Symbol '%s'",
+				s->c_name->s_value,((GrString*)k)->s_value);
+		return NULL;
 	}
 
 	assert(GrSymbol_Verify(entry->e_key));
 
 	if(!GrUtil_CheckGetAttr((GrSymbol*)(entry->e_key),perm))
 	{
+		GrErr_PermFormat("'%s' Symbol In ClassObject '%s' Is %s",
+					((GrString*)k)->s_value,s->c_name->s_value,
+					GrSymbol_PermName((GrSymbol*)entry->e_key));
+
 		return NULL;
 	}
 	return entry->e_value;
@@ -246,7 +241,7 @@ static struct gr_type_ops class_type_ops=
 	.t_get_attr=(GrGetAttrFunc)class_get_attr,
 	.t_set_attr=(GrSetAttrFunc)class_set_attr,
 };
-	
+
 
 GrTypeInfo Gr_Type_Class=
 {
