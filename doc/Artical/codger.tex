@@ -1,0 +1,134 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage{CJK}
+\usepackage{indentfirst}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.2em}
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\author{陈林}
+\title{Codger解析器的设计与实现}
+\date{2012-4-5}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+\section{Codger简介}
+codger是一门面向对象的动态语言，
+
+\section{解析器的组成}
+Codger解析器总共7个部分组成：词法分析，语法分析，抽象语法树，字节码，虚拟机，内存管理，基本数据类型。这些模块交互在一起完成codger源程序的解析与运行。
+\section{词法}
+codger源程序由一系列具有独立意义的基本语法单位--单词组成，单词是最小的词法单位，它们不能分割。单词分为8类：关键字，运算符，特殊符号，整数，长整数，浮点数，字符串，标识符，空白符，注释，其中空白符与注释属于无用单词，当被扫描器识别到时，会立刻被弃。
+
+解析器中的语法识别模块用于对codger源程序进行词法分析，从输入字符流中扫描出由字符序列组成的单词。并把识别出的单词交给后面的语法分析模块进一步处理，并在识别过程中检测是否存在非法的单词。
+\subsection{关键字}
+codger中关键字具有专门的意义与用途，它们不能被当作一般的标识符来使用，这些关键字有：and, as, attr, break, catch, class,
+continue, do, elif, else, end, false, finally, for, from, func, if, import, in, inherit, new, not, 
+or, print, private, protected, public, return, static, then, to, true, try, while。
+\subsection{标识符}
+标识符用于定义变量，函数，类，方法等所使用的名称，解析器没有限定标识符的长度，但在定义标识符时，需要遵守一定的规则：以字母或者下画线开头，后面可以接零个或多个字母、数字、下画线，并且区会字母的大写与小写。用bnf文法表示为：
+\begin{quote}
+\begin{verbatim}
+identifier ::=(letter|"_"|)(letter|digit|"_")*
+digit ::="0".."9"
+letter ::=lowercase|uppercase
+lowercase ::="a".."z"
+uppercase ::="A".."Z"
+\end{verbatim}
+\end{quote}
+\subsection{特殊符号与运算符}
+在codger中，运算符用于指定一种运算方式，特殊符号用于分隔不同的语句或者用于指定某些特定意义的用途。它们有：
+\begin{quote}
+\begin{verbatim}
+ (   )   [   ]   .   ,  +   -   ~   *  ；
+ /   %  <<   >>   <   >   <=   >=  ==
+ !=   &   ^   | =   +=   -=   *=   /= 
+ %=   &=   ^=   |=   >>=   <<=  换行符
+\end{verbatim}
+\end{quote}
+\subsection{整数}
+整数是一种与机器平台相关的数据类型，在32位机上，其表示范围为 $-2^{31}$ 到 $2^{31}-1$。而在64位机上，其表示范围为$-2^{63}$ 到 $2^{63}-1$ 。整数的表示范围有限，在设计程序时需要考虑运算结果溢出的情况。整数可以在codger源程序中显示的定义，整数又被分为二进制整数，八进制整数，十进制整数，十六进制整数。二进制整数以0b或者0B开头，后面紧接着一个或多个0或1；八进制整数以0或者0o、0O开头，后面紧接数字一个或多个0－7；十进制整数以1－9开头，后面紧接数字零个或多个0－9，或者是十进制整数只有一位0；十六进制整数以0x或都0X开头，后面紧接一个或者多个数字0－9、a－f、A－F。用bnf文法表示为：
+\begin{quote}
+\begin{verbatim}
+integer::=decimalinteger|octinteger|hexinteger|bininteger
+decimalinteger ::= nonzerodigit digit* | "0"
+octinteger ::= "0" ("o" | "O") octdigit+ | "0" octdigit+
+hexinteger ::= "0" ("x" | "X") hexdigit+
+bininteger ::= "0" ("b" | "B") bindigit+
+nonzerodigit ::= "1"..."9"
+octdigit ::= "0"..."7"
+bindigit ::= "0" | "1"
+hexdigit ::= digit | "a"..."f" | "A"..."F"
+\end{verbatim}
+\end{quote}
+
+\subsection{长整数}
+整数表示范围有限，在进行大数据运算时受到限制，Codger 提贡长整数用于解决这种问题。长整数是一种与机器无关的数据类型，可以进行任意大小的数据运算，不用去考虑数据溢出问题，但是前提是你的计算机有中够大的内存空间，来保存这些数据。 长整数可以在源程序中显示的定义，定义方法同整数一样，只有在后面多了一位字符L或者是l。用bnf文法表示为：
+\begin{quote}
+ \begin{verbatim}
+  longinteger ::= integer ("l" | "L")
+ \end{verbatim}
+\end{quote}
+
+\subsection{浮点数}
+在codger中采用的是32位浮点数，其数值范围约为：$-3.4*10^{-38}$ 到 $-3.4*10^{38}$ 。浮点数由三个部分组成：整数部分，浮点部分，指数部分。浮点数可以在源程序中显示定义，定义时整数部分与指数部分可以省去。用bnf文法表示浮点数为：
+\begin{quote}
+ \begin{verbatim}
+floatnumber ::= pointfloat | exponentfloat
+pointfloat ::= [intpart] "." digit+
+exponentfloat ::= (intpart | pointfloat) exponent
+intpart ::= digit+
+exponent ::= ("e" | "E") ["+" | "-"] digit+
+ \end{verbatim}
+\end{quote}
+\subsection{字符串}
+字符串可以在源程序中显示定义，使用规则为：以双引号开头和双引号结尾，中间可以是除 \verb \ 和换行符以处的任意字符，其中\verb \ 用于转义其它特殊字符，如果想要以多行的形式书写字符串，需要在每一行的未尾加上\verb \ 。用bnf文法表示为：
+\begin{quote}
+ \begin{verbatim}
+string ::=`"'stringitem*`"'
+stringitem ::= <any source character except "\" 
+				or newline or the quote> ｜"\"esc_item
+esc_item ::=<any source character >
+ \end{verbatim}
+\end{quote}
+\subsection{注释}
+在Codger注释以\#号开头,直到这一行结果，解析器解析源程序，注释中的所有内容都分被忽略掉。用bnf文法表示为：
+\begin{quote}
+ \begin{verbatim}
+comment ::="#" cm_item* newline
+cm_item:=<any source character except newline>
+ \end{verbatim}
+\end{quote}
+\subsection{空白符}
+Codger中的空白符由一个或都多个空格或者是制表符组成，程序中的空白符用于区分开不同的单词，或者使源程序的可读性更强。当解析器识别到空白符时，不会对它做任何的处理，只是简单的将它抛弃。用bnf文法表示为：
+\begin{quote}
+ \begin{verbatim}
+white_space ::=ws_item+
+ws_item ::= space | tab 
+ \end{verbatim}
+\end{quote}
+\section{词法识别算法}
+在前面一部分结出了在codger中所有的单词,以及描述单词结构的bnf文法，这些文法都是正则文法。正则文法与有限状态机具有等价性，它们之间可以相互转换\footnote{等价性的证明以及转换的方法可以参考``形式语言与自动机理论''}。而词法识别算法通常是通过构造有限状态机的方法来识别源程序中的不同类型的单词，状态机可以使用类似于lex的词法分析软件自动生成，这么方法处理起来简单，只需要遵守词法分析软件的使用规则即可，或者程序员可以通过手工来构造状态机。手工构造相比词法分析软件相比优点在于:
+\begin{enumerate}
+ \item 词法分析软件有固定处理框架，不能随意改变，限定了程序的灵活性。手工构造则没有这种限制。
+ \item 词法分析软件根据一定算法生成有限状态机，其中有许多重复的或者是多余的状态都可以被优化掉。
+\end{enumerate}
+但手工构造如果处理不好，可能会随着正则语言规模的增大，复杂度也跟着增加，最终可以超出人脑可能处理的限度。下面介绍一种在codger词法分析模块中使用的一种算法--状态链。
+\subsection{状态链简介}
+在codger解析器的早期版本中，采用状态矩阵\footnote{大多数编译原理书本都会介绍状态矩阵算法，这里不对其进行详细说明}的方法来识别源程序中的单词。但由于状态矩阵算法会随着正则文法规模的增大，复杂度也跟着增加，每次当需要变更每个单词的结构时，都需要更改一大堆数据，使解析器的维护的扩展都变得非常困难，而且极容易出错。最后不得不放弃状态矩阵，而寻找新的方法。
+
+状态链识别法是在codger解析器开发过程中总结出的一种非常实用和高效的算法，之所以命名为状态链，因为状态链算法处理的最多的是状态与状态之间的链接。状态链算法优点再于：
+\begin{enumerate}
+ \item 随着正则文法规模的变大，其复杂度不会增加。
+ \item 状态链是一种分治算法，它先通过为每一个不同类型的单词构造子状态机，然后再通过合并算法把子状态机合并在一起，合并时，不需要更改子状态机中的数据和状态，只需增加新的状态链接到子状态机中已有的状态。
+ \item 状态机中的每个状态只需要处理它所接受输入事件类型，以及在该输入事件类型下的后继状态，而不用去了解状态机的整体结构。当状态机的结构发生变化时，很多状态都可以直接得到重用，使解析器的维护和扩展变得非常容易。
+\end{enumerate}
+
+
+
+
+
+\end{CJK}
+\end{document}
+\subsection{数之间的类型转换}
+当不同数据类型之间进行运算时，会涉及到类型转换，它们之间转换优先级为：浮点数\verb > 长整数\verb > 整数。当优先级高的与代先级低的数据类型之间进行运算时，优先级低的首先会被转换为代先级高的数据类型，然后再进行运算。

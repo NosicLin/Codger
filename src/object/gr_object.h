@@ -2,11 +2,36 @@
 #define _CODGER_OBJECT_ROBJECT_H_
 #include<stdio.h>
 #include<assert.h>
+#include<memory/gc.h>
 struct gr_type_info;
 
 struct  gr_object 
 {
-	struct gr_type_info* g_type;
+
+#ifdef GRGC_DEBUG
+	GRGC_HEADER ;
+#endif 
+
+	union{
+		/* keep pointer at least align 4, 
+		 * so the lower two bit can used for garbage collection 
+		 */
+		struct gr_type_info* g_type;
+		struct 
+		{
+			/* @g_ref_low: if object come from high level area reference 
+			 * low level object,this bit will mark
+			 */
+			long g_ref_low:1;  
+
+			/* @g_upgrade: an object alloc from young area,when garbage 
+			 * collection works,if it still alive,this bit will mark, and 
+			 * the next time garbage collection works again,if it then 
+			 * alive,it will be upgrade to old area */
+			long g_upgrade:1;
+			long g_reverse:30;
+		};
+	};
 };
 typedef struct gr_object GrObject;
 
