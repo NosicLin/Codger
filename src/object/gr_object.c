@@ -639,8 +639,42 @@ defalut_action:
 }
 
 
-
-
-
+void GrObject_Destruct(GrObject* g)
+{
+	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
+	if(!g_ops->t_destruct)
+	{
+		return ;
+	}
+	g_ops->t_destruct(g);
+}
+int GrObject_GcUpdate(GrObject* g)
+{
+	/*
+	printf("%s Object Up Interal addr=%lx \n",
+			GrObject_Name(g),(long)(g));
+	*/
+	GrTypeInfo* info=GrObject_Type(g);
+	struct gr_type_ops* g_ops=info->t_ops;
+	int ret;
+	if(info->t_class)
+	{
+		info->t_class=GrGc_Update(info->t_class);
+	}
+	if(!g_ops->t_gc_update)
+	{
+		return 0;
+	}
+	ret=g_ops->t_gc_update(g);
+	if(ret<0) 
+	{
+		if(!GrExcept_Happened())
+		{
+				GrErr_BugFromat("Interal Bug For %s GrUpdate Func",
+						GrObject_Name(g));
+		}
+	}
+	return ret;
+}
 
 

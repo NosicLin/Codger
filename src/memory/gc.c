@@ -9,42 +9,19 @@
 #include<engine/eg_thread.h>
 #include<engine/eg_sframe.h>
 
-#ifdef GRGC_DEBUG
-
-static long grgc_checksum(long addr)
-{
-	return (addr<<8)^(addr>>8);
-}
-
-static inline void GrGC_HeaderCheck(GrObject* g)
-{
-	assert(g->g_header.g_check_sum==grgc_checksum((long)g));
-}
-static inline void GrGc_InitHeader(GrObject* g,struct gr_type_info* info)
-{
-	g->g_header.g_check_sum=grgc_checksum((long)g);
-	g->g_type=info;
-}
-
-#else 
-#define GrGC_HeaderCheck(g)
-#define GrGc_InitHeader(g,info) ((GrObject*)(g))->g_type=info
-
-#endif /*GRGC_DEBUG*/
-
 
 
 #ifdef GRGC_MEM_TOOL_DEBUG 
 void* __GrGc_New(size_t size,struct gr_type_info* info)
 {
-	void* ptr=GrMem_Alloc(size);
-	((GrObject*)ptr)->g_type=info;
-	return ptr;
+    void* ptr=GrMem_Alloc(size);
+    ((GrObject*)ptr)->g_type=info;
+    return ptr;
 }
 
 void* __GrGc_Alloc(size_t size,struct gr_type_info* info,long flags)
 {
-	return __GrGc_New(size,info);
+    return __GrGc_New(size,info);
 }
 int GrModule_GcInit(){return 1;}
 int GrModule_GcExit(){return 1;}
@@ -68,6 +45,89 @@ int GrModule_GcExit(){return 1;}
 
 #define GC_BLOCK_REF_LOW (1ul<<4)
 
+struct block_header
+{
+    struct list_head b_link;
+    long b_flags;
+    size_t b_free_pos;
+    size_t b_max_pos;
+#ifdef GRGC_DEBUG
+	char* b_name;
+	unsigned long b_check_sum;
+#endif 
+};
+
+
+struct gc_heap
+{
+    long g_flags;
+    struct list_head g_blocks;
+    struct block_header* g_cur;
+    int g_obs_nu;
+
+    struct block_header* g_collection;
+    size_t g_scan;
+#ifdef GRGC_DEBUG
+	char* g_name;
+#endif 
+};
+
+#define GC_GET_BLOCK_HEADER(g) \
+    ((struct block_header*)(GR_PAGE_ROUND_UPPER(g)))
+
+#define GC_GET_HEAP_LEVEL(g) \
+    (GC_GET_BLOCK_HEADER(g)->b_flags&GC_HEAP_LEVEL_MASK)
+
+
+#ifdef GRGC_DEBUG 
+static void gc_raise_memerr()
+{
+	int* a=0;
+	*a=3;
+}
+static unsigned long grgc_checksum(unsigned long addr)
+{
+    return (addr<<8)^(addr>>8);
+}
+
+#define GC_OBS_HEADER_CHECK(g) \
+	do{ \
+		BUG_ON(((unsigned long)(g)&GC_ADDR_LOW_MASK), \
+				"addr(g)=%lx",(long)(g));  \
+		BUG_ON(((GrObject*)(g))->g_header.g_check_sum!=grgc_checksum((unsigned long)(g)),"addr=%lx",(long)(g)); \
+	}while(0)
+
+static inline void GrGc_InitHeader(GrObject* g,struct gr_type_info* info)
+{
+	g->g_header.g_check_sum=grgc_checksum((unsigned long)g);
+	g->g_type=info;
+	/*
+	printf("alloc %s add=%lx, from %s\n",GrObject_Name(g),
+			(long)g,
+			GC_GET_BLOCK_HEADER(g)->b_name);
+	*/
+}
+#define GC_BLOCK_HEADER_CHECK(b) \
+	do{ \
+		BUG_ON(!GR_PAGE_ALIGNED(b),"addr=%lx",(long)(b)); \
+		BUG_ON(((struct block_header*)(b))->b_check_sum!=grgc_checksum((unsigned long )(b)),"block_addr=%lx,checksum=%lx",(long)(b), \
+				((struct block_header*)(b))->b_check_sum); \
+	}while(0)
+
+#else 
+
+#define GC_OBS_HEADER_CHECK(g)
+#define GC_BLOCK_HEADER_CHECK(b)
+#define GrGc_InitHeader(g,info) \
+	do{ \
+		((GrObject*)(g))->g_type=info; \
+	}while(0) 
+
+#endif /*GRGC_DEBUG*/
+
+
+
+
 void* __GrGc_New(size_t size,struct gr_type_info*);
 void* __GrGc_Alloc(size_t size,struct gr_type_info*,long flags);
 
@@ -76,31 +136,35 @@ void* __GrGc_SafeAlloc(size_t size,struct gr_type_info*);
 
 int GrGc_Collection();
 
-struct block_header
-{
-	struct list_head b_link;
-	long b_flags;
-	size_t b_free_pos;
-	size_t b_max_pos;
-};
-
-struct gc_heap
-{
-	long g_flags;
-	struct list_head g_blocks;
-	struct block_header* g_cur;
-	int g_obs_nu;
-
-	struct block_header* g_collection;
-	size_t g_scan;
-};
 
 
-#define GC_GET_BLOCK_HEADER(g) \
-	((struct block_header*)((long)(g)&GC_ADDR_HIGH_MASK))
 
-#define GC_GET_HEAP_LEVEL(g) \
-	(GC_GET_BLOCK_HEADER(g)->b_flags&GC_HEAP_LEVEL_MASK)
+/* every heap has some block link together*/
+/* heap.b_blocks                       heap.g_cur
+ *      |  	                                |
+ *      |                                   |
+ *      V                                   V
+ * +-----+ ---> +-----+ ---> +-----+ ---> +-----+
+ * |     | <--- |     | <--- |     | <--- |     |
+ * +-----+      +-----+      +-----+      +-----+
+ *                  
+ *
+ */
+
+/* every block has some objects in it 
+ * +--------------+
+ * |  Object 1    |
+ * |--------------|
+ * |  Object 2    |  <--- scan 
+ * |--------------|
+ * |    .....     |
+ * |--------------|
+ * |  Object n    |
+ * |--------------+
+ * |  Frea Area   |  <---- free_pos
+ * |   .......    |
+ * +--------------+
+ */
 
 
 
@@ -136,15 +200,15 @@ static void gc_block_header_print(struct block_header* b)
 /* garbage collection heap,total three generation: young,old and static 
  *
  * @young:
- * 		object in young heap will be regard as not living too long,
+ *      object in young heap will be regard as not living too long,
  * so garbage collection work more times here,if after two collection,an
  * object still live, it will be upgrade to old heap
  *
  * @old:
- * 		an area not collection too frequently
+ *      an area not collection too frequently
  *
  * @static:
- * 		if an object alloc here,it will alive in all the system running 
+ *      if an object alloc here,it will alive in all the system running 
  * time,and it address will not change,so before alloc ,
  * think it is really worth.
  */
@@ -169,17 +233,23 @@ static int gc_heap_enlarge(register struct gc_heap* g)
 {
 	/* alloc a page */
 	register struct block_header* h=(struct block_header*)Gr_AllocPage();
+	//printf("alloc block addr=%lx \n",(long)h);
 
 	if(h==NULL) return -1;
 	h->b_flags=g->g_flags;
 	h->b_free_pos=(size_t)h+GC_BLOCK_HEADER_NEED;
 	h->b_max_pos=(size_t)h+GC_BLOCK_SIZE;
 
+
 	/* link to g->g_blocks */
-	list_add(&h->b_link,&g->g_blocks);
+	list_add_tail(&h->b_link,&g->g_blocks);
 
 	/* set cur is h */
 	g->g_cur=h;
+#ifdef GRGC_DEBUG
+	h->b_check_sum=grgc_checksum((unsigned long)h);
+	h->b_name=g->g_name;
+#endif 
 	return 0;
 }
 
@@ -193,7 +263,7 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 	register size_t ptr=cur->b_free_pos;
 	register size_t free_pos=GC_ROUND_ADDR(ptr+alloc_size);
 
-	
+
 	if(alloc_size>GC_MAX_ALLOC_SIZE)
 	{
 		WARN("AllocSize(%d) Is Too Big,Max=(%lu)",
@@ -263,42 +333,45 @@ struct gc_migrate
 };
 
 static int s_collection_level=0;
-static struct gr_type_info s_migrate={};
-#define GC_NEED_UPGRADE(g) (g)->g_upgrade
-#define GC_IS_REF_LOW(g) (g)->g_ref_low
+#define GC_NEED_UPGRADE(g) ((GrObject*)(g))->g_upgrade
+#define GC_IS_REF_LOW(g) ((GrObject*)(g))->g_ref_low
 
 #define GC_COPY_MARK_FLAGS(copy_g,g) \
 	do{ \
-		(copy_g)->g_type=(g)->g_type; \
+		((GrObject*)(copy_g))->g_type=((GrObject*)(g))->g_type; \
 	}while(0)
 
 #define GC_MARK_REF_LOW_LEVEL(g) \
 	do{ \
-		g->g_ref_low=1; \
+		((GrObject*)(g))->g_ref_low=1; \
+		GC_GET_BLOCK_HEADER(g)->b_flags|=GC_BLOCK_REF_LOW;\
 	}while(0)  
 
 #define GC_MARK_NEXT_UPGRADE(g) \
 	do{ \
-		g->g_upgrade=1; \
+		((GrObject*)(g))->g_upgrade=1; \
 	}while(0)
 
 #define GC_MARK_MIGRATE(g,addr) \
 	do{ \
-		g->g_type=&s_migrate; \
+		assert(GrObject_Type((GrObject*)(g))->t_size<=GC_MAX_ALLOC_SIZE);\
+		g->g_type=(struct gr_type_info*)GrObject_Type((GrObject*)(g))->t_size; \
 		((struct gc_migrate*)(g))->m_addr=(void*)(addr); \
 	}while(0)
 
-#define GC_IS_MIGRATED(g) ((g)->g_type==&s_migrate)
+#define GC_IS_MIGRATED(g) ((size_t)((GrObject*)(g))->g_type<=GC_MAX_ALLOC_SIZE)
 
 #define GC_MIGRATED_ADDR(g) (((struct gc_migrate*)(g))->m_addr)
 
 static inline void gc_memcpy(GrObject* des,GrObject* src,size_t length)
 {
+	BUG_ON(GrObject_Type(des)->t_size!=length,"%d!=%d",
+			GrObject_Type(des)->t_size,length);
 	memcpy((char*)des+sizeof(GrObject),
 			(char*)src+sizeof(GrObject),
 			length-sizeof(GrObject));
 }
-		
+
 
 
 
@@ -306,10 +379,18 @@ static inline void gc_memcpy(GrObject* des,GrObject* src,size_t length)
 
 void* GrGc_Update(void* ptr)
 {
+#ifdef GRGC_DEBUG
+	GC_OBS_HEADER_CHECK(ptr);
+	struct block_header* bh=GC_GET_BLOCK_HEADER(ptr);
+	GC_BLOCK_HEADER_CHECK(bh);
+#endif 
+
 	GrObject* g=(GrObject*)ptr;
 	GrObject* copy_g;
 	struct gr_type_info* info;
 	int g_level=GC_GET_HEAP_LEVEL(g);
+
+
 
 	/* if current only collection young area,
 	 * but g object alloc in old area or static area,
@@ -328,6 +409,13 @@ void* GrGc_Update(void* ptr)
 	{
 		return GC_MIGRATED_ADDR(g);
 	}
+	/*
+	printf("g_level=%d,name=%s,block_addr=%lx,s_collection_level=%d ",
+			g_level,GC_GET_BLOCK_HEADER(ptr)->b_name,
+			(long)GC_GET_BLOCK_HEADER(ptr),
+			s_collection_level);
+	printf("object_name=%s addr=%lx\n",GrObject_Name(g),(long)g);
+	*/
 
 	/* g object come from youn area */
 	info=GrObject_Type(g);
@@ -351,10 +439,13 @@ void* GrGc_Update(void* ptr)
 				GrGc_MemErr();
 				return NULL;
 			}
-			GC_COPY_MARK_FLAGS(copy_g,g);
 			GC_MARK_REF_LOW_LEVEL(copy_g);
 		}
-		else
+		/* object is too younger, so we still alloc it from youn area
+		 * if next time garbage collection work, it still alive,it will 
+		 * be upgrade to old area
+		 */
+		else 
 		{
 			copy_g=gc_heap_alloc(gc_young_anothor,info);
 			if(copy_g==NULL)
@@ -362,14 +453,16 @@ void* GrGc_Update(void* ptr)
 				GrGc_MemErr();
 				return NULL;
 			}
-			GC_COPY_MARK_FLAGS(copy_g,g);
 			GC_MARK_NEXT_UPGRADE(copy_g);
 		}
-
 		gc_memcpy(copy_g,g,info->t_size);
 		GC_MARK_MIGRATE(g,copy_g);
 		return copy_g;
+
 	}
+	/* collection level is GrGc_HEAP_OLD, so object in old area also 
+	 * copy to another old area 
+	 */
 	if(g_level==GrGc_HEAP_OLD)
 	{
 		copy_g=gc_heap_alloc(gc_old_another,info);
@@ -415,28 +508,36 @@ static int gc_heap_scan_all(struct gc_heap* h)
 
 	int ret=0;
 
-	assert((cur_heap->g_flags&GC_HEAP_LEVEL_MASK)<s_collection_level);
+
+	//assert((cur_heap->g_flags&GC_HEAP_LEVEL_MASK)<=s_collection_level);
 	while(1)
 	{
+		/* First scan all object in cur_block */
 		while(scan<cur_block->b_free_pos)
 		{
 			cur_obs=(GrObject*) scan;
-			obs_size=GrObject_Type(cur_obs)->t_size;
 
+			GC_OBS_HEADER_CHECK(cur_obs);
 			GrObject_GcUpdate(cur_obs);
-			scan+=obs_size;
+
+			obs_size=GrObject_Type(cur_obs)->t_size;
+			scan+=GC_ROUND_ADDR(obs_size);
 		}
+		/* if this block is not last block,so change cur_block
+		 * and scan it */
 		if(cur_block->b_link.next!=&cur_heap->g_blocks)
 		{
 			cur_block=list_entry(cur_block->b_link.next,
-								struct block_header,b_link);
+					struct block_header,b_link);
 
 			scan=((size_t)cur_block)+GC_BLOCK_HEADER_NEED;
 			continue;
 		}
+		/* all object in heap has scaned */
 		break;
 	}
 
+	/* check whether we have scaned objects or not */
 	if(cur_heap->g_collection!=cur_block||cur_heap->g_scan!=scan)
 	{
 		ret=1;
@@ -446,12 +547,15 @@ static int gc_heap_scan_all(struct gc_heap* h)
 		ret=0;
 	}
 
+	/* update scan info */
 	cur_heap->g_collection=cur_block;
 	cur_heap->g_scan=scan;
 
 	return ret;
 }
 
+
+/* only scan object in heap that reference low level object */
 static int gc_heap_scan_mark_low(struct gc_heap* h)
 {
 
@@ -466,24 +570,30 @@ static int gc_heap_scan_mark_low(struct gc_heap* h)
 
 	int ret=0;
 
-	assert((cur_heap->g_flags&GC_HEAP_LEVEL_MASK)<s_collection_level);
+	assert((cur_heap->g_flags&GC_HEAP_LEVEL_MASK)>s_collection_level);
+
 	while(1)
 	{
-
-		while(scan<cur_block->b_free_pos)
+		/* if cur_block has object reference low level object*/
+		if(cur_block->b_flags&GC_BLOCK_REF_LOW)
 		{
-			cur_obs=(GrObject*) scan;
-			obs_size=GrObject_Type(cur_obs)->t_size;
-			if(GC_IS_REF_LOW(cur_obs))
+			while(scan<cur_block->b_free_pos)
 			{
-				GrObject_GcUpdate(cur_obs);
+				cur_obs=(GrObject*) scan;
+				GC_OBS_HEADER_CHECK(cur_obs);
+				obs_size=GrObject_Type(cur_obs)->t_size;
+				if(GC_IS_REF_LOW(cur_obs))
+				{
+					GrObject_GcUpdate(cur_obs);
+				}
+				scan+=GC_ROUND_ADDR(obs_size);
 			}
-			scan+=obs_size;
 		}
+		/* scan next block */
 		if(cur_block->b_link.next!=&cur_heap->g_blocks)
 		{
 			cur_block=list_entry(cur_block->b_link.next,
-								struct block_header,b_link);
+					struct block_header,b_link);
 
 			scan=((size_t)cur_block)+GC_BLOCK_HEADER_NEED;
 			continue;
@@ -500,15 +610,53 @@ static int gc_heap_scan_mark_low(struct gc_heap* h)
 		ret=0;
 	}
 
+	/* update collection info */
 	cur_heap->g_collection=cur_block;
 	cur_heap->g_scan=scan;
 
 	return ret;
 }
 
-int gc_heap_destory()
+static int gc_heap_destory(struct gc_heap* h)
 {
-	/*TODO */
+	struct block_header* cur_block;
+	size_t scan;
+
+	GrObject* cur_obs;
+	size_t obs_size;
+
+	/* traver every block and destruct every garbage object in block 
+	 * then free block 
+	 */
+	while(!list_empty(&h->g_blocks))
+	{
+		cur_block=list_entry(h->g_blocks.next,struct block_header,b_link);
+		list_del(&cur_block->b_link);
+
+		scan=(size_t)cur_block+GC_BLOCK_HEADER_NEED;
+		while(scan<cur_block->b_free_pos)
+		{
+			cur_obs=(GrObject*)scan;
+			if(GC_IS_MIGRATED(cur_obs))
+			{
+				obs_size=(size_t)cur_obs->g_type;
+			}
+			else
+			{
+				obs_size=GrObject_Type(cur_obs)->t_size;
+				GrObject_Destruct(cur_obs);
+			}
+			scan+=GC_ROUND_ADDR(obs_size);
+		}
+		/*
+		printf("free %s block addr=%lx\n",cur_block->b_name,
+				(long)(cur_block));
+		*/
+#ifdef GRGC_DEBUG
+		cur_block->b_check_sum=0;
+#endif
+		Gr_FreePage(cur_block);
+	}
 
 	return 0;
 }
@@ -522,10 +670,29 @@ static inline int gc_heap_init(struct gc_heap* h,long level)
 	h->g_obs_nu=0;
 	h->g_collection=0;
 	h->g_scan=0;
+#ifdef GRGC_DEBUG
+	if(level==GrGc_HEAP_YOUNG)
+	{
+		h->g_name="Young";
+	}
+	else if(level==GrGc_HEAP_OLD)
+	{
+		h->g_name="Old";
+	}
+	else if (level==GrGc_HEAP_STATIC)
+	{
+		h->g_name="Static";
+	}
+	else 
+	{
+		assert(0);
+	}
+#endif 
 	if(gc_heap_enlarge(h)<0)
 	{
 		return -1;
 	}
+
 	return 0;
 }
 
@@ -540,6 +707,7 @@ static int gc_collection_begin()
 {
 	if(s_collection_level==GrGc_HEAP_YOUNG)
 	{
+		//printf("init youn another\n");
 		if(gc_heap_init(gc_young_anothor,GrGc_HEAP_YOUNG)<0)
 		{
 			return -1;
@@ -611,18 +779,20 @@ static void gc_collection_end()
 
 int GrGc_Collection(int level)
 {
+//	printf("GrGc_Collection Begin\n");
+	s_collection_level=level;
 	gc_collection_begin();
 
 	assert(gc_level_valied(level));
-	s_collection_level=level;
 
 
 	EgThread* t=EgThread_GetSelf();
 
 	/* Roots:
-	 * 	1)Data Stack;
-	 * 	2)StackFrame;
-	 * 	3)Modules
+	 *  1)Data Stack;
+	 *  2)StackFrame;
+	 *  3)Modules
+	 *  4)EgThread->relval
 	 */
 
 	/* First Update Data Stack */
@@ -630,12 +800,14 @@ int GrGc_Collection(int level)
 	assert(dstack);
 	size_t sp=t->t_sp;
 	size_t i;
+//	printf("begin scan data stack......\n");
 	for(i=0;i<sp;i++)
 	{
 		dstack[i]=GrGc_Update(dstack[i]);
 	}
 
 	/* Second Update StackFrame */
+//	printf("begin scan stack frame......\n");
 	EgSframe* cur_sf=t->t_fstack;
 	while(cur_sf!=NULL)
 	{
@@ -647,20 +819,35 @@ int GrGc_Collection(int level)
 	/* Thirdth Update Module */
 	/* TODO */
 
+	/* Fourth Update EgThread->retval */
+
+//	printf("begin EgThread->t_relval .....\n");
+	if(t->t_relval!=NULL)
+	{
+		t->t_relval=GrGc_Update(t->t_relval);
+	}
+//	printf("begin EgThread->t_host .....\n");
+	t->t_host=GrGc_Update(t->t_host);
+
 
 	/* Scan Heap And Update Object */
 	if(s_collection_level==GrGc_HEAP_YOUNG)
 	{
 		while(1)
 		{
+//			printf("begin scan gc_static......\n");
+			//if(gc_heap_scan_all(gc_static))
 			if(gc_heap_scan_mark_low(gc_static))
 			{
 				continue;
 			}
+//			printf("begin scan gc_old......\n");
+			//if(gc_heap_scan_all(gc_old))
 			if(gc_heap_scan_mark_low(gc_old))
 			{
 				continue;
 			}
+//			printf("begin scan gc_young_anothor......\n");
 			if(gc_heap_scan_all(gc_young_anothor))
 			{
 				continue;
@@ -674,14 +861,18 @@ int GrGc_Collection(int level)
 	{
 		while(1)
 		{
+//			printf("begin scan gc_static......\n");
+			//if(gc_heap_scan_all(gc_static))
 			if(gc_heap_scan_mark_low(gc_static))
 			{
 				continue;
 			}
+//			printf("begin scan gc_old_another......\n");
 			if(gc_heap_scan_all(gc_old_another))
 			{
 				continue;
 			}
+//			printf("begin scan gc_young_anothor......\n");
 			if(gc_heap_scan_all(gc_young_anothor))
 			{
 				continue;
@@ -695,12 +886,42 @@ int GrGc_Collection(int level)
 	}
 
 	gc_collection_end();
+
+//	printf("GrGc_Collection End\n\n\n");
 	return 0;
 }
+void GrGc_Intercept(void* d,void* s)
+{
+	GC_OBS_HEADER_CHECK(d);
+	GC_OBS_HEADER_CHECK(s);
+
+	if(GC_GET_HEAP_LEVEL(d)>GC_GET_HEAP_LEVEL(s))
+	{
+		GC_MARK_REF_LOW_LEVEL(d);
+	}
+}
+void GrGc_MarkRefLow(void* ptr)
+{
+	GC_OBS_HEADER_CHECK(ptr);
+	GC_MARK_REF_LOW_LEVEL(ptr);
+}
+
+int GrGc_IsRefLow(void* ptr)
+{
+	return GC_IS_REF_LOW(ptr);
+}
+
 
 
 int GrModule_GcInit()
 {
+#ifdef GRGC_DEBUG
+	__heap->g_name="Heap0";
+	(__heap+1)->g_name="Heap1";
+	(__heap+2)->g_name="Heap2";
+	(__heap+3)->g_name="Heap3";
+	(__heap+4)->g_name="Heap4";
+#endif 
 	if(gc_heap_init(gc_young,GrGc_HEAP_YOUNG)<0)
 	{
 		return -1;
@@ -727,6 +948,7 @@ int GrModule_GcExit()
 void GrGc_MemErr()
 {
 	GrErr_MemFormat("Can't Alloc Memory For Garbage collection");
+	assert(0);
 }
 
 #endif 

@@ -1,6 +1,7 @@
 #include"eg_thread.h"
 #include<utility_c/marocs.h>
 #include<memory/memory.h>
+#include<memory/gc.h>
 #include"except.h"
 #include<string.h>
 #include<stdio.h>
@@ -35,6 +36,7 @@ EgThread* EgThread_New()
 		return NULL;
 	}
 	t->t_dstack_cap=EG_THREAD_DEFALUT_DATA_SIZE;
+	t->t_host=Gr_Object_Nil;
 	return t;
 }
 
@@ -166,6 +168,12 @@ void EgThread_SFrameReturn(EgThread* eg)
 		} \
 	}while(0)
 
+#define EG_THREAD_SAVE_FRAME(f) \
+	do{ \
+		f->f_pc=pc; \
+		f->f_sp=sp; \
+	}while(0)
+
 
 #define DATA_SWAP(x,y) \
 	do{ \
@@ -195,7 +203,6 @@ int  EgThread_Run(EgThread* e)
 	register u_int8_t cur_code;	/* instruction register*/
 	register u_int32_t rd; 		/* data register */
 	u_int32_t rs; 				/* status register */
-	GrObject* rh=Gr_Object_Nil;
 	register GrObject* acc;		
 	register GrObject* r0;
 	register GrObject* r1;
@@ -223,7 +230,34 @@ int  EgThread_Run(EgThread* e)
 	EG_THREAD_USE_FRAME(cur_frame);
 	EG_THREAD_CLR_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
 
+	int i=0;
+	int j=0;
 next_instruct:
+
+	assert(sp<EG_THREAD_DEFALUT_DATA_SIZE-100);
+	i++;
+	if(i>1000)
+	{
+		if(j>100)
+		{
+			EG_THREAD_SAVE_FRAME(cur_frame);
+			eg->t_sp=sp;
+			GrGc_Collection(GRGC_HEAP_OLD);
+			j=0;
+			i=0;
+			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+		}
+		else
+		{
+			EG_THREAD_SAVE_FRAME(cur_frame);
+			eg->t_sp=sp;
+			GrGc_Collection(GRGC_HEAP_YOUNG);
+			j++;
+			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+		}
+		i=0;
+	}
+
 	if(GrExcept_Happened())
 	{
 		return EG_THREAD_EXIT_EXCEPTION;
@@ -256,8 +290,8 @@ next_instruct:
 			UNPACK_TWO_OP;
 			eg->t_sp=sp;
 			eg->t_pc=pc;
-			r2=rh;
-			rh=Gr_Object_Nil;
+			r2=eg->t_host;
+			eg->t_host=Gr_Object_Nil;
 			acc=GrObject_Call(r0,r2,r1);
 			ACC_PUSH;
 			goto next_instruct;
@@ -471,7 +505,7 @@ next_instruct:
 			goto next_instruct;
 		case OP_SET_HOST:
 			UNPACK_ONE_OP;
-			rh=r0;
+			eg->t_host=r0;
 			goto next_instruct;
 
 		/* frame op */

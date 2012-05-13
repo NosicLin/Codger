@@ -27,22 +27,20 @@ static inline int ga_init(GrArray* ga,size_t size)
 	ga->a_flags=0;
 	ga->a_size=size;
 	int i;
+	int cap=size;
 
-	if(size<=GR_ARRAY_SMALL_SIZE)
+	if(cap<GR_ARRAY_SMALL_SIZE)
 	{
-		ga->a_cap=GR_ARRAY_SMALL_SIZE;
-		ga->a_objects=ga->a_small_objects;
+		cap=GR_ARRAY_SMALL_SIZE;
 	}
-	else
+	obs=GrMem_Alloc(sizeof(*obs)*cap);
+	ga->a_objects=obs;
+	ga->a_cap=cap;
+
+	if(obs==NULL)
 	{
-		obs=GrMem_Alloc(sizeof(*obs)*size);
-		if(obs==NULL)
-		{
-			GrErr_MemFormat("Can't Alloc Memory For Array To Init");
-			return -1;
-		}
-		ga->a_cap=size;
-		ga->a_objects=obs;
+		GrErr_MemFormat("Can't Alloc Memory For Array To Init");
+		return -1;
 	}
 
 	for(i=0;i<size;i++)
@@ -75,10 +73,7 @@ static int ga_enlarge(GrArray* ga,size_t size)
 	{
 		new_obs[i]=old_obs[i];
 	}
-	if(old_obs!=ga->a_small_objects)
-	{
-		GrMem_Free(old_obs);
-	}
+	GrMem_Free(old_obs);
 	ga->a_objects=new_obs;
 	ga->a_cap=size;
 	return 0;
@@ -101,7 +96,10 @@ GrArray* GrArray_GcNew()
 	GrArray* ga=ga_malloc(GRGC_HEAP_YOUNG);
 	if(ga==NULL) return NULL;
 
-	ga_init(ga,0);
+	if(ga_init(ga,0)<0)
+	{
+		return NULL;
+	}
 	return ga;
 }
 GrArray* GrArray_GcNewFlag(long flags)
@@ -109,7 +107,10 @@ GrArray* GrArray_GcNewFlag(long flags)
 	GrArray* ga=ga_malloc(flags);
 	if(ga==NULL) return NULL;
 
-	ga_init(ga,0);
+	if(ga_init(ga,0)<0)
+	{
+		return NULL;
+	}
 	return ga;
 }
 
@@ -136,7 +137,7 @@ int GrArray_Init(GrArray* ga)
 int GrArray_Push(GrArray* ga,GrObject* item)
 {
 	BUG_ON(ga->a_size>ga->a_cap,"ga->a_size=%d,ga->a_cap=%d",
-								ga->a_size,ga->a_cap);
+			ga->a_size,ga->a_cap);
 	int ret;
 
 	if(ga->a_size==ga->a_cap)
@@ -155,10 +156,11 @@ int GrArray_Push(GrArray* ga,GrObject* item)
 		}
 	}
 	ga->a_objects[ga->a_size++]=item;
+	GrGc_Intercept(ga,item);
 	return 0;
 }
-			
-			
+
+
 
 GrObject* GrArray_Pop(GrArray* ga)
 {
@@ -179,6 +181,7 @@ int GrArray_Set(GrArray* ga,ssize_t index,GrObject* item)
 		return -1;
 	}
 	ga->a_objects[index]=item;
+	GrGc_Intercept(ga,item);
 	return 0;
 }
 
@@ -227,6 +230,7 @@ int GrArray_Insert(GrArray* ga,ssize_t index,GrObject* item)
 	}
 	obs[index]=item;
 	ga->a_size++;
+	GrGc_Intercept(ga,item);
 	return 0;
 }
 int GrArray_Remove(GrArray* ga,ssize_t index)
@@ -292,6 +296,10 @@ GrArray* GrArray_Plus(GrArray* x ,GrArray* y)
 	}
 
 	m->a_size=m_size;
+	if(GrGc_IsRefLow(x)||GrGc_IsRefLow(y))
+	{
+		GrGc_MarkRefLow(m);
+	}
 	return m;
 }
 
@@ -329,6 +337,24 @@ int GrArray_Print(GrArray* ga,FILE* f)
 
 	return 0;
 }
+int GrArray_GcUpdate(GrArray* ga)
+{
+	ssize_t i;
+	GrObject** obs=ga->a_objects;
+	for(i=0;i<ga->a_size;i++)
+	{
+		obs[i]=GrGc_Update(obs[i]);
+	}
+	return 0;
+}
+
+void GrArray_Destruct(GrArray* ga)
+{
+	if(ga->a_objects!=NULL)
+	{
+		GrMem_Free(ga->a_objects);
+	}
+}
 
 static int ga_set_item(GrObject* ga,GrObject* index,GrObject* item)
 {
@@ -364,7 +390,7 @@ static GrObject* ga_plus(GrObject* x,GrObject* y)
 		return (GrObject*)GrArray_Plus(GR_TO_A(x),GR_TO_A(y));
 	}
 	GrErr_TypeFormat("Can't Connect Array Object And '%s'",
-					GrObject_Name(y));
+			GrObject_Name(y));
 	return NULL;
 }
 
@@ -374,6 +400,8 @@ static struct gr_type_ops array_type_ops=
 {
 	.t_hash=GrUtil_HashNotSupport,
 	.t_print=(GrPrintFunc)GrArray_Print,
+	.t_destruct=(GrDestructFunc)GrArray_Destruct,
+	.t_gc_update=(GrGcUpdateFunc)GrArray_GcUpdate,
 
 	.t_iter=(GrIterFunc)GrArray_Iter,
 	.t_get_item=ga_get_item,
@@ -403,6 +431,7 @@ GrArrayIter* GrArrayIter_GcNew(GrArray* host)
 	iter->i_cur_pos=0;
 	return iter;
 }
+
 GrObject* GrArrayIter_Next(GrArrayIter* iter)
 {
 	if(iter->i_cur_pos>=GrArray_Size(iter->i_host))
@@ -414,8 +443,15 @@ GrObject* GrArrayIter_Next(GrArrayIter* iter)
 	return iter->i_host->a_objects[iter->i_cur_pos++];
 }
 
+int GrArrayIter_GcUpdate(GrArrayIter* iter)
+{
+	iter->i_host=GrGc_Update(iter);
+	return 0;
+}
+
 static struct gr_type_ops array_iter_type_ops=
 {
+	.t_gc_update=(GrGcUpdateFunc)GrArrayIter_GcUpdate,
 	.t_iter_next=(GrIterNextFunc)GrArrayIter_Next,
 };
 

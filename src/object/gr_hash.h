@@ -25,7 +25,6 @@ struct gr_hash
 	struct gr_hash_entry* h_table;
 	long h_flags;
 	GrHashLookUpFunc h_look_up;
-	struct gr_hash_entry h_small_table[GR_HASH_MIN_SIZE];
 };
 
 typedef struct gr_hash GrHash;
@@ -59,7 +58,7 @@ int GrHash_Verify(GrObject* h);
 
 static inline int GrHashEntry_Valid(GrHashEntry* h)
 {
-	return (h->e_key!=NULL&&h->e_key!=Gr_Hash_Dummy);
+	return ((h->e_key!=NULL)&&(h->e_key!=Gr_Hash_Dummy));
 }
 
 #ifdef GR_HASH_DEBUG

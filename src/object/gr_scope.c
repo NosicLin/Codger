@@ -30,21 +30,43 @@ inline int GrScope_Init(GrScope* s,GrScope* upper)
 	s->s_upper=upper;
 	return 0;
 }
+
+int GrScope_GcUpdate(GrScope* s)
+{
+	if(s->s_upper!=NULL)
+	{
+		s->s_upper=GrGc_Update(s->s_upper);
+	}
+	s->s_table=GrGc_Update(s->s_table);
+	return 0;
+}
+
+
+static struct gr_type_ops scope_type_ops=
+{
+	.t_gc_update=(GrGcUpdateFunc) GrScope_GcUpdate,
+};
+
+
 GrTypeInfo Gr_Type_Scope=
 {
 	.t_name="ScopeObject",
 	.t_size=sizeof(GrScope),
-	.t_ops=&GR_TYPE_OPS_NOT_SUPPORT,
+	.t_ops=&scope_type_ops,
 };
 
 
 int GrScope_Map(GrScope* s,GrObject* key,GrObject* value)
 {
+	assert(key);
+	assert(value);
 	return GrHash_Map(s->s_table,key,value);
 }
 
 int GrScope_MapUpper(GrScope* s,GrObject* key,GrObject* value)
 {
+	assert(value);
+	assert(key);
 	GrScope* cur=s->s_upper;
 	GrHashEntry* entry;
 	while(cur!=NULL)
@@ -56,6 +78,7 @@ int GrScope_MapUpper(GrScope* s,GrObject* key,GrObject* value)
 			continue;
 		}
 		entry->e_value=value;
+		GrGc_Intercept(cur->s_table,value);
 		return 0;
 	}
 	GrErr_NameFormat("upper Name '%s' Is Not Define",GR_TO_S(key)->s_value);

@@ -10,7 +10,6 @@
 #define GrGc_HEAP_YOUNG (1ul<<0)
 #define GrGc_HEAP_OLD (1ul<<1)
 #define GrGc_HEAP_STATIC (1ul<<2)
-
 #define GRGC_HEAP_YOUNG GrGc_HEAP_YOUNG 
 #define GRGC_HEAP_OLD GrGc_HEAP_OLD 
 #define GRGC_HEAP_STATIC GrGc_HEAP_STATIC
@@ -57,6 +56,9 @@ int GrGc_Collection(int level);
 /* copy object g to another area, and return the address */
 void* GrGc_Update(void* g);
 void GrGc_MemErr();
+void GrGc_Intercept(void* ,void*);
+void GrGc_MarkRefLow(void*);
+int GrGc_IsRefLow(void*);
 
 
 int GrModule_GcInit();
@@ -66,7 +68,7 @@ int GrModule_GcExit();
 /* used to debug */
 struct grgc_header
 {
-	long g_check_sum;
+	unsigned long g_check_sum;
 };
 #define GRGC_HEADER struct grgc_header g_header
 #endif  /*GRGC_DEBUG*/

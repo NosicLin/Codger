@@ -14,19 +14,24 @@
 
 GrClass* GrClass_GcNew()
 {
-	GrClass* c=GrGc_New(GrClass,&Gr_Type_Class);
+	return GrClass_GcNewFlag(GRGC_HEAP_YOUNG);
+}
+
+GrClass* GrClass_GcNewFlag(long flags)
+{
+	GrClass* c=GrGc_Alloc(GrClass,&Gr_Type_Class,flags);
 	if(c==NULL)
 	{
 		GrErr_MemFormat("Can't Alloc Memory For ClassObject");
 		return NULL;
 	}
 	
-	GrHash* h=GrHash_GcNew();
-	if(h==NULL)
+	GrHash* s=GrHash_GcNew();
+	if(s==NULL)
 	{
 		return NULL;
 	}
-	c->c_symbols=h;
+	c->c_symbols=s;
 
 	GrHash* t=GrHash_GcNew();
 	if(t==NULL) return NULL;
@@ -43,33 +48,12 @@ GrClass* GrClass_GcNew()
 	c->c_template=t;
 	c->c_inhert=NULL;
 	c->c_name=(GrString*)Gr_Const_String_unkown;
+
+	GrGc_MarkRefLow(c);
 	return c;
 }
 
 
-GrClass* GrClass_GcNewFlag(long flags)
-{
-	GrClass* c=GrGc_Alloc(GrClass,&Gr_Type_Class,flags);
-	if(c==NULL)
-	{
-		GrErr_MemFormat("Can't Alloc Memory For ClassObject");
-		return NULL;
-	}
-	
-	GrHash* h=GrHash_GcNewFlag(flags);
-	if(h==NULL)
-	{
-		return NULL;
-	}
-	c->c_symbols=NULL;
-
-	GrHash* t=GrHash_GcNewFlag(flags);
-	if(t==NULL) return NULL;
-
-	c->c_template=t;
-	c->c_inhert=NULL;
-	return c;
-}
 
 int GrClass_SetAttr(GrClass* s,GrObject* k,GrObject* v)
 {
@@ -91,6 +75,7 @@ int GrClass_SetAttr(GrClass* s,GrObject* k,GrObject* v)
 	}
 	assert(GrSymbol_Verify(entry->e_key));
 	entry->e_value=v;
+	GrGc_Intercept(s->c_symbols,v);
 	return 0;
 }
 
@@ -120,14 +105,23 @@ GrObject* GrClass_GetAttr(GrClass* s,GrObject* k)
 int  GrClass_AddAttr(GrClass* s,GrObject* k,GrObject* v)
 {
 	assert(GrSymbol_Verify(k));
-	return GrHash_Map(s->c_symbols,k,v);
+	int ret;
+	ret=GrHash_Map(s->c_symbols,k,v);
+	if(ret<0)
+	{
+		return -1;
+	}
+	return 0;
 }
 
 
 int GrClass_TemplateAdd(GrClass* s,GrObject* k,GrObject* v)
 {
 	assert(GrSymbol_Verify(k));
-	return GrHash_Map(s->c_template,k,v);
+	int ret;
+	ret=GrHash_Map(s->c_template,k,v);
+	if(ret<0) return -1;
+	return 0;
 }
 
 int GrClass_SetInherit(GrClass* c,GrObject* g)
@@ -138,6 +132,7 @@ int GrClass_SetInherit(GrClass* c,GrObject* g)
 		return -1;
 	}
 	c->c_inhert=(GrClass*)g;
+	GrGc_Intercept(c,g);
 	return 0;
 }
 
@@ -147,8 +142,10 @@ GrInstance* GrClass_Call(GrClass* s,GrObject* host,GrArray* args)
 {
 
 	size_t arg_nu=GrArray_Size(args);
+
 	GrInstance* is=GrInstance_GcNew(s->c_instance_type);
 	GrHashEntry* entry=GrHash_GetEntry(s->c_template,Gr_Const_String_init);
+
 	/* class has no construct, so arg_nu will be 0*/
 	if(!GrHashEntry_Valid(entry))
 	{
@@ -170,13 +167,26 @@ GrInstance* GrClass_Call(GrClass* s,GrObject* host,GrArray* args)
 	{
 		return is;
 	}
+
 	EgThread* t=EgThread_GetSelf();
 	t->t_relval=(GrObject*)is;
+
 	if(GrFunc_Call((GrFunc*)init,(GrObject*)is,args)==NULL)
 	{
 		return NULL;
 	}
 	return is;
+}
+
+int GrClass_GcUpdate(GrClass* c)
+{
+	if(c->c_inhert!=NULL)
+	{
+		c->c_inhert=GrGc_Update(c->c_inhert);
+	}
+	c->c_symbols=GrGc_Update(c->c_symbols);
+	c->c_template=GrGc_Update(c->c_template);
+	return 0;
 }
 
 
@@ -204,6 +214,7 @@ static int class_set_attr(GrClass* s,GrObject* k,GrObject* v,long perm)
 	}
 
 	entry->e_value=v;
+	GrGc_Intercept(s->c_symbols,v);
 	return 0;
 }
 
@@ -240,6 +251,7 @@ static struct gr_type_ops class_type_ops=
 	.t_call=(GrCallFunc)GrClass_Call,
 	.t_get_attr=(GrGetAttrFunc)class_get_attr,
 	.t_set_attr=(GrSetAttrFunc)class_set_attr,
+	.t_gc_update=(GrGcUpdateFunc)GrClass_GcUpdate,
 };
 
 

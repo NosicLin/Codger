@@ -12,7 +12,6 @@ struct gr_array
 	ssize_t a_cap;
 	ssize_t a_size;
 	struct gr_object** a_objects;
-	struct gr_object* a_small_objects[GR_ARRAY_SMALL_SIZE];
 };
 
 typedef struct gr_array GrArray;
@@ -62,7 +61,7 @@ int GrArray_Print(GrArray*,FILE* f);
 
 static inline int GrArray_Verify(GrObject* ga)
 {
-	return  ga->g_type==&Gr_Type_Array;
+	return  GrObject_Type(ga)==&Gr_Type_Array;
 }
 
 

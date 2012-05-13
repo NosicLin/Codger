@@ -48,7 +48,7 @@ int main(int argc,char** argv)
 	root=parser_get_root();
 	
 	module=Ast_ToModule(root);
-	module_name=GrString_GcNew("main");
+	module_name=GrString_GcNewFlag("main",GRGC_HEAP_STATIC);
 	if(module==NULL||module_name==NULL)
 	{
 		goto error;

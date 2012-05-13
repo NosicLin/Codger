@@ -4,6 +4,7 @@
 #include"gr_array.h"
 #include"gr_scope.h"
 #include"gr_opcode.h"
+#include<memory/gc.h>
 
 #define GR_FUNC_DEBUG
 
@@ -21,14 +22,18 @@ GrFunc* GrFunc_GcNew();
 GrFunc* GrFunc_GcNewFlag(long);
 static inline void GrFunc_SetScope(GrFunc* f,GrScope* s)
 {
+
+	GrGc_Intercept(f,s);
 	f->f_livein=s;
 }
 static inline void GrFunc_SetDefaultArgs(GrFunc* f,GrArray* args)
 {
+	GrGc_Intercept(f,args);
 	f->f_default_args=args;
 }
 static inline void GrFunc_SetOpcode(GrFunc* f,GrOpcode* op)
 {
+	GrGc_Intercept(f,op);
 	f->f_codes=op;
 }
 

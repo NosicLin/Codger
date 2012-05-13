@@ -15,15 +15,21 @@ static GrObject __Gr_Hash_Dummy;
 
 GrObject* Gr_Hash_Dummy=&__Gr_Hash_Dummy;
 
-static inline void ht_init(GrHash* h,GrHashLookUpFunc f)
+static inline int ht_init(GrHash* h,GrHashLookUpFunc f)
 {
 	h->h_fill=0;
 	h->h_used=0;
 	h->h_mask=GR_HASH_MIN_SIZE-1;
-	h->h_table=h->h_small_table;
 	h->h_flags=0;
 	h->h_look_up=f;
-	memset(h->h_small_table,0,sizeof(GrHashEntry)*GR_HASH_MIN_SIZE);
+	h->h_table=GrMem_Alloc(sizeof(GrHashEntry)*GR_HASH_MIN_SIZE);
+	if(h->h_table==NULL)
+	{
+		return -1;
+	}
+
+	memset(h->h_table,0,sizeof(GrHashEntry)*GR_HASH_MIN_SIZE);
+	return 0;
 }
 
 
@@ -194,10 +200,7 @@ static int ht_resize(GrHash* h,ssize_t minisize)
 			}
 		}
 	}
-	if(old_table!=h->h_small_table)
-	{
-		GrMem_Free(old_table);
-	}
+	GrMem_Free(old_table);
 
 	return 0;
 }
@@ -205,8 +208,7 @@ static int ht_resize(GrHash* h,ssize_t minisize)
 
 inline int GrHash_Init(GrHash* h)
 {
-	ht_init(h,ht_normal_lookup_func);
-	return 0;
+	return ht_init(h,ht_normal_lookup_func);
 }
 
 GrHash* GrHash_GcNew()
@@ -216,7 +218,10 @@ GrHash* GrHash_GcNew()
 	{
 		return NULL;
 	}
-	ht_init(h,ht_normal_lookup_func);
+	if(ht_init(h,ht_normal_lookup_func)<0)
+	{
+		return NULL;
+	}
 	return h;
 }
 GrHash* GrHash_GcNewFlag(long flags)
@@ -226,23 +231,25 @@ GrHash* GrHash_GcNewFlag(long flags)
 	{
 		return NULL;
 	}
-	ht_init(h,ht_normal_lookup_func);
+	if(ht_init(h,ht_normal_lookup_func)<0)
+	{
+		return NULL;
+	}
 	return h;
 }
 
 void GrHash_Destruct(GrHash* h)
 {
-	if(h->h_table==h->h_small_table)
+	if(h->h_table!=NULL)
 	{
-		return ;
+		GrMem_Free(h->h_table);
 	}
-
-	GrMem_Free(h->h_table);
 }
 
 
 int GrHash_Map(GrHash* h,GrObject* key,GrObject* value)
 {
+	assert(value);
 	ssize_t code=GrObject_Hash(key);
 	ssize_t used=h->h_used;
 	int ret=0;
@@ -270,6 +277,8 @@ int GrHash_Map(GrHash* h,GrObject* key,GrObject* value)
 	{
 		ret=ht_resize(h,(h->h_used>50000?2:4)*h->h_used);
 	}
+	GrGc_Intercept(h,key);
+	GrGc_Intercept(h,value);
 	return ret;
 }
 
@@ -412,11 +421,33 @@ int GrHash_Print(GrHash* h,FILE* f)
 	return 0;
 }
 
+int GrHash_GcUpdate(GrHash* h)
+{
+	ssize_t used=h->h_used;
+	ssize_t i=0;
+	struct gr_hash_entry* entry=h->h_table;
+	//printf("hash used =%d \n",used);
+	while(i<used)
+	{
+		assert(i<=h->h_mask);
+		if(GrHashEntry_Valid(entry))
+		{
+			entry->e_key=GrGc_Update(entry->e_key);
+			entry->e_value=GrGc_Update(entry->e_value);
+			i++;
+		}
+		entry++;
+	}
+	return 0;
+}
+
+
 static struct gr_type_ops hash_type_ops=
 {
 	.t_hash=GrUtil_HashNotSupport,
 	.t_print=(GrPrintFunc)GrHash_Print,
 	.t_destruct=(GrDestructFunc)GrHash_Destruct,
+	.t_gc_update=(GrGcUpdateFunc)GrHash_GcUpdate,
 
 	.t_set_item=(GrSetItemFunc)GrHash_Map,
 	.t_get_item=(GrGetItemFunc)GrHash_Lookup,

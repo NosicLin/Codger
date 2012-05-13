@@ -332,12 +332,14 @@ int GrModule_IntInit()
 	{
 		return 0;
 	}
+	/*
 	GrClass* c=GrInt_GetIntClass();
 	if(c==NULL) return -1;
 
 	Gr_Type_Int.t_class=c;
 	Gr_Type_Bool.t_class=c;
 
+	*/
 	s_module_int_inited=1;
 	return 0;
 }

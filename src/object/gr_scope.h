@@ -6,6 +6,7 @@
 
 struct gr_scope
 {
+	INHERIT_GROBJECT;
 	struct gr_scope* s_upper;
 	GrHash* s_table;
 };

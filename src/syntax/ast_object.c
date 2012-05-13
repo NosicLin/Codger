@@ -167,11 +167,11 @@ GrModule*  Ast_ToModule(AstObject* root)
 	GrModule* md=0;
 	GrOpcode* op=0;
 	int ret=0;
-	md=GrModule_GcNewFlag(GRGC_HEAP_OLD);
-	op=GrOpcode_GcNewFlag(GRGC_HEAP_OLD);
+	md=GrModule_GcNewFlag(GRGC_HEAP_STATIC);
+	op=GrOpcode_GcNewFlag(GRGC_HEAP_STATIC);
 
-	GrString* op_name=GrString_GcNewFlag("module",GRGC_HEAP_OLD);
-	GrArray* op_args_name=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	GrString* op_name=GrString_GcNewFlag("module",GRGC_HEAP_STATIC);
+	GrArray* op_args_name=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
 
 	if(op_name==NULL) goto error;
 	if(op_args_name==NULL) goto error;

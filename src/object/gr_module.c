@@ -36,20 +36,19 @@ GrModule* GrModule_GcNewFlag(long flags)
 
 int GrModule_Init(GrModule* m)
 {
-	GrArray* consts_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	GrArray* consts_pool=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
 	if(consts_pool==NULL) goto error;
 
-	GrArray* symbols_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	GrArray* symbols_pool=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
 	if(symbols_pool==NULL) goto error;
 
-	GrArray* opcodes_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+	GrArray* opcodes_pool=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
 	if(opcodes_pool==NULL) goto error;
-	GrArray* attrs_pool=GrArray_GcNewFlag(GRGC_HEAP_OLD);
+
+	GrArray* attrs_pool=GrArray_GcNewFlag(GRGC_HEAP_STATIC);
 	if(attrs_pool==NULL) goto error;
 
-	GrHash* attrs=GrHash_GcNewFlag(GRGC_HEAP_OLD);
-	if(attrs_pool==NULL) goto error ;
-
+	GrHash* attrs=GrHash_GcNewFlag(GRGC_HEAP_STATIC);
 	if(attrs==NULL) goto error;
 
 	m->m_consts_pool=consts_pool;
@@ -186,13 +185,25 @@ int GrModule_WriteToFile(GrModule* m,FILE* f,long flags)
 
 	return 1;
 }
+int GrModule_GcUpdate(GrModule* m)
+{
+	/* FIXME */
+	m->m_attrs=GrGc_Update(m->m_attrs);
+	return 0;
+}
+
+static struct gr_type_ops gr_module_ops=
+{
+	.t_gc_update=(GrGcUpdateFunc)GrModule_GcUpdate,
+};
+
 
 
 GrTypeInfo Gr_Type_Module=
 {
 	.t_name="ModuleObject",
 	.t_size=sizeof(GrModule),
-	.t_ops=&GR_TYPE_OPS_NOT_SUPPORT,
+	.t_ops=&gr_module_ops,
 };
 
 

@@ -93,6 +93,7 @@ GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 
 	ef=EgSframe_NewFromFunc(gf);
 	if(ef==NULL) return NULL;
+
 	scope=ef->f_scope;
 
 	for(i=0;i<op->o_args_nu;i++)
@@ -126,20 +127,19 @@ error:
 	return NULL;
 }
 
-
-
-
-
-
-
-
-
+int GrFunc_GcUpdate(GrFunc* f)
+{
+	f->f_livein=GrGc_Update(f->f_livein);
+	f->f_default_args=GrGc_Update(f->f_default_args);
+	return 0;
+}
 
 
 
 static struct gr_type_ops func_type_ops=
 {
 	.t_call=(GrCallFunc)GrFunc_Call,
+	.t_gc_update=(GrGcUpdateFunc)GrFunc_GcUpdate,
 };
 struct gr_type_info Gr_Type_Func =
 {

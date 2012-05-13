@@ -6,4 +6,9 @@ func sum(x)
 	end 
 end 
 
-print sum(1000)
+print sum(300000)
+
+x=0
+while 1
+	x+=1
+end 

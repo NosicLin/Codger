@@ -31,11 +31,12 @@ GrInstance* GrInstance_GcNewFlag(GrTypeInfo* t,long f)
 		GrErr_MemFormat("Can't Alloc Memory For InstanceObject");
 		return NULL;
 	}
-	GrHash* s=GrHash_GcNewFlag(f);
+	GrHash* s=GrHash_GcNew();
 	if(s==NULL) return NULL;
 
 	i->i_symbols=s;
 
+	GrGc_Intercept(i,s);
 	return i;
 }
 
@@ -83,6 +84,7 @@ int GrInstance_SetAttr(GrInstance* ic,GrObject* k,GrObject* v)
 	{
 		assert(GrSymbol_Verify(entry->e_key));
 		entry->e_value=v;
+		GrGc_Intercept(ic->i_symbols,v);
 		return 0;
 	}
 
@@ -96,6 +98,7 @@ int GrInstance_SetAttr(GrInstance* ic,GrObject* k,GrObject* v)
 	{
 		assert(GrSymbol_Verify(entry->e_key));
 		GrHash_Map(ic->i_symbols,entry->e_key,v);
+		GrGc_Intercept(ic->i_symbols,v);
 		return 0;
 	}
 
@@ -111,6 +114,12 @@ int GrInstance_SetAttr(GrInstance* ic,GrObject* k,GrObject* v)
 				cl->c_name->s_value);
 		return -1;
 	}
+}
+
+int GrInstance_GcUpdate(GrInstance* ic)
+{
+	ic->i_symbols=GrGc_Update(ic->i_symbols);
+	return 0;
 }
 
 
@@ -135,6 +144,7 @@ static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 			return -1;
 		}
 		entry->e_value=v;
+		GrGc_Intercept(ic->i_symbols,v);
 		return 0;
 	}
 
@@ -154,6 +164,7 @@ static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 			return -1;
 		}
 		GrHash_Map(ic->i_symbols,entry->e_key,v);
+		GrGc_Intercept(ic->i_symbols,v);
 		return 0;
 	}
 
@@ -228,6 +239,7 @@ struct gr_type_ops instance_type_ops=
 	.t_get_attr=(GrGetAttrFunc)gi_get_attr,
 	.t_set_attr=(GrSetAttrFunc)gi_set_attr,
 	.t_print=(GrPrintFunc)GrInstance_Print,
+	.t_gc_update=(GrGcUpdateFunc)GrInstance_GcUpdate,
 };
 
 

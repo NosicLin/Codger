@@ -93,6 +93,9 @@ GrObject* GrObject_GetAttr(GrObject*,GrObject*,long);
 
 int GrObject_SetAttr(GrObject*,GrObject*,GrObject*,long);
 
+void GrObject_Destruct(GrObject*);
+int GrObject_GcUpdate(GrObject*);
+
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 
 

@@ -35,12 +35,16 @@ typedef int (*GrSetAttrFunc)(GrObject*,GrObject*,GrObject* v,long);
 typedef GrObject* (*GrGetAttrFunc)(GrObject*,GrObject*,long);
 
 typedef int (*GrDestructFunc)(GrObject*);
+typedef int (*GrGcUpdateFunc)(GrObject*);
 struct gr_type_ops
 {
 	GrHashFunc t_hash;
 	GrCmpFunc t_rich_eq;
 
 	GrPrintFunc t_print;
+	GrDestructFunc t_destruct;
+	GrGcUpdateFunc t_gc_update;
+
 
 	GrIterFunc t_iter;
 	GrIterNextFunc t_iter_next;
@@ -49,10 +53,6 @@ struct gr_type_ops
 	GrSetAttrFunc t_set_attr;
 
 
-
-	GrNewFunc t_new;
-
-	GrDestructFunc t_destruct;
 
 
 	GrCallFunc t_call;

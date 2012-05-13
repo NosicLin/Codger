@@ -1,4 +1,11 @@
 sum=0
+i=0
 while 1
-	sum+=1
+	sum=[3,4,4,5,5]
+	while i<10000
+		sum[0]=i+1
+		sum[1]=i+2
+		i+=1
+	end 
+	i=0
 end
