@@ -9,6 +9,7 @@
 #include<engine/eg_thread.h>
 #include<engine/eg_sframe.h>
 
+#define GC_ANALYZE 
 
 
 #ifdef GRGC_MEM_TOOL_DEBUG 
@@ -44,6 +45,11 @@ int GrModule_GcExit(){return 1;}
 #define GC_HEAP_LEVEL_MASK ((1ul<<GC_MAX_HEAP_LEVEL)-1)
 
 #define GC_BLOCK_REF_LOW (1ul<<4)
+#define GC_BLOCK_NEED_DESTUCT (1ul<<5)
+
+#define GC_COLLECTION_TIGGER_MIN_BLOCK_NU 100
+#define GC_COLLECTION_TIGGER_MAX_BLOCK_NU 10000
+#define GC_COLLECTION_TIGGER_OBS_RATIO 2 
 
 struct block_header
 {
@@ -63,8 +69,12 @@ struct gc_heap
     long g_flags;
     struct list_head g_blocks;
     struct block_header* g_cur;
-    int g_obs_nu;
 
+	size_t g_block_nu;
+    size_t g_obs_nu;
+	size_t g_last_alive_nu;
+
+	/* scan info,used for garbage collection */
     struct block_header* g_collection;
     size_t g_scan;
 #ifdef GRGC_DEBUG
@@ -80,7 +90,9 @@ struct gc_heap
 
 
 #ifdef GRGC_DEBUG 
-static void gc_raise_memerr()
+
+/* it is usefull when use memory debug tool like valgrind */
+void gc_raise_memerr()
 {
 	int* a=0;
 	*a=3;
@@ -97,7 +109,7 @@ static unsigned long grgc_checksum(unsigned long addr)
 		BUG_ON(((GrObject*)(g))->g_header.g_check_sum!=grgc_checksum((unsigned long)(g)),"addr=%lx",(long)(g)); \
 	}while(0)
 
-static inline void GrGc_InitHeader(GrObject* g,struct gr_type_info* info)
+static inline void GrGc_InitObsHeader(GrObject* g,struct gr_type_info* info)
 {
 	g->g_header.g_check_sum=grgc_checksum((unsigned long)g);
 	g->g_type=info;
@@ -118,7 +130,7 @@ static inline void GrGc_InitHeader(GrObject* g,struct gr_type_info* info)
 
 #define GC_OBS_HEADER_CHECK(g)
 #define GC_BLOCK_HEADER_CHECK(b)
-#define GrGc_InitHeader(g,info) \
+#define GrGc_InitObsHeader(g,info) \
 	do{ \
 		((GrObject*)(g))->g_type=info; \
 	}while(0) 
@@ -168,8 +180,8 @@ int GrGc_Collection();
 
 
 
-#if 0
-static void gc_block_header_print(struct block_header* b)
+#ifdef GRGC_DEBUG 
+void gc_block_header_print(struct block_header* b)
 {
 	printf("@block_header\n{\n");
 	printf("\tflags=");
@@ -190,6 +202,15 @@ static void gc_block_header_print(struct block_header* b)
 	printf("\tbegin_ops=%lx\n",(long)b);
 	printf("\tfree_pos=%lx\n",(long)(b->b_free_pos));
 	printf("\tmax_pos=%lx\n",(long)(b->b_max_pos));
+	printf("}\n");
+}
+void gc_heap_print(struct gc_heap* g)
+{
+	printf("Heap{\n");
+	printf("\tg->name=%s\n",g->g_name);
+	printf("\tg->block_nu=%d\n",g->g_block_nu);
+	printf("\tg->obs_nu=%d\n",g->g_obs_nu);
+	printf("\tg->last_alive_nu=%d\n",g->g_last_alive_nu);
 	printf("}\n");
 }
 #endif 
@@ -229,6 +250,74 @@ static struct gc_heap* gc_old_another=__heap+3;
 
 /* two for gc_young,two for old,and one for static */
 
+static int s_collection_switch=1;
+static int s_collection_level=0;
+static int s_collection_working=0;
+
+#ifdef GRGC_DEBUG
+static int s_collection_old_nu=0;
+static int s_collection_young_nu=0;
+#endif 
+
+static inline int gc_tigger_algrithom(struct gc_heap* g)
+{
+	int level=g->g_flags&GC_HEAP_LEVEL_MASK;
+	if(level==GrGc_HEAP_YOUNG)
+	{
+		if(g->g_block_nu<GC_COLLECTION_TIGGER_MIN_BLOCK_NU)
+		{
+			return 0;
+		}
+		if(g->g_obs_nu>(g->g_last_alive_nu<<GC_COLLECTION_TIGGER_OBS_RATIO))
+		{
+			return 1;
+		}
+	}
+	if(level==GrGc_HEAP_OLD)
+	{
+		if(g->g_block_nu<GC_COLLECTION_TIGGER_MIN_BLOCK_NU)
+		{
+			return 0;
+		}
+		if(g->g_block_nu>GC_COLLECTION_TIGGER_MAX_BLOCK_NU)
+		{
+			return 1;
+		}
+		if(g->g_obs_nu>(g->g_last_alive_nu<<GC_COLLECTION_TIGGER_OBS_RATIO))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+static inline void gc_tigger_collection(struct gc_heap* g)
+{
+	int expect_level=g->g_flags&GC_HEAP_LEVEL_MASK;
+	if(expect_level==GrGc_HEAP_STATIC)
+	{
+		return ;
+	}
+	if(s_collection_working==1)
+	{
+		return ;
+	}
+	if(s_collection_switch==0)
+	{
+		return ;
+	}
+	if(gc_tigger_algrithom(g))
+	{
+		EgThread* t=EgThread_GetSelf();
+		EG_THREAD_SET_FLAGS(t,EG_THREAD_FLAGS_GC_WORK);
+		if(expect_level>s_collection_level)
+		{
+			s_collection_level=expect_level;
+		}
+	}
+
+}
+
 static int gc_heap_enlarge(register struct gc_heap* g)
 {
 	/* alloc a page */
@@ -243,9 +332,14 @@ static int gc_heap_enlarge(register struct gc_heap* g)
 
 	/* link to g->g_blocks */
 	list_add_tail(&h->b_link,&g->g_blocks);
+	g->g_block_nu++;
 
 	/* set cur is h */
 	g->g_cur=h;
+
+
+	gc_tigger_collection(g);
+
 #ifdef GRGC_DEBUG
 	h->b_check_sum=grgc_checksum((unsigned long)h);
 	h->b_name=g->g_name;
@@ -274,7 +368,12 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 	if(free_pos<=cur->b_max_pos)
 	{
 		cur->b_free_pos=free_pos;
-		GrGc_InitHeader((GrObject*)ptr,info);
+		GrGc_InitObsHeader((GrObject*)ptr,info);
+		g->g_obs_nu++;
+		if(info->t_ops->t_destruct)
+		{
+			cur->b_flags|=GC_BLOCK_NEED_DESTUCT;
+		}
 		return (void*)ptr;
 	}
 	else  /* enlarge heap */
@@ -290,7 +389,12 @@ void* gc_heap_alloc(register struct gc_heap* g,struct gr_type_info* info)
 	ptr=cur->b_free_pos;
 	cur->b_free_pos=GC_ROUND_ADDR(ptr+alloc_size);
 
-	GrGc_InitHeader((GrObject*)ptr,info);
+	GrGc_InitObsHeader((GrObject*)ptr,info);
+	g->g_obs_nu++;
+	if(info->t_ops->t_destruct)
+	{
+		cur->b_flags|=GC_BLOCK_NEED_DESTUCT;
+	}
 	return (void*)ptr;
 }
 
@@ -332,7 +436,6 @@ struct gc_migrate
 	void* m_addr;
 };
 
-static int s_collection_level=0;
 #define GC_NEED_UPGRADE(g) ((GrObject*)(g))->g_upgrade
 #define GC_IS_REF_LOW(g) ((GrObject*)(g))->g_ref_low
 
@@ -410,12 +513,12 @@ void* GrGc_Update(void* ptr)
 		return GC_MIGRATED_ADDR(g);
 	}
 	/*
-	printf("g_level=%d,name=%s,block_addr=%lx,s_collection_level=%d ",
-			g_level,GC_GET_BLOCK_HEADER(ptr)->b_name,
-			(long)GC_GET_BLOCK_HEADER(ptr),
-			s_collection_level);
-	printf("object_name=%s addr=%lx\n",GrObject_Name(g),(long)g);
-	*/
+	   printf("g_level=%d,name=%s,block_addr=%lx,s_collection_level=%d ",
+	   g_level,GC_GET_BLOCK_HEADER(ptr)->b_name,
+	   (long)GC_GET_BLOCK_HEADER(ptr),
+	   s_collection_level);
+	   printf("object_name=%s addr=%lx\n",GrObject_Name(g),(long)g);
+	   */
 
 	/* g object come from youn area */
 	info=GrObject_Type(g);
@@ -633,25 +736,28 @@ static int gc_heap_destory(struct gc_heap* h)
 		cur_block=list_entry(h->g_blocks.next,struct block_header,b_link);
 		list_del(&cur_block->b_link);
 
-		scan=(size_t)cur_block+GC_BLOCK_HEADER_NEED;
-		while(scan<cur_block->b_free_pos)
+		if(cur_block->b_flags&GC_BLOCK_NEED_DESTUCT)
 		{
-			cur_obs=(GrObject*)scan;
-			if(GC_IS_MIGRATED(cur_obs))
+			scan=(size_t)cur_block+GC_BLOCK_HEADER_NEED;
+			while(scan<cur_block->b_free_pos)
 			{
-				obs_size=(size_t)cur_obs->g_type;
+				cur_obs=(GrObject*)scan;
+				if(GC_IS_MIGRATED(cur_obs))
+				{
+					obs_size=(size_t)cur_obs->g_type;
+				}
+				else
+				{
+					obs_size=GrObject_Type(cur_obs)->t_size;
+					GrObject_Destruct(cur_obs);
+				}
+				scan+=GC_ROUND_ADDR(obs_size);
 			}
-			else
-			{
-				obs_size=GrObject_Type(cur_obs)->t_size;
-				GrObject_Destruct(cur_obs);
-			}
-			scan+=GC_ROUND_ADDR(obs_size);
 		}
 		/*
-		printf("free %s block addr=%lx\n",cur_block->b_name,
-				(long)(cur_block));
-		*/
+		   printf("free %s block addr=%lx\n",cur_block->b_name,
+		   (long)(cur_block));
+		   */
 #ifdef GRGC_DEBUG
 		cur_block->b_check_sum=0;
 #endif
@@ -668,6 +774,8 @@ static inline int gc_heap_init(struct gc_heap* h,long level)
 	h->g_flags=level;
 	h->g_cur=0;
 	h->g_obs_nu=0;
+	h->g_last_alive_nu=0;
+	h->g_block_nu=0;
 	h->g_collection=0;
 	h->g_scan=0;
 #ifdef GRGC_DEBUG
@@ -702,6 +810,7 @@ static inline void gc_heap_init_collection_info(struct gc_heap* h)
 			struct block_header,b_link);
 	h->g_scan=(size_t)(h->g_collection)+GC_BLOCK_HEADER_NEED;
 }
+
 
 static int gc_collection_begin()
 {
@@ -752,6 +861,8 @@ static void gc_collection_end()
 		gc_young=gc_young_anothor;
 		gc_young_anothor=temp;
 		gc_heap_destory(gc_young_anothor);
+
+		gc_young->g_last_alive_nu=gc_young->g_obs_nu;
 	}
 	else if(s_collection_level==GrGc_HEAP_OLD)
 	{
@@ -760,12 +871,15 @@ static void gc_collection_end()
 		gc_young_anothor=temp;
 
 		gc_heap_destory(gc_young_anothor);
+		gc_young->g_last_alive_nu=gc_young->g_obs_nu;
 
 		temp=gc_old;
+
 		gc_old=gc_old_another;
 		gc_old_another=temp;
 
 		gc_heap_destory(gc_old_another);
+		gc_old->g_last_alive_nu=gc_old->g_obs_nu;
 	}
 	else
 	{
@@ -777,14 +891,27 @@ static void gc_collection_end()
 
 
 
-int GrGc_Collection(int level)
+int GrGc_CleanGarbage()
 {
-//	printf("GrGc_Collection Begin\n");
-	s_collection_level=level;
+	BUG_ON(!gc_level_valied(s_collection_level),"level=%d",s_collection_level);
+	if(gc_tigger_algrithom(gc_old))
+	{
+		s_collection_level=GrGc_HEAP_OLD;
+	}
+
+#ifdef GRGC_DEBUG
+	if(s_collection_level==GrGc_HEAP_YOUNG)
+	{
+		s_collection_young_nu++;
+	}
+	if(s_collection_level==GrGc_HEAP_OLD)
+	{
+		s_collection_old_nu++;
+	}
+#endif 
+
+	s_collection_working=1;
 	gc_collection_begin();
-
-	assert(gc_level_valied(level));
-
 
 	EgThread* t=EgThread_GetSelf();
 
@@ -800,14 +927,14 @@ int GrGc_Collection(int level)
 	assert(dstack);
 	size_t sp=t->t_sp;
 	size_t i;
-//	printf("begin scan data stack......\n");
+	//	printf("begin scan data stack......\n");
 	for(i=0;i<sp;i++)
 	{
 		dstack[i]=GrGc_Update(dstack[i]);
 	}
 
 	/* Second Update StackFrame */
-//	printf("begin scan stack frame......\n");
+	//	printf("begin scan stack frame......\n");
 	EgSframe* cur_sf=t->t_fstack;
 	while(cur_sf!=NULL)
 	{
@@ -821,12 +948,12 @@ int GrGc_Collection(int level)
 
 	/* Fourth Update EgThread->retval */
 
-//	printf("begin EgThread->t_relval .....\n");
+	//	printf("begin EgThread->t_relval .....\n");
 	if(t->t_relval!=NULL)
 	{
 		t->t_relval=GrGc_Update(t->t_relval);
 	}
-//	printf("begin EgThread->t_host .....\n");
+	//	printf("begin EgThread->t_host .....\n");
 	t->t_host=GrGc_Update(t->t_host);
 
 
@@ -835,19 +962,19 @@ int GrGc_Collection(int level)
 	{
 		while(1)
 		{
-//			printf("begin scan gc_static......\n");
+			//			printf("begin scan gc_static......\n");
 			//if(gc_heap_scan_all(gc_static))
 			if(gc_heap_scan_mark_low(gc_static))
 			{
 				continue;
 			}
-//			printf("begin scan gc_old......\n");
+			//			printf("begin scan gc_old......\n");
 			//if(gc_heap_scan_all(gc_old))
 			if(gc_heap_scan_mark_low(gc_old))
 			{
 				continue;
 			}
-//			printf("begin scan gc_young_anothor......\n");
+			//			printf("begin scan gc_young_anothor......\n");
 			if(gc_heap_scan_all(gc_young_anothor))
 			{
 				continue;
@@ -861,18 +988,18 @@ int GrGc_Collection(int level)
 	{
 		while(1)
 		{
-//			printf("begin scan gc_static......\n");
+			//			printf("begin scan gc_static......\n");
 			//if(gc_heap_scan_all(gc_static))
 			if(gc_heap_scan_mark_low(gc_static))
 			{
 				continue;
 			}
-//			printf("begin scan gc_old_another......\n");
+			//			printf("begin scan gc_old_another......\n");
 			if(gc_heap_scan_all(gc_old_another))
 			{
 				continue;
 			}
-//			printf("begin scan gc_young_anothor......\n");
+			//			printf("begin scan gc_young_anothor......\n");
 			if(gc_heap_scan_all(gc_young_anothor))
 			{
 				continue;
@@ -886,8 +1013,9 @@ int GrGc_Collection(int level)
 	}
 
 	gc_collection_end();
+	s_collection_level=0;
+	s_collection_working=0;
 
-//	printf("GrGc_Collection End\n\n\n");
 	return 0;
 }
 void GrGc_Intercept(void* d,void* s)
@@ -911,6 +1039,14 @@ int GrGc_IsRefLow(void* ptr)
 	return GC_IS_REF_LOW(ptr);
 }
 
+void GrGc_Disable()
+{
+	s_collection_switch=0;
+}
+void GrGc_Enable()
+{
+	s_collection_switch=1;
+}
 
 
 int GrModule_GcInit()
@@ -939,6 +1075,18 @@ int GrModule_GcInit()
 
 int GrModule_GcExit()
 {
+	/*
+	   printf("Collection Times Info{\n");
+	   printf("\t YoungArea=%d\n",s_collection_young_nu);
+	   printf("\t OldArea=%d\n",s_collection_old_nu);
+	   printf("}\n");
+	   */
+
+	/*
+	   gc_heap_print(gc_young);
+	   gc_heap_print(gc_old);
+	   gc_heap_print(gc_static);
+	   */
 	gc_heap_destory(gc_young);
 	gc_heap_destory(gc_old);
 	gc_heap_destory(gc_static);

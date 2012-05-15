@@ -11,6 +11,15 @@
 #include"gr_func.h"
 #include<engine/eg_thread.h>
 
+void GrClass_Destruct(GrClass* gc)
+{
+	if(gc->c_instance_type)
+	{
+		GrMem_Free(gc->c_instance_type);
+		gc->c_instance_type=NULL;
+	}
+}
+
 
 GrClass* GrClass_GcNew()
 {
@@ -37,7 +46,11 @@ GrClass* GrClass_GcNewFlag(long flags)
 	if(t==NULL) return NULL;
 
 	GrTypeInfo* i_type=GrMem_Alloc(sizeof(*i_type));
-	if(i_type==NULL) return NULL;
+	if(i_type==NULL)
+	{
+		c->c_instance_type=NULL;
+		return NULL;
+	}
 
 	i_type->t_class=c;
 	i_type->t_name="InstanceObject";
@@ -252,6 +265,7 @@ static struct gr_type_ops class_type_ops=
 	.t_get_attr=(GrGetAttrFunc)class_get_attr,
 	.t_set_attr=(GrSetAttrFunc)class_set_attr,
 	.t_gc_update=(GrGcUpdateFunc)GrClass_GcUpdate,
+	.t_destruct=(GrDestructFunc)GrClass_Destruct,
 };
 
 

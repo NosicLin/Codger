@@ -273,7 +273,7 @@ static struct gr_type_ops int_type_ops=
 
 struct gr_type_info Gr_Type_Int=
 {
-	.t_class=NULL,
+	.t_class=NULL, /* Update Later */
 	.t_name="IntObject",
 	.t_size=sizeof(GrInt),
 	.t_ops=&int_type_ops,
@@ -323,24 +323,18 @@ struct gr_type_info Gr_Type_Bool=
 
 
 
-static int s_module_int_inited=0;
 
 
 int GrModule_IntInit()
 {
-	if(s_module_int_inited)
-	{
-		return 0;
-	}
-	/*
+	Gr_Type_Int.t_class=NULL;
+
 	GrClass* c=GrInt_GetIntClass();
 	if(c==NULL) return -1;
 
 	Gr_Type_Int.t_class=c;
 	Gr_Type_Bool.t_class=c;
 
-	*/
-	s_module_int_inited=1;
 	return 0;
 }
 
@@ -357,31 +351,55 @@ int GrModule_IntExit()
 
 GrObject* GrInt_MethodNegative(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	return (GrObject*)GrInt_Negative((GrInt*)host);
 }
 GrObject* GrInt_MethodNegated(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	return (GrObject*)GrInt_Negated((GrInt*)host);
 }
 
 GrObject* GrInt_MethodPositive(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	return (GrObject*)GrInt_Positive((GrInt*)host);
 }
 GrObject* GrInt_MethodMul(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_mul(host,right);
 }
 GrObject* GrInt_MethodDiv(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_div(host,right);
 }
 GrObject* GrInt_MethodMod(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_mod(host,right);
@@ -389,6 +407,10 @@ GrObject* GrInt_MethodMod(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodPlus(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_plus(host,right);
@@ -396,6 +418,10 @@ GrObject* GrInt_MethodPlus(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodMinus(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_minus(host,right);
@@ -403,6 +429,10 @@ GrObject* GrInt_MethodMinus(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodLShift(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_lshift(host,right);
@@ -410,6 +440,10 @@ GrObject* GrInt_MethodLShift(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodRShift(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_rshift(host,right);
@@ -417,6 +451,10 @@ GrObject* GrInt_MethodRShift(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodAnd(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_and(host,right);
@@ -424,12 +462,20 @@ GrObject* GrInt_MethodAnd(GrObject* host,GrArray* args)
 
 GrObject* GrInt_MethodXor(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_xor(host,right);
 }
 GrObject* GrInt_MethodOr(GrObject* host,GrArray* args)
 {
+	if(!GrInt_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
 	GrObject* right=GrArray_Get(args,0);
 	assert(right);
 	return int_or(host,right);
@@ -522,13 +568,12 @@ static GrInnerFuncEntry s_int_method[]=
 	},
 };
 
-static GrClass* s_int_class=NULL;
 
 GrClass* GrInt_GetIntClass()
 {
-	if(s_int_class!=NULL)
+	if(Gr_Type_Int.t_class!=NULL)
 	{
-		return s_int_class;
+		return Gr_Type_Int.t_class;
 	}
 
 	GrClass* int_class=GrClass_GcNewFlag(GrGc_HEAP_STATIC);
@@ -541,10 +586,13 @@ GrClass* GrInt_GetIntClass()
 	{
 		return NULL;
 	}
-	int ret=GrUtil_FillInnerMethodsFlag(int_class->c_template,s_int_method,GrGc_HEAP_STATIC);
+	GrClass_SetName(int_class,name);
+
+	int ret=GrUtil_FillInnerMethodsFlag(int_class->c_template,
+			s_int_method,GrGc_HEAP_STATIC);
+
 	if(ret<0) return NULL;
 
-	s_int_class=int_class;
 	return int_class;
 }
 

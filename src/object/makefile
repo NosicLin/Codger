@@ -3,7 +3,7 @@ PROJECT=object
 SRC=gr_int.c gr_object.c gr_hash.c gr_array.c gr_string.c \
 	gr_opcode.c gr_scope.c gr_module.c gr_consts.c \
 	gr_func.c gr_util.c gr_symbol.c gr_class.c \
-	gr_inner_func.c gr_instance.c
+	gr_inner_func.c gr_instance.c gr_float.c
 
 DEBUG=
 

@@ -13,6 +13,7 @@
 static struct area_header* area_cached[GR_AREA_CACHE_NU];
 static int area_free_nu=0;
 #endif 
+static int s_area_nu=0;
 
 struct page_header
 {
@@ -74,6 +75,8 @@ static struct area_header* alloc_area()
 	h->a_free_pos=0;
 	h->a_page_used=0;
 
+	s_area_nu++;
+
 //	print_area(h);
 	return h;
 }
@@ -90,6 +93,8 @@ static void free_area(struct area_header* h)
 	}
 #endif
 	assert(h->a_page_used==0);
+	assert(s_area_nu>0);
+	s_area_nu--;
 	free(h);
 
 }
@@ -244,3 +249,9 @@ void Gr_FreePage(register void* ptr)
 
 
 }
+
+void Gr_PrintAreaNum()
+{
+	printf("AreaNum=%d\n",s_area_nu);
+}
+

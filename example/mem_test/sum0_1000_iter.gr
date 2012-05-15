@@ -1,8 +1,8 @@
 sum=0
 i=0
 while i<3000000
-	sum+=i
-	i+=1
+	sum=sum+i
+	i=i+1
 end 
 print sum
 

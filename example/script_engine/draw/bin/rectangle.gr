@@ -1,0 +1,30 @@
+func draw_retangle(x,y,w,h)
+	$drawLine(x,y,x+w,y)
+	$drawLine(x,y,x,y+h)
+	$drawLine(x,y+h,w+x,y+h)
+	$drawLine(x+w,y,w+x,y+h)
+end 
+
+setColor(100,0,0)
+draw_retangle(50,50,100,100)
+
+setColor(0,100,0)
+draw_retangle(100,100,300,300)
+
+setColor(0,0,100)
+draw_retangle(350,350,100,100)
+
+setColor(100,100,100)
+draw_retangle(150,150,200,200)
+
+setColor(100,100,0)
+draw_retangle(150,350,-100,100)
+
+setColor(0,100,100)
+draw_retangle(350,150,100,-100)
+
+setColor(100,0,100)
+draw_retangle(40,40,420,420)
+
+setColor(100,0,100)
+draw_retangle(30,30,440,440)

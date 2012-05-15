@@ -8,6 +8,7 @@
 
 #define EG_THREAD_FLAGS_EXCEPTION_HAPPED (0x1l)
 #define EG_THREAD_FLAGS_FRAME_CHANGE (0x1l<<1)
+#define EG_THREAD_FLAGS_GC_WORK (0x1l<<2)
 struct eg_thread
 {
 	struct list_head t_link;

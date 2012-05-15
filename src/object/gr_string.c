@@ -5,6 +5,9 @@
 #include<engine/except.h>
 #include"gr_int.h"
 
+/* string hash func 
+ * search from google 
+ */
 static size_t gs_str_hash(const char* str)
 {
 	size_t hash = 1315423911;
@@ -108,7 +111,13 @@ int GrString_Init(GrString* gs,const char* str)
 	ssize_t length=strlen(str);
 	return gs_init(gs,str,length);
 }
-
+void GrString_Destruct(GrString* gs)
+{
+	if(gs->s_value)
+	{
+		GrMem_Free(gs->s_value);
+	}
+}
 GrString* GrString_Get(GrString* gs,ssize_t index)
 {
 	if(gs_outof_range(gs,index))
@@ -222,6 +231,7 @@ static GrObject* gs_get_item(GrObject* x,GrObject* y)
 					GrObject_Name(y));
 	return NULL;
 }
+
 					
 
 static struct gr_type_ops string_type_ops=
@@ -229,6 +239,7 @@ static struct gr_type_ops string_type_ops=
 	.t_hash=(GrHashFunc)GrString_Hash,
 	.t_print=(GrPrintFunc)GrString_Print,
 	.t_rich_eq=gs_rich_eq,
+	.t_destruct=(GrDestructFunc)GrString_Destruct,
 
 	.t_get_item=gs_get_item,
 	.t_plus=gs_plus,

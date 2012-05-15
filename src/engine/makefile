@@ -5,7 +5,7 @@ SRC=eg_codger.c eg_sframe.c eg_thread.c  except.c
 
 DEBUG=
 
-BIN= codger.c
+BIN= codger.c codger_nogc.c
 
 
 

@@ -230,33 +230,9 @@ int  EgThread_Run(EgThread* e)
 	EG_THREAD_USE_FRAME(cur_frame);
 	EG_THREAD_CLR_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
 
-	int i=0;
-	int j=0;
 next_instruct:
 
 	assert(sp<EG_THREAD_DEFALUT_DATA_SIZE-100);
-	i++;
-	if(i>1000)
-	{
-		if(j>100)
-		{
-			EG_THREAD_SAVE_FRAME(cur_frame);
-			eg->t_sp=sp;
-			GrGc_Collection(GRGC_HEAP_OLD);
-			j=0;
-			i=0;
-			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
-		}
-		else
-		{
-			EG_THREAD_SAVE_FRAME(cur_frame);
-			eg->t_sp=sp;
-			GrGc_Collection(GRGC_HEAP_YOUNG);
-			j++;
-			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
-		}
-		i=0;
-	}
 
 	if(GrExcept_Happened())
 	{
@@ -273,6 +249,15 @@ next_instruct:
 			}
 			EG_THREAD_USE_FRAME(cur_frame);
 			EG_THREAD_CLR_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+		}
+		if(EG_THREAD_HAS_FLAGS(eg,EG_THREAD_FLAGS_GC_WORK))
+		{
+			EG_THREAD_CLR_FLAGS(eg,EG_THREAD_FLAGS_GC_WORK);
+			EG_THREAD_SAVE_FRAME(cur_frame);
+			eg->t_sp=sp;
+			GrGc_CleanGarbage();
+			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+			goto next_instruct;
 		}
 	}
 
@@ -413,10 +398,10 @@ next_instruct:
 			goto next_instruct;
 		case OP_PRINT:
 			UNPACK_ONE_OP;
-			GrObject_Print(r0,stdout,GR_PRINT_SPACE);
+			GrObject_Print(r0,stderr,GR_PRINT_SPACE);
 			goto next_instruct;
 		case OP_PRINT_LN:
-			fprintf(stdout,"\n");
+			fprintf(stderr,"\n");
 			goto next_instruct;
 		case OP_ITER:
 			UNPACK_ONE_OP;

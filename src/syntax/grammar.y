@@ -4,6 +4,7 @@
 #include"ast_nodes.h"
 #include"parser.h"
 #include<object/gr_int.h>
+#include<object/gr_float.h>
 #include<object/gr_string.h>
 #include<memory/gc.h>
 #include<object/gr_consts.h>
@@ -115,6 +116,11 @@ literal: tINTEGER
 	}
 	| tFLAOT
 	{
+		GrFloat* gf=GrFloat_GcNewFromStrFlag(yl_cur_string(),GRGC_HEAP_STATIC);
+		if(gf==NULL) return AST_MEM_FAILED;
+		AstObject* node=AstLiteral_New(F_TO_GR(gf));
+		if(node==NULL) return AST_MEM_FAILED;
+		$$=node;
 	}
 	| tSTRING
 	{

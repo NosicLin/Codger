@@ -8,7 +8,6 @@
 #include"eg_thread.h"
 #include"eg_sframe.h"
 #include"object/gr_int.h"
-#include"object/gr_float.h"
 #include<memory/mem_base.h>
 
 int main(int argc,char** argv)
@@ -18,7 +17,6 @@ int main(int argc,char** argv)
 	GrModule_MemInit();
 	GrModule_GcInit();
 	GrModule_IntInit();
-	GrModule_FloatInit();
 	GrModule_ConstsInit();
 
 	Scanner* sc=0;
@@ -67,6 +65,7 @@ int main(int argc,char** argv)
 	EgThread_PushSframe(thread,sf);
 	sf=NULL;
 
+	GrGc_Disable();
 	EgThread_Run(thread);
 
 error:

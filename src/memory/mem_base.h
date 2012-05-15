@@ -15,6 +15,7 @@ static inline void Gr_Free(void* ptr)
 
 void* Gr_AllocPage();
 void Gr_FreePage(void* ptr);
+void Gr_PrintAreaNum();
 
 #define GR_PAGE_SHIFT 12 
 #define GR_PAGE_SIZE (1ul<<GR_PAGE_SHIFT)

@@ -51,7 +51,7 @@ void* __GrGc_Alloc(size_t size,struct gr_type_info*,long flags);
 void* __GrGc_SafeNew(size_t size,struct gr_type_info*);
 void* __GrGc_SafeAlloc(size_t size,struct gr_type_info*);
 
-int GrGc_Collection(int level);
+int GrGc_CleanGarbage();
 
 /* copy object g to another area, and return the address */
 void* GrGc_Update(void* g);
@@ -60,6 +60,8 @@ void GrGc_Intercept(void* ,void*);
 void GrGc_MarkRefLow(void*);
 int GrGc_IsRefLow(void*);
 
+void GrGc_Disable();
+void GrGc_Enable();
 
 int GrModule_GcInit();
 int GrModule_GcExit();

@@ -1,0 +1,8 @@
+sum=0
+i=0
+while 1
+	sum=sum+i
+	a=[3,4,5,6,76]
+	a[2]=a
+	i=i+1
+end 

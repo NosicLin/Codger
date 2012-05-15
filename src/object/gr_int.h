@@ -52,7 +52,6 @@ struct gr_long* GrInt_ToGrLong(GrInt*);
 */
 
 GrInt* GrInt_GetAttr(GrInt*,GrObject*);
-GrInt* GrInt_SetAttr(GrInt*,GrObject*,GrObject*);
 
 static inline GrInt* GrInt_Positive(GrInt*);
 static inline GrInt* GrInt_Negative(GrInt*);

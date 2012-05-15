@@ -6,11 +6,25 @@
 #include<utility_c/marocs.h>
 
 
+void GrOpcode_Destruct(GrOpcode* op)
+{
+	if(op->o_codes)
+	{
+		GrMem_Free(op->o_codes);
+		op->o_codes=NULL;
+	}
+}
+
+struct gr_type_ops opcode_type_ops=
+{
+	.t_destruct=(GrDestructFunc)GrOpcode_Destruct,
+};
+
 struct gr_type_info Gr_Type_Opcode=
 {
 	.t_name="OpcodeObject",
 	.t_size=sizeof(GrOpcode),
-	.t_ops=&GR_TYPE_OPS_NOT_SUPPORT,
+	.t_ops=&opcode_type_ops,
 };
 
 

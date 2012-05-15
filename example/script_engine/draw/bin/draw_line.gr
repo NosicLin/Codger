@@ -1,0 +1,4 @@
+drawLine(100,100,300,300)
+drawLine(100,23,30,300)
+setColor(100,100,0)
+drawLine(12,33,30,300)

@@ -38,6 +38,9 @@ enum GR_EXCEPT_TYPE
 	Gr_Except_Iter_Stop,
 };
 
+int GrModule_ExceptInit();
+
+
 
 #endif /*_CODGER_VM_EXCEPT_H_*/
 

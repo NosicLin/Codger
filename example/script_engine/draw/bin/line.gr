@@ -1,0 +1,19 @@
+print width,height
+i=0
+setColor(100,100,100);
+while i<width
+    setColor(i,i,i)
+	drawPixel(i,100)
+	i+=1
+end 
+j=0
+while j<height 
+	setColor(j,j,j)
+	drawPixel(100,j)
+	j+=1
+end 
+
+setColor(200,0,0);
+drawLine(30,30,400,400);
+
+

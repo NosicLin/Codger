@@ -1,0 +1,8 @@
+print width,height
+i=0
+setColor(100,100,100);
+while i<100
+	setColor(i,i,i);
+	drawPixel(i,100)
+	i+=1
+end 

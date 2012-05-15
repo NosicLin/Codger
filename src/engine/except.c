@@ -10,12 +10,18 @@ static long s_except_happed=0;
 
 static int  s_except_type=0;
 
+int GrModule_ExceptInit()
+{
+	s_except_type=0;
+	s_except_happed=0;
+	return 0;
+}
 
 int GrExcept_SetException(int type,const char* name,const char* msg)
 {
 	s_except_happed=1;
 	s_except_type=type;
-	printf("%s:%s\n",name,msg);
+	fprintf(stderr,"%s:%s\n",name,msg);
 	return 0;
 }
 #define GR_EXCEPT_FORMAT_MSG \
