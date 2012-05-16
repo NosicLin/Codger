@@ -1,0 +1,122 @@
+func add(x,y)
+	return x+y
+end 
+func minus(x,y)
+	return x-y
+end 
+func add_many(*x)
+	sum=0
+	for i in x
+		sum+=i
+	end 
+	return sum
+end 
+
+export add 
+export minus
+export add_many
+
+
+func bubble_sort(src)
+	i=0
+	while i<src.size()-1
+		j=src.size()-1
+		while j>i
+			if src[j]<src[j-1]
+				temp=src[j]
+				src[j]=src[j-1]
+				src[j-1]=temp
+			end 
+			j=j-1
+		end 
+		i=i+1
+	end 
+end 
+export bubble_sort
+
+func build_heap(src)
+	size=src.size()
+	i=src.size()/2-1
+	while i>=0
+		f_now=i
+		largest=f_now*2+1
+		while largest<size
+			if largest+1<size and src[largest+1]>src[largest]
+				largest=largest+1
+			end 
+			if src[f_now]<src[largest]
+				temp=src[f_now]
+				src[f_now]=src[largest]
+				src[largest]=temp
+				f_now=largest
+				largest=2*largest+1
+			else
+				largest=size
+			end 
+		end
+		i=i-1
+	end 
+end 
+
+export build_heap
+
+func heap_sort(array)
+	k=array.size()-1
+	while k>0
+		#swap(head,tail)
+		temp=array[k]
+		array[k]=array[0]
+		array[0]=temp
+    
+		#rebulding the heap
+		i=0
+		while i<k-1
+			j=i+1
+			while j!=0 and array[j]>array[j/2]
+				temp=array[j]
+				array[j]=array[j/2]
+				array[j/2]=temp
+				j=j/2
+			end
+			i=i+1
+		end
+		k=k-1
+	end
+end 
+export heap_sort	
+
+
+func insert_sort(array)
+	size=array.size()
+	i=1
+	while i<size
+		temp=array[i]
+		j=i
+		while j>0 and temp<array[j-1]
+			array[j]=array[j-1]
+			j=j-1
+		end
+		array[j]=temp
+		i=i+1
+	end 
+end 
+export insert_sort 
+
+func select_sort(array)
+	size=array.size()
+	i=0
+	while i<size-1
+		j=i+1
+		while j<size
+			if array[j]<array[i]
+				temp=array[j]
+				array[j]=array[i]
+				array[i]=temp
+			end 
+			j=j+1
+		end
+		i=i+1
+	end
+end 
+
+export select_sort

@@ -1,0 +1,3 @@
+name="nosicLin"
+print "module export:"+name
+export name 

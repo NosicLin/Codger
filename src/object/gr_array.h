@@ -33,7 +33,7 @@ GrArray* GrArray_GcNewFlag(long);
 GrArray* GrArray_GcNewWithSize(ssize_t size);
 
 int GrArray_Init(GrArray*);
-int GrArray_Resize(GrArray*);
+int GrArray_Resize(GrArray*,ssize_t);
 
 int GrArray_Push(GrArray*,GrObject* item);
 GrObject* GrArray_Pop(GrArray*);
@@ -56,8 +56,12 @@ static inline ssize_t GrArray_Size(GrArray* ga)
 	return ga->a_size;
 }
 
+#define GrArray_Empty GrArray_Bool
 int GrArray_Bool(GrArray*);
 int GrArray_Print(GrArray*,FILE* f);
+
+struct gr_class;
+struct gr_class* GrArray_GetArrayClass();
 
 static inline int GrArray_Verify(GrObject* ga)
 {
@@ -66,6 +70,8 @@ static inline int GrArray_Verify(GrObject* ga)
 
 
 
+int GrModule_ArrayInit();
+int GrModule_ArrayExit();
 #ifdef GR_ARRAY_DEBUG
 static inline GrArray* GR_TO_A(GrObject* g)
 {

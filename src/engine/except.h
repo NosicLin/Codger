@@ -14,6 +14,8 @@ void GrErr_IndexFormat(const char* s,...);
 void GrErr_OutOfRangeFormat(const char* s,...);
 void GrErr_ArgsFormat(const char* s,...);
 void GrErr_PermFormat(const char* s,...);
+void GrErr_ParseFormat(const char* s,...);
+void GrErr_ValueFormat(const char* s,...);
 
 /* normal exception */
 

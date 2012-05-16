@@ -1,0 +1,5 @@
+print "module import  beign"
+
+import expt
+print expt
+print expt.name

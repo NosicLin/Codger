@@ -192,19 +192,6 @@ int GrModule_GcUpdate(GrModule* m)
 	return 0;
 }
 
-static struct gr_type_ops gr_module_ops=
-{
-	.t_gc_update=(GrGcUpdateFunc)GrModule_GcUpdate,
-};
-
-
-
-GrTypeInfo Gr_Type_Module=
-{
-	.t_name="ModuleObject",
-	.t_size=sizeof(GrModule),
-	.t_ops=&gr_module_ops,
-};
 
 
 
@@ -221,9 +208,68 @@ u_int32_t GrModule_MapAttr(GrModule* m,GrString* g ,long flags)
 
 
 
+int GrModule_AddAttr(GrModule* m,GrObject* k,GrObject* v)
+{
+	assert(GrString_Verify(k));
+	return GrHash_Map(m->m_attrs,k,v);
+}
+
+int GrModule_SetAttr(GrModule* m,GrObject* k,GrObject* v)
+{
+	assert(GrString_Verify(k));
+	GrHashEntry* entry=GrHash_GetEntry(m->m_attrs,k);
+	if(GrHashEntry_Valid(entry))
+	{
+		GrErr_PermFormat("Symbol '%s' In Module.%s Is Protected",
+				((GrString*)k)->s_value,m->m_name->s_value);
+		return -1;
+	}
+	GrErr_NameFormat("Module.%s Has Not '%s' Symbol",
+			m->m_name->s_value,((GrString*)k)->s_value);
+	return -1;
+}
+
+GrObject* GrModule_GetAttr(GrModule* m,GrObject* k)
+{
+	assert(GrString_Verify(k));
+	GrHashEntry* entry=GrHash_GetEntry(m->m_attrs,k);
+	if(GrHashEntry_Valid(entry))
+	{
+		assert(entry->e_value);
+		return entry->e_value;
+	}
+
+	GrErr_NameFormat("Module.%s Has Not '%s' Symbol",
+			m->m_name->s_value,((GrString*)k)->s_value);
+	return NULL;
+}
+
+static int module_set_attr(GrModule* m,GrObject* k,GrObject* v,long flags)
+{
+	return GrModule_SetAttr(m,k,v);
+}
+static GrObject* module_get_attr(GrModule* m,GrObject* k,long flags)
+{
+	return  GrModule_GetAttr(m,k);
+}
 
 
 
+static struct gr_type_ops gr_module_ops=
+{
+	.t_gc_update=(GrGcUpdateFunc)GrModule_GcUpdate,
+	.t_get_attr=(GrGetAttrFunc)module_get_attr,
+	.t_set_attr=(GrSetAttrFunc)module_set_attr,
+};
+
+
+
+GrTypeInfo Gr_Type_Module=
+{
+	.t_name="ModuleObject",
+	.t_size=sizeof(GrModule),
+	.t_ops=&gr_module_ops,
+};
 
 
 

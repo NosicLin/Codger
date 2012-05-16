@@ -1,0 +1,45 @@
+print "test size"
+a=[3,4,5,6,7,7,3]
+print a.size(),7
+
+print "test pop"
+while not a.empty()
+	print a.pop()
+end 
+print a
+
+print "test push"
+a=[]
+i=0
+while  a.size()<10
+	a.push(i)
+	i+=1
+end 
+print a
+
+print "test clear"
+
+a.clear()
+print a
+
+print "test Resize"
+a=[3,4,4,5,56,6,7,7]
+a.resize(4)
+print a
+a.resize(10)
+print a
+
+
+print "test Remove"
+i=0
+while i<8
+	a=[0,1,2,3,4,5,6,7]
+	a.remove(i)
+	print a
+	i+=1
+end 
+
+
+#print a.resize(-1)
+a.remove(-1)
+

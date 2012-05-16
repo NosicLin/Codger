@@ -1,0 +1,6 @@
+print "a begin"
+import b
+print "a end"
+
+print b.add(3,4)
+print b.a

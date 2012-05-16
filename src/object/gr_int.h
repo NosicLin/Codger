@@ -19,6 +19,10 @@ extern GrObject* Gr_False;
 extern GrObject* Gr_True;
 
 
+struct gr_float;
+struct gr_string;
+struct gr_long;
+
 
 
 
@@ -46,10 +50,10 @@ void GrInt_Init(GrInt*,long value);
 static inline long GrInt_GetValue(GrInt* gi);
 
 /* type cast */
-/*
 struct gr_string* GrInt_ToGrString(GrInt*);
 struct gr_long* GrInt_ToGrLong(GrInt*);
-*/
+struct gr_float* GrInt_ToGrFloat(GrInt*);
+struct gr_int* GrInt_ToGrInt(GrInt*);
 
 GrInt* GrInt_GetAttr(GrInt*,GrObject*);
 

@@ -8,6 +8,7 @@
 #include<object/gr_consts.h>
 #include<object/gr_func.h>
 #include<object/gr_class.h>
+#include"eg_codger.h"
 #define EG_THREAD_DEFALUT_DATA_SIZE (1024*8) 
 
 static EgThread* eg_thread_cur=0;
@@ -232,7 +233,7 @@ int  EgThread_Run(EgThread* e)
 
 next_instruct:
 
-	assert(sp<EG_THREAD_DEFALUT_DATA_SIZE-100);
+	BUG_ON(sp>=(EG_THREAD_DEFALUT_DATA_SIZE-100),"sp=%d",sp);
 
 	if(GrExcept_Happened())
 	{
@@ -387,14 +388,16 @@ next_instruct:
 		case OP_BOOL_NOTAKE:
 			REF_ONE_OP;
 			rs=GrObject_Bool(r0);
-			ACC_PUSH;
 			goto next_instruct;
 		case OP_BOOL:
 			UNPACK_ONE_OP;
 			rs=GrObject_Bool(r0);
 			goto next_instruct;
 		case OP_LOGIC_NOT:
-			assert(0);
+			UNPACK_ONE_OP;
+			rs=GrObject_Bool(r0);
+			acc=rs?Gr_False:Gr_True;
+			ACC_PUSH;
 			goto next_instruct;
 		case OP_PRINT:
 			UNPACK_ONE_OP;
@@ -572,6 +575,22 @@ next_instruct:
 			r1=symbols_pool[rd];
 			GrScope_MapUpper(scope,r1,r0);
 			goto next_instruct;
+		case OP_IMPORT:
+			eg->t_sp=sp;
+			eg->t_pc=pc;
+			r0=symbols_pool[rd];
+			acc=(GrObject*)EgCodger_ImportModule((GrString*)r0);
+			ACC_PUSH;
+			goto next_instruct;
+		case OP_EXPORT:
+			UNPACK_ONE_OP;
+			r1=symbols_pool[rd];
+			GrModule_AddAttr(cur_module,r1,r0);
+			goto next_instruct;
+
+
+
+
 
 		/* flow control op */
 		case OP_BREAK:

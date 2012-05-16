@@ -19,6 +19,14 @@ GrFloat* GrFloat_GcNewFlag(float value,long flags);
 GrFloat* GrFloat_GcNewFromStr(const char* str);
 GrFloat* GrFloat_GcNewFromStrFlag(const char* str,long flags);
 
+struct gr_int;
+struct gr_string;
+struct gr_long;
+
+struct gr_int* GrFloat_ToGrInt(GrFloat*);
+struct gr_float* GrFloat_ToGrFloat(GrFloat*);
+struct gr_string* GrFloat_ToGrString(GrFloat*);
+
 
 GrFloat* GrFloat_GetAttr(GrFloat*,GrObject*);
 

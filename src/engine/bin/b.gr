@@ -1,0 +1,9 @@
+print "b begin"
+print "b end"
+
+func add(x,y)
+	return x+y
+end 
+a=0
+export add  
+export a

@@ -37,7 +37,7 @@
 
 /* keyword */
 %token kAND kAS kATTR kBREAK kCATCH kCLASS kCONTINUE kDO kELIF 
-%token kELSE kEND kFINALLY kFOR kFROM kFUNC kIF  kIMPORT kIN 
+%token kELSE kEND kEXPORT kFINALLY kFOR kFROM kFUNC kIF  kIMPORT kIN 
 %token kINHRIT kNEW kNOT kOR kPRINT kPRIVATE kPROTECTED kPUBLIC kRETURN kSTATIC kTHEN kTO KTRY kVFUNC kWHILE 
 %token kTRUE kFALSE 
 
@@ -98,6 +98,8 @@ stmt:stmt_expr {$$=$1;}
 	|stmt_continue{$$=$1;}
 	|stmt_return{$$=$1;}
 	|class_declare{$$=$1;}
+	|stmt_export{$$=$1;}
+	|stmt_import{$$=$1;}
 	;
 
 stmt_delimiter:tNEWLINE| tSEMI;
@@ -466,6 +468,32 @@ oper_assing_operator:tAMUL{$$=&Ast_Type_Mul_Assign;}
 	;
 	
 		
+
+stmt_import: kIMPORT identifier 
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Import);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+	;
+		   
+stmt_export: kEXPORT identifier kAS identifier 
+    {
+ 		AstObject* node=AstNode_New(&Ast_Type_Export_As);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		AstNode_Add(node,$4);
+		$$=node;
+	}
+	| kEXPORT identifier
+	{
+		AstObject* node=AstNode_New(&Ast_Type_Export);
+		if(node==NULL) return AST_MEM_FAILED;
+		AstNode_Add(node,$2);
+		$$=node;
+	}
+	;
 
 stmt_print:kPRINT expr_list
 	{

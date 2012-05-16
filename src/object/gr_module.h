@@ -45,6 +45,9 @@ int GrModule_SetName(GrModule*,GrString*);
 int GrModule_SetOpcode(GrModule*,GrOpcode*);
 GrString* GrModule_GetName(GrModule*);
 
+int GrModule_AddAttr(GrModule*,GrObject*,GrObject*);
+int GrModule_SetAttr(GrModule*,GrObject*,GrObject*);
+GrObject* GrModule_GetAttr(GrModule*,GrObject*);
 
 int GrModule_WriteToFile(GrModule* m,FILE* f,long);
 

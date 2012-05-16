@@ -96,6 +96,11 @@ int GrObject_SetAttr(GrObject*,GrObject*,GrObject*,long);
 void GrObject_Destruct(GrObject*);
 int GrObject_GcUpdate(GrObject*);
 
+GrObject* GrObject_ToGrInt(GrObject*);
+GrObject* GrObject_ToGrFloat(GrObject*);
+GrObject* GrObject_ToGrString(GrObject*);
+GrObject* GrObject_ToGrLong(GrObject*);
+
 #endif /*_CODGER_OBJECT_ROBJECT_H_*/
 
 

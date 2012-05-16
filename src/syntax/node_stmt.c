@@ -3,6 +3,145 @@
 #include"node_expr.h"
 #include<object/gr_class.h>
 
+static int import_to_opcode(AstObject* ab ,GrModule* m,
+					GrOpcode* op,long flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_IMPORT);
+	CHECK_SUB_NODE_NUM(ab,1);
+	int ret;
+
+	AstObject* identifier;
+	AstNode_GetSub1(ab,&identifier);
+
+	GrString* name=AST_TO_VAR(identifier)->v_value;
+	assert(name);
+	u_int32_t id=GrModule_MapSymbol(m,(GrObject*)name);
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,10);
+	if(ret<0) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_IMPORT,id);
+		GrOpcode_Push3(op,OP_STORE_SYMBOL,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_IMPORT2,id);
+		GrOpcode_Push5(op,OP_STORE_SYMBOL2,id);
+	}
+	return 0;
+}
+
+AstTypeInfo Ast_Type_Import=
+{
+	.t_type=ATN_IMPORT,
+	.t_name="Import",
+	.t_to_opcode=import_to_opcode,
+};
+
+static int export_to_opcode(AstObject* ab,GrModule* m,
+		GrOpcode* op,long  flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_EXPORT);
+	CHECK_SUB_NODE_NUM(ab,1);
+	int ret;
+
+	AstObject* identifier;
+	AstNode_GetSub1(ab,&identifier);
+
+	GrString* name=AST_TO_VAR(identifier)->v_value;
+	assert(name);
+	u_int32_t id=GrModule_MapSymbol(m,(GrObject*)name);
+	if(id==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,10);
+	if(ret<0) return -1;
+
+	if(GrOpcode_OpdataSize16(id))
+	{
+		GrOpcode_Push3(op,OP_LOAD_SYMBOL,id);
+		GrOpcode_Push3(op,OP_EXPORT,id);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_LOAD_SYMBOL,id);
+		GrOpcode_Push5(op,OP_EXPORT,id);
+	}
+	return 0;
+}
+static int export_as_to_opcode(AstObject* ab,GrModule* m,
+		GrOpcode* op,long  flags)
+{
+	CHECK_NODE_TYPE(ab,ATN_EXPORT_AS);
+	CHECK_SUB_NODE_NUM(ab,2);
+	int ret;
+
+	AstObject* value_name;
+	AstObject* export_name;
+	AstNode_GetSub2(ab,&value_name,&export_name);
+
+	GrString* s_value=AST_TO_VAR(value_name)->v_value;
+	assert(s_value);
+
+	GrString* s_export=AST_TO_VAR(export_name)->v_value;
+	assert(s_export);
+
+
+	u_int32_t id_value=GrModule_MapSymbol(m,(GrObject*)s_value);
+	if(id_value==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	u_int32_t id_export=GrModule_MapSymbol(m,(GrObject*)s_export);
+	if(id_export==GR_MODULE_MAP_ERR)
+	{
+		return -1;
+	}
+
+	ret=GrOpcode_NeedMore(op,10);
+	if(ret<0) return -1;
+
+	if(GrOpcode_OpdataSize16(id_value))
+	{
+		GrOpcode_Push3(op,OP_LOAD_SYMBOL,id_value);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_LOAD_SYMBOL,id_value);
+	}
+	if(GrOpcode_OpdataSize16(id_export))
+	{
+		GrOpcode_Push3(op,OP_EXPORT,id_export);
+	}
+	else
+	{
+		GrOpcode_Push5(op,OP_EXPORT2,id_export);
+	}
+	return 0;
+
+}
+
+AstTypeInfo Ast_Type_Export =
+{
+	.t_type=ATN_EXPORT,
+	.t_name="Export",
+	.t_to_opcode=export_to_opcode,
+};
+AstTypeInfo Ast_Type_Export_As=
+{
+	.t_type=ATN_EXPORT_AS,
+	.t_name="Export As",
+	.t_to_opcode=export_as_to_opcode,
+};
 static int print_to_opcode(AstObject* ab,GrModule* m,
 							GrOpcode* op,long flags)
 {

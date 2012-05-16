@@ -12,5 +12,5 @@ x=0
 while x<1000 
 	sum(10000)
 	x=x+1
-	print x
+	#print x
 end 

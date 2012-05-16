@@ -1,0 +1,17 @@
+func add(x,y)
+	return x+y
+end 
+func minus(x,y)
+	return x-y
+end 
+func add_many(*x)
+	sum=0
+	for i in x
+		sum+=i
+	end 
+end 
+
+export add 
+export minus
+export add_many
+

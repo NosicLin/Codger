@@ -677,4 +677,103 @@ int GrObject_GcUpdate(GrObject* g)
 	return ret;
 }
 
+GrObject* GrObject_ToGrInt(GrObject* g)
+{
+	GrTypeInfo* info=GrObject_Type(g);
+	struct gr_type_ops* g_ops=info->t_ops;
+	GrObject* ret;
+	if(!g_ops->t_to_int)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_to_int(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s ToGcInt Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	return NULL;
+}
+GrObject* GrObject_ToGrFloat(GrObject* g)
+{
+	GrTypeInfo* info=GrObject_Type(g);
+	struct gr_type_ops* g_ops=info->t_ops;
+	GrObject* ret;
+	if(!g_ops->t_to_float)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_to_float(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s ToGcFloat Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	return NULL;
+}
+GrObject* GrObject_ToGrString(GrObject* g)
+{
+	GrTypeInfo* info=GrObject_Type(g);
+	struct gr_type_ops* g_ops=info->t_ops;
+	GrObject* ret;
+	if(!g_ops->t_to_string)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_to_string(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s ToGcFloat Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	return NULL;
+}
+
+GrObject* GrObject_ToGrLong(GrObject* g)
+{
+	GrTypeInfo* info=GrObject_Type(g);
+	struct gr_type_ops* g_ops=info->t_ops;
+	GrObject* ret;
+	if(!g_ops->t_to_long)
+	{
+		goto defalut_action;
+	}
+	ret=g_ops->t_to_long(g);
+	if(ret==NULL)
+	{
+		if(!GrExcept_Happened())
+		{
+			GrErr_BugFromat("Interal Bug For %s ToGcFloat Func",
+					GrObject_Name(g));
+		}
+	}
+	return ret;
+defalut_action:
+	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	return NULL;
+}
+
+
+
+
+
+
 

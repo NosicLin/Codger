@@ -62,6 +62,24 @@ GrFloat* GrFloat_GcNewFromStrFlag(const char* str,long flags)
 	return  ret;
 }
 
+struct gr_int* GrFloat_ToGrInt(GrFloat* gf)
+{
+	return GrInt_GcNew(gf->f_value);
+}
+
+struct gr_float* GrFloat_ToGrFloat(GrFloat* gf)
+{
+	return gf;
+}
+
+struct gr_string* GrFloat_ToGrString(GrFloat* gf)
+{
+	char buf[100];
+	sprintf(buf,"%g",gf->f_value);
+	return GrString_GcNew(buf);
+}
+
+
 
 static GrObject* float_mul(GrObject* x,GrObject* y)
 {
@@ -266,6 +284,10 @@ static struct gr_type_ops float_type_ops=
 	.t_plus_reverse=float_plus_reverse,
 	.t_minus_reverse=float_minus_reverse,
 	.t_cmp_reverse=float_cmp_reverse,
+
+	.t_to_float=(GrCastFunc)GrFloat_ToGrFloat,
+	.t_to_int=(GrCastFunc)GrFloat_ToGrInt,
+	.t_to_string=(GrCastFunc)GrFloat_ToGrString,
 };
 	
 struct gr_type_info Gr_Type_Float=

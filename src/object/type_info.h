@@ -36,6 +36,8 @@ typedef GrObject* (*GrGetAttrFunc)(GrObject*,GrObject*,long);
 
 typedef int (*GrDestructFunc)(GrObject*);
 typedef int (*GrGcUpdateFunc)(GrObject*);
+
+typedef GrObject* (*GrCastFunc)(GrObject*);
 struct gr_type_ops
 {
 	GrHashFunc t_hash;
@@ -96,6 +98,11 @@ struct gr_type_ops
 	GrBinaryFunc t_or_reverse;
 
 	GrCmpFunc t_cmp_reverse;
+
+	GrCastFunc t_to_float;
+	GrCastFunc t_to_int;
+	GrCastFunc t_to_long;
+	GrCastFunc t_to_string;
 
 };
 typedef struct gr_type_ops GrTypeOps;

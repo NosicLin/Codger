@@ -1,4 +1,6 @@
 #include"gr_int.h"
+#include"gr_float.h"
+#include"gr_string.h"
 #include<memory/gc.h>
 #include<memory/memory.h>
 #include<utility_c/marocs.h>
@@ -123,14 +125,23 @@ GrInt* GrInt_GcNewFromStrFlag(const char* str,long flags)
 	return GrInt_GcNewFlag(val,flags);
 }
 
-/*
 GrString* GrInt_ToGrString(GrInt* gi)
 {
-	TODO("Transate GrInt Object To GrString Object");
-	GrMem_ALLOC_INT_ERR;
-	return NULL;
+	char buf[20];
+	sprintf(buf,"%ld",gi->i_value);
+	return GrString_GcNew(buf);
 }
-*/
+
+GrFloat* GrInt_ToGrFloat(GrInt* gi)
+{
+	float f=gi->i_value;
+	return GrFloat_GcNew(f);
+}
+
+GrInt* GrInt_ToGrInt(GrInt* gi)
+{
+	return gi;
+}
 
 static GrObject* int_mul(GrObject* l,GrObject* r)
 {
@@ -269,6 +280,10 @@ static struct gr_type_ops int_type_ops=
 	.t_cmp=int_cmp,
 
 	.t_bool=(GrBoolFunc)GrInt_Bool,
+
+	.t_to_float=(GrCastFunc)GrInt_ToGrFloat,
+	.t_to_string=(GrCastFunc)GrInt_ToGrString,
+	.t_to_int=(GrCastFunc)GrInt_ToGrInt,
 };
 
 struct gr_type_info Gr_Type_Int=
@@ -310,6 +325,10 @@ static struct gr_type_ops bool_type_ops=
 	.t_cmp=int_cmp,
 
 	.t_bool=(GrBoolFunc)GrInt_Bool,
+
+	.t_to_float=(GrCastFunc)GrInt_ToGrFloat,
+	.t_to_string=(GrCastFunc)GrInt_ToGrString,
+	.t_to_int=(GrCastFunc)GrInt_ToGrInt,
 };
 struct gr_type_info Gr_Type_Bool=
 {

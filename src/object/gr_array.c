@@ -6,6 +6,7 @@
 #include"gr_int.h"
 #include"gr_consts.h"
 #include"gr_util.h"
+#include"gr_class.h"
 
 #define GR_ARRAY_FLAG_PRINT 0x1l
 
@@ -53,11 +54,9 @@ static inline int ga_init(GrArray* ga,size_t size)
 
 static int ga_enlarge(GrArray* ga,size_t size)
 {
-	if(size<=GR_ARRAY_SMALL_SIZE)
+	if(size<=ga->a_cap)
 	{
-		WARN("Array Enlarged Size Will Larger Than %d,But is %d",
-				GR_ARRAY_SMALL_SIZE,size);
-		return -1;
+		return 0;
 	}
 
 	GrObject** new_obs=(GrObject**)GrMem_Alloc(sizeof(*new_obs)*size);
@@ -159,6 +158,40 @@ int GrArray_Push(GrArray* ga,GrObject* item)
 	GrGc_Intercept(ga,item);
 	return 0;
 }
+
+int GrArray_Resize(GrArray* ga,ssize_t size)
+{
+
+	if(size<0)
+	{
+		GrErr_ValueFormat("Resize ArrayObject With Negative Value");
+		return -1;
+	}
+
+	int ret;
+	size_t i;
+	if(ga->a_size>=size)
+	{
+		ga->a_size=size;
+		return 0;
+	}
+	ret=ga_enlarge(ga,size);
+	if(ret<0)
+	{
+		return -1;
+	}
+	for(i=ga->a_size;i<size;i++)
+	{
+		ga->a_objects[i]=Gr_Object_Nil;
+	}
+	ga->a_size=size;
+	return 0;
+}
+
+
+
+
+
 
 
 
@@ -408,6 +441,9 @@ static struct gr_type_ops array_type_ops=
 	.t_set_item=ga_set_item,
 	.t_plus=ga_plus,
 	.t_bool=(GrBoolFunc)GrArray_Bool,
+
+	.t_get_attr=GrUtil_BaseTypeGetAttr,
+	.t_set_attr=GrUtil_BaseTypeSetAttr,
 };
 
 struct gr_type_info Gr_Type_Array=
@@ -453,6 +489,7 @@ static struct gr_type_ops array_iter_type_ops=
 {
 	.t_gc_update=(GrGcUpdateFunc)GrArrayIter_GcUpdate,
 	.t_iter_next=(GrIterNextFunc)GrArrayIter_Next,
+
 };
 
 GrTypeInfo Gr_Type_Array_Iter=
@@ -462,7 +499,195 @@ GrTypeInfo Gr_Type_Array_Iter=
 	.t_ops=&array_iter_type_ops,
 };
 
+int  GrModule_ArrayInit()
+{
+	Gr_Type_Array.t_class=NULL;
+	GrClass* c=GrArray_GetArrayClass();
+	if(c==NULL) return -1;
+	Gr_Type_Array.t_class=c;
+	return 0;
+}
+int GrModule_ArrayExit()
+{
+	return 0;
+}
 
+GrObject* GrArray_MethodPush(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrObject* item=GrArray_Get(args,0);
+	assert(item);
+	GrArray_Push((GrArray*)host,item);
+	return Gr_Object_Nil;
+}
+
+GrObject* GrArray_MethodPop(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrObject* item=GrArray_Pop((GrArray*)host);
+	return item;
+}
+
+GrObject* GrArray_MethodSize(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	size_t size=GrArray_Size((GrArray*)host);
+	return (GrObject*)GrInt_GcNew(size);
+}
+
+GrObject* GrArray_MethodAt(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrObject* item=GrArray_Get(args,0);
+	assert(item);
+	return ga_get_item(host,item);
+}
+
+GrObject* GrArray_MethodEmpty(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return  Gr_Object_Nil;
+	}
+	return GrArray_Empty((GrArray*)host)==0?Gr_True:Gr_False;
+}
+
+GrObject* GrArray_MethodClear(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrArray_Resize((GrArray*)host,0);
+	return Gr_Object_Nil;
+}
+GrObject* GrArray_MethodResize(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrObject* item=GrArray_Get(args,0);
+	GrInt* size=(GrInt*)GrObject_ToGrInt(item);
+	if(size==NULL)
+	{
+		return NULL;
+	}
+	GrArray_Resize((GrArray*)host,size->i_value);
+	return Gr_Object_Nil;
+}
+
+GrObject* GrArray_MethodRemove(GrObject* host,GrArray* args)
+{
+	if(!GrArray_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	GrObject* item=GrArray_Get(args,0);
+	GrInt* index=(GrInt*)GrObject_ToGrInt(item);
+
+	if(index==NULL)
+	{
+		return NULL;
+	}
+
+
+	GrArray_Remove((GrArray*)host,index->i_value);
+	return Gr_Object_Nil;
+}
+
+static  GrInnerFuncEntry s_array_method[]=
+{
+	{
+		.e_name="push",
+		.e_permission=0,
+		.e_func=GrArray_MethodPush,
+		.e_arg_nu=1,
+	},
+	{
+		.e_name="pop",
+		.e_permission=0,
+		.e_func=GrArray_MethodPop,
+		.e_arg_nu=0,
+	},
+	{
+		.e_name="at",
+		.e_permission=0,
+		.e_func=GrArray_MethodAt,
+		.e_arg_nu=1,
+	},
+	{
+		.e_name="empty",
+		.e_permission=0,
+		.e_func=GrArray_MethodEmpty,
+		.e_arg_nu=0,
+	},
+	{
+		.e_name="size",
+		.e_permission=0,
+		.e_func=GrArray_MethodSize,
+		.e_arg_nu=0,
+	},
+	{
+		.e_name="clear",
+		.e_permission=0,
+		.e_func=GrArray_MethodClear,
+		.e_arg_nu=0,
+	},
+	{
+		.e_name="resize",
+		.e_permission=0,
+		.e_func=GrArray_MethodResize,
+		.e_arg_nu=1,
+	},
+	{
+		.e_name="remove",
+		.e_permission=0,
+		.e_func=GrArray_MethodRemove,
+		.e_arg_nu=1,
+	},
+	{
+		.e_name=NULL,
+	},
+};
+
+GrClass* GrArray_GetArrayClass()
+{
+	if(Gr_Type_Array.t_class!=NULL)
+	{
+		return Gr_Type_Array.t_class;
+	}
+	GrClass* array_class=GrClass_GcNewFlag(GrGc_HEAP_STATIC);
+	if(array_class==NULL)
+	{
+		return NULL;
+	}
+	GrString* name=GrString_GcNewFlag("ArrayClass",GrGc_HEAP_STATIC);
+	if(name==NULL)
+	{
+		return NULL;
+	}
+	GrClass_SetName(array_class,name);
+
+	int ret=GrUtil_FillInnerMethodsFlag(array_class->c_template,
+			s_array_method,GrGc_HEAP_STATIC);
+
+	if(ret<0) return NULL;
+
+	return array_class;
+}
 
 
 

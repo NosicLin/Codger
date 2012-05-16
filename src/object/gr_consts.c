@@ -59,7 +59,7 @@ int GrModule_ConstsInit()
 }
 
 
-int GrModule_ConstExit()
+int GrModule_ConstsExit()
 {
 	return 0;
 }

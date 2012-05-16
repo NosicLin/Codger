@@ -4,6 +4,9 @@
 #include<object/gr_string.h>
 
 extern AstTypeInfo Ast_Type_Print;
+extern AstTypeInfo Ast_Type_Import;
+extern AstTypeInfo Ast_Type_Export;
+extern AstTypeInfo Ast_Type_Export_As;
 extern AstTypeInfo Ast_Type_Stmts;
 extern AstTypeInfo Ast_Type_Expr;
 extern AstTypeInfo Ast_Type_Break;

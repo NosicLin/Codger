@@ -1,0 +1,24 @@
+import algrithom 
+print algrithom.add(3,4)
+print algrithom.minus(3,4)
+print algrithom.add_many(1,3,4,5,65)
+print algrithom.add_many(3,4,5)
+
+a=[34,5,6,7,2,4,6,7]
+algrithom.bubble_sort(a)
+print a
+
+
+a=[34,5,6,3,4,98,243,2133,7,2,4,6,7]
+
+algrithom.build_heap(a)
+algrithom.heap_sort(a);
+print a
+
+a=[34,5,6,3,4,98,243,2133,7,2,4,6,7]
+algrithom.insert_sort(a);
+print a
+
+a=[34,5,6,3,4,98,243,2133,7,2,4,6,7]
+algrithom.select_sort(a);
+print a

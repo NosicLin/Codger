@@ -104,6 +104,18 @@ void GrErr_ArgsFormat(const char* s,...)
 	GrExcept_SetException(Gr_Err_Args,"ArgsErr",s_format_buf);
 
 }
+void GrErr_ParseFormat(const char* s,...)
+{
+	GR_EXCEPT_FORMAT_MSG;
+	GrExcept_SetException(Gr_Err_Args,"ParseErr",s_format_buf);
+
+}
+void GrErr_ValueFormat(const char* s,...)
+{
+	GR_EXCEPT_FORMAT_MSG;
+	GrExcept_SetException(Gr_Err_Args,"ValueErr",s_format_buf);
+
+}
 
 void GrExcept_IterStop()
 {
