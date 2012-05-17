@@ -5,9 +5,12 @@
 #include <GL/gl.h>
 #include<wx/dir.h>
 #include<wx/filefn.h>
- 
 #include"DrawPlane.h"
 #include"FileList.h"
+
+extern "C" {
+#include<engine/eg_codger.h>
+}
  
 class MyApp: public wxApp
 {
@@ -24,7 +27,11 @@ IMPLEMENT_APP(MyApp);
 
 bool  MyApp::OnInit()
 {
-	GrModule_MemInit();
+	if(EgCodger_ModuleInit()<0)
+	{
+		return false;
+	}
+
 	m_frame=new wxFrame(NULL,-1,wxT("Draw Script"),
 			wxPoint(50,50),wxSize(800,600));
 

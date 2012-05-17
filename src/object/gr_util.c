@@ -41,6 +41,28 @@ int GrUtil_FillInnerMethodsFlag(GrHash* h,GrInnerFuncEntry* es,long flags)
 	return 0;
 }
 
+int GrUtil_FillWithGrString(GrHash* h,GrInnerFuncEntry* es,long flags)
+{
+	GrString* s;
+	GrInnerFunc* f;
+	int ret;
+
+	while(es->e_name!=NULL)
+	{
+
+		s=GrString_GcNewFlag(es->e_name,flags);
+		if(s==NULL) return -1;
+		assert(((GrObject*)s)->g_type);
+		f=GrInnerFunc_GcNewFlag(es->e_func,es->e_arg_nu,flags);
+		if(f==NULL) return -1;
+
+		ret=GrHash_Map(h,(GrObject*)s,(GrObject*)f);
+		if(ret<0) return -1;
+		es++;
+	}
+	return 0;
+}
+
 
 
 GrObject* GrUtil_BaseTypeGetAttr(GrObject* g,GrObject* k,long perm)

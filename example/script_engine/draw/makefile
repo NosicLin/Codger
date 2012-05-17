@@ -1,6 +1,6 @@
 PROJECT=draw
 
-SRC= main.cc canvas.cc
+SRC= main.cc canvas.cc DrawPlane.cc
 
 DEBUG=
 
@@ -31,7 +31,7 @@ FLAGS=-g -Wall  `wx-config --cxxflags --libs`  \
 
 INCLUDE= -I. -I$(codger) -include sys/types.h
 LIB= -lGL -lGLU -L$(codger)/lib -llexical -lsyntax -lengine -lobject \
-	 -lmemory -lutility_c
+	 -lmemory -lutility_c -lm -lextends
 	
 
 

@@ -17,6 +17,8 @@ GrModule* EgCodger_ImportModule(GrString* name);
 int EgCodger_AddModule(GrModule* module);
 
 
+
+
 int EgCodger_ModuleInit();
 int EgCodger_ModuleExit();
 

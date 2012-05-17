@@ -481,7 +481,7 @@ GrObject* GrArrayIter_Next(GrArrayIter* iter)
 
 int GrArrayIter_GcUpdate(GrArrayIter* iter)
 {
-	iter->i_host=GrGc_Update(iter);
+	iter->i_host=GrGc_Update(iter->i_host);
 	return 0;
 }
 

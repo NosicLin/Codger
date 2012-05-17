@@ -21,7 +21,7 @@ char* yl_cur_string()
 }
 void  yyerror(char* error)
 {
-	printf("SyntaxError At Line %d\n",yl_scanner->s_line);
+	fprintf(stderr,"SyntaxError At Line %d\n",yl_scanner->s_line);
 }
 /* used for parser */
 int yylex()

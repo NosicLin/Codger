@@ -3,6 +3,7 @@
 #include<memory/memory.h>
 #include<engine/except.h>
 #include"gr_string.h"
+#include<engine/eg_buildin.h>
 
 GrScope* GrScope_GcNew(GrScope* upper)
 {
@@ -59,19 +60,33 @@ GrTypeInfo Gr_Type_Scope=
 int GrScope_Map(GrScope* s,GrObject* key,GrObject* value)
 {
 	assert(key);
-	assert(value);
+	assert(GrString_Verify(key));
+
+	GrHash* table=EgCodger_GetBuildin();
+	GrHashEntry* entry=GrHash_GetEntry(table,key);
+
+	assert(entry);
+	if(GrHashEntry_Valid(entry))
+	{
+		GrErr_PermFormat("Buildin '%s' Is Protected,Can't Assign To It",
+				GR_TO_S(key)->s_value);
+
+	}
 	return GrHash_Map(s->s_table,key,value);
 }
 
 int GrScope_MapUpper(GrScope* s,GrObject* key,GrObject* value)
 {
 	assert(value);
-	assert(key);
+	assert(GrString_Verify(key));
+
+	GrHash* table;
 	GrScope* cur=s->s_upper;
 	GrHashEntry* entry;
 	while(cur!=NULL)
 	{
 		entry=GrHash_GetEntry(cur->s_table,key);
+		assert(entry);
 		if(entry->e_key==NULL||entry->e_key==Gr_Hash_Dummy)
 		{
 			cur=cur->s_upper;
@@ -81,6 +96,17 @@ int GrScope_MapUpper(GrScope* s,GrObject* key,GrObject* value)
 		GrGc_Intercept(cur->s_table,value);
 		return 0;
 	}
+
+	table=EgCodger_GetBuildin();
+	entry=GrHash_GetEntry(table,key);
+	assert(entry);
+	if(GrHashEntry_Valid(entry))
+	{
+		GrErr_PermFormat("Buildin '%s' Is Protected,Can't Assign To It",
+				GR_TO_S(key)->s_value);
+
+	}
+
 	GrErr_NameFormat("upper Name '%s' Is Not Define",GR_TO_S(key)->s_value);
 	return -1;
 
@@ -88,10 +114,34 @@ int GrScope_MapUpper(GrScope* s,GrObject* key,GrObject* value)
 
 GrObject* GrScope_Lookup(GrScope* s,GrObject* key)
 {
-	return GrHash_LookupName(s->s_table,key);
+	assert(GrString_Verify(key));
+	/* look up current scope */
+	GrHash* table=s->s_table;
+	GrHashEntry* entry=GrHash_GetEntry(table,key);
+	assert(entry);
+	if(GrHashEntry_Valid(entry))
+	{
+		assert(entry->e_value);
+		return entry->e_value;
+	}
+
+	/* look up  buildin */
+	table=EgCodger_GetBuildin();
+	entry=GrHash_GetEntry(table,key);
+	assert(entry);
+	if(GrHashEntry_Valid(entry))
+	{
+		assert(entry->e_value);
+		return entry->e_value;
+	}
+
+	GrErr_NameFormat("Name '%s' Is Not Define",GR_TO_S(key)->s_value);
+	return NULL;
+
 }
 GrObject* GrScope_LookupUpper(GrScope* s,GrObject* key)
 {
+	GrHash* table;
 	GrScope* cur=s->s_upper;
 	GrHashEntry* entry;
 	while(cur!=NULL)
@@ -104,6 +154,16 @@ GrObject* GrScope_LookupUpper(GrScope* s,GrObject* key)
 		}
 		return entry->e_value;
 	}
+
+	table=EgCodger_GetBuildin();
+	entry=GrHash_GetEntry(table,key);
+	assert(entry);
+	if(GrHashEntry_Valid(entry))
+	{
+		assert(entry->e_value);
+		return entry->e_value;
+	}
+
 	GrErr_NameFormat("upper Name '%s' Is Not Define",GR_TO_S(key)->s_value);
 	return NULL;
 }

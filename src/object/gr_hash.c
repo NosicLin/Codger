@@ -387,8 +387,8 @@ int GrHash_Print(GrHash* h,FILE* f)
 	{
 		if(p->e_key==NULL||p->e_key==Gr_Hash_Dummy)
 		{
-			continue;
 			p++;
+			continue;
 		}
 		i--;
 		fprintf(f,"\t");

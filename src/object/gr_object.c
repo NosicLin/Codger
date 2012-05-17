@@ -720,7 +720,7 @@ GrObject* GrObject_ToGrFloat(GrObject* g)
 	}
 	return ret;
 defalut_action:
-	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	GrErr_TypeFormat("'%s' Can't Cast To GrFloat",GrObject_Name(g));
 	return NULL;
 }
 GrObject* GrObject_ToGrString(GrObject* g)
@@ -737,13 +737,13 @@ GrObject* GrObject_ToGrString(GrObject* g)
 	{
 		if(!GrExcept_Happened())
 		{
-			GrErr_BugFromat("Interal Bug For %s ToGcFloat Func",
+			GrErr_BugFromat("Interal Bug For %s ToGcString Func",
 					GrObject_Name(g));
 		}
 	}
 	return ret;
 defalut_action:
-	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	GrErr_TypeFormat("'%s' Can't Cast To GrString",GrObject_Name(g));
 	return NULL;
 }
 
@@ -761,13 +761,13 @@ GrObject* GrObject_ToGrLong(GrObject* g)
 	{
 		if(!GrExcept_Happened())
 		{
-			GrErr_BugFromat("Interal Bug For %s ToGcFloat Func",
+			GrErr_BugFromat("Interal Bug For %s ToGcLong Func",
 					GrObject_Name(g));
 		}
 	}
 	return ret;
 defalut_action:
-	GrErr_TypeFormat("'%s' Can't Cast To GrInt",GrObject_Name(g));
+	GrErr_TypeFormat("'%s' Can't Cast To GrLong",GrObject_Name(g));
 	return NULL;
 }
 

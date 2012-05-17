@@ -41,5 +41,6 @@ end
 
 
 #print a.resize(-1)
+
 a.remove(-1)
 

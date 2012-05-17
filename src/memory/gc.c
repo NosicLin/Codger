@@ -621,8 +621,10 @@ static int gc_heap_scan_all(struct gc_heap* h)
 			cur_obs=(GrObject*) scan;
 
 			GC_OBS_HEADER_CHECK(cur_obs);
+			//printf("cur_name=%s\n",GrObject_Name(cur_obs));
 			GrObject_GcUpdate(cur_obs);
 
+			//printf("cur_name=%s\n",GrObject_Name(cur_obs));
 			obs_size=GrObject_Type(cur_obs)->t_size;
 			scan+=GC_ROUND_ADDR(obs_size);
 		}

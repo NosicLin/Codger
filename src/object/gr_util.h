@@ -17,6 +17,8 @@ typedef struct gr_inner_func_entry GrInnerFuncEntry;
 GrHash* GrUtil_CreateInnerMethodsFlag(GrInnerFuncEntry*,long);
 int GrUtil_FillInnerMethodsFlag(GrHash*,GrInnerFuncEntry*,long);
 
+int GrUtil_FillWithGrString(GrHash*,GrInnerFuncEntry*,long);
+
 int GrUtil_CheckSetAttr(GrSymbol*,long);
 int GrUtil_CheckGetAttr(GrSymbol*,long);
 

@@ -15,8 +15,11 @@
 #include"object/gr_float.h"
 #include"object/gr_array.h"
 #include<memory/mem_base.h>
+#include"eg_buildin.h"
+#include<extends/ex_math.h>
 
-GrHash* s_modules=NULL;
+
+static GrHash* s_modules=NULL;
 
 
 int EgCodger_StartThread(EgThread* eg)
@@ -51,7 +54,7 @@ GrModule* EgCodger_ParseFile(const char* file_name)
 	ret=yyparse();
 	if(ret!=0)
 	{
-		GrErr_ParseFormat("Parse File %s Failed",file_name);
+		GrErr_ParseFormat("Parse File %s Failed(ret=%d)",file_name,ret);
 		goto error;
 	}
 	AstPending_Clear();
@@ -137,6 +140,22 @@ GrModule* EgCodger_ImportModule(GrString* name)
 	EgCodger_AddModule(module);
 	return module;
 }
+
+int eg_codger_init()
+{
+	s_modules=GrHash_GcNewFlag(GRGC_HEAP_STATIC);
+	if(s_modules==NULL)
+	{
+		return -1;
+	}
+	return 0;
+}
+int eg_codger_exit()
+{
+	s_modules=NULL;
+	return 0;
+}
+
 int EgCodger_ModuleInit()
 {
 	int ret;
@@ -159,15 +178,21 @@ int EgCodger_ModuleInit()
 	ret=GrModule_ConstsInit();
 	if(ret<0) goto const_failed;
 
-	s_modules=GrHash_GcNewFlag(GRGC_HEAP_STATIC);
-	if(s_modules==NULL)
-	{
-		goto s_modules_falied;
-	}
+	ret=GrModule_BuildinInit();
+	if(ret<0) goto buildin_failed;
 
+	ret=eg_codger_init();
+	if(ret<0) goto s_modules_falied;
+
+	ret=ExMath_Init();
+	if(ret<0) goto s_math_failed;
 	return 0;
 
+s_math_failed:
+	eg_codger_exit();
 s_modules_falied:
+	GrModule_BuildinExit();
+buildin_failed:
 	GrModule_ConstsExit();
 const_failed:
 	GrModule_ArrayExit();
@@ -185,6 +210,7 @@ mem_failed:
 
 int EgCodger_ModuleExit()
 {
+	eg_codger_exit();
 	GrModule_ConstsExit();
 	GrModule_ArrayExit();
 	GrModule_FloatExit();
@@ -194,9 +220,13 @@ int EgCodger_ModuleExit()
 	return 0;
 }
 
-
-
-
 	
+
+
+
+
+
+
+
 
 

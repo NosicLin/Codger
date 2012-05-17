@@ -1,0 +1,50 @@
+import math
+
+class Point
+	attr x
+	attr y
+	func init(x,y)
+		this.x=x
+		this.y=y
+	end 
+end 
+
+func param_get(param,value)
+	cur=0.0
+	for i in param 
+		cur+=i[6]
+		if cur>value
+			return i
+		end 
+	end 
+	return param[param.size()-1]
+end 
+
+
+func make_ifs(x,y,param)
+	ifs_iter=func()
+		r=Float($math.random()%10000)/10000.0
+		p=$param_get($param,r)
+		a=p[0]
+		b=p[1]
+		c=p[2]
+		d=p[3]
+		e=p[4]
+		f=p[5]
+		newx=a*$x+b*$y+e
+		newy=c*$x+d*$y+f
+		$x=newx
+		$y=newy 
+		return $Point(newx,newy)
+	end 
+
+	return ifs_iter
+end 
+
+export make_ifs	
+
+
+		
+
+
+

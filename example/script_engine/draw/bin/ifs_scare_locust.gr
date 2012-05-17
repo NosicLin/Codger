@@ -1,0 +1,20 @@
+import ifs
+parm=[
+[0,		0,		0,		0.5,	0,	0,		0.05],
+[0.42,	-0.42,	0.42,	0.42,	0,	0.2,	0.4],
+[0.42,	0.42,	-0.42,	0.42,	0,	0.2,	0.4],
+[0.1,	0,		0,		0.3,	0,	0.6,	0.15],
+]
+iter=ifs.make_ifs(0.0,0.0,parm)
+hshift=Float(width)*0.5
+vshift=Float(height)*0.1
+w=width*0.9
+h=height*0.9
+i=0
+setColor(1.0,0.0,0.1)
+while i<100000
+	p=iter()
+	#print p.x,p.y     -
+	drawPixel(hshift+p.x*w,vshift+p.y*h)
+	i+=1
+end 

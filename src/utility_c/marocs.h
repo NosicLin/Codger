@@ -8,19 +8,19 @@
 	do{ \
 		if(condition)\
 		{\
-			printf("%s::%s(Line %d):",__FILE__,__func__,__LINE__);\
-			printf("%s(%s,",#name,#condition);\
-			printf(args);\
-			printf(")\n");\
+			fprintf(stderr,"%s::%s(Line %d):",__FILE__,__func__,__LINE__);\
+			fprintf(stderr,"%s(%s,",#name,#condition);\
+			fprintf(stderr,args);\
+			fprintf(stderr,")\n");\
 		}\
 	}while(0)
 
 #define Maroc_Func(name,args...) \
 	do{ \
-		printf("%s::%s(Line %d):",__FILE__,__func__,__LINE__);\
-		printf("%s(",#name);\
-		printf(args);\
-		printf(")\n");\
+		fprintf(stderr,"%s::%s(Line %d):",__FILE__,__func__,__LINE__);\
+		fprintf(stderr,"%s(",#name);\
+		fprintf(stderr,args);\
+		fprintf(stderr,")\n");\
 	}while(0)
 
 #define MAROC_ALL

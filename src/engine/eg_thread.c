@@ -189,6 +189,7 @@ void EgThread_SFrameReturn(EgThread* eg)
 
 int  EgThread_Run(EgThread* e)
 {
+	int exit_code;
 	eg_thread_cur=e;
 	if(e->t_fstack==NULL)
 	{
@@ -235,9 +236,15 @@ next_instruct:
 
 	BUG_ON(sp>=(EG_THREAD_DEFALUT_DATA_SIZE-100),"sp=%d",sp);
 
+	//fprintf(stderr,"sp=%d\n",sp);
 	if(GrExcept_Happened())
 	{
-		return EG_THREAD_EXIT_EXCEPTION;
+		/* FIXME Now i hava write code to handle except
+		 * When Exception happend just clear all stack frame 
+		 */
+		eg->t_fstack=NULL;
+		exit_code=EG_THREAD_EXIT_EXCEPTION;
+		goto over;
 	}
 	if(eg->t_flags)
 	{
@@ -246,7 +253,9 @@ next_instruct:
 			cur_frame=eg->t_fstack;
 			if(cur_frame==NULL)
 			{
-				return EG_THREAD_EXIT_NORMAL;
+				assert(sp==0);
+				exit_code=EG_THREAD_EXIT_NORMAL;
+				goto over;
 			}
 			EG_THREAD_USE_FRAME(cur_frame);
 			EG_THREAD_CLR_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
@@ -636,7 +645,12 @@ next_instruct:
 
 over:
 
-	return 0;
+	fprintf(stderr,"EgThread With Code(%d) sp=%d\n",exit_code,sp);
+	eg->t_sp=0;
+	eg->t_pc=0;
+	eg->t_host=Gr_Object_Nil;
+	eg->t_relval=NULL;
+	return exit_code;
 }
 
 
