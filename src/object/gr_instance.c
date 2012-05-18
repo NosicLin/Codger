@@ -150,6 +150,7 @@ static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 
 
 	assert(cl->c_template);
+//	fprintf(stderr,"cl->c_template=%lx \n",(long)cl->c_template);
 	entry=GrHash_GetEntry(cl->c_template,k);
 	if(entry==NULL) return -1;
 

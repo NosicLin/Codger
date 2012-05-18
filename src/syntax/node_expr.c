@@ -1432,7 +1432,7 @@ static int  period_to_oper_and_assign_code(AstObject* ab,
 	ret=Ast_ToOpcode(expr,m,op,0);
 	if(ret<0) return -1;
 
-	ret=GrOpcode_NeedMore(op,14);
+	ret=GrOpcode_NeedMore(op,20);
 	if(ret<0) return -1;
 
 
@@ -1446,6 +1446,8 @@ static int  period_to_oper_and_assign_code(AstObject* ab,
 	{
 		GrOpcode_Push5(op,OP_GET_ATTR2,id);
 	}
+
+	GrOpcode_Push(op,OP_DATA_SWAP0_1);
 
 	switch(type)
 	{

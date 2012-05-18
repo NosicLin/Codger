@@ -187,8 +187,21 @@ int GrModule_WriteToFile(GrModule* m,FILE* f,long flags)
 }
 int GrModule_GcUpdate(GrModule* m)
 {
-	/* FIXME */
+	m->m_consts_pool=GrGc_Update(m->m_consts_pool);
+	m->m_symbols_pool=GrGc_Update(m->m_symbols_pool);
+	m->m_opcodes_pool=GrGc_Update(m->m_opcodes_pool);
+	m->m_attrs_pool=GrGc_Update(m->m_attrs_pool);
 	m->m_attrs=GrGc_Update(m->m_attrs);
+
+	if(m->m_name)
+	{
+		m->m_name=GrGc_Update(m->m_name);
+	}
+	if(m->m_codes)
+	{
+		m->m_codes=GrGc_Update(m->m_codes);
+	}
+
 	return 0;
 }
 

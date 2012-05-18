@@ -11,6 +11,11 @@
 #include<object/gr_object.h>
 static GrHash* s_buildin=NULL;
 
+int EgBuildin_GcUpdate()
+{
+	s_buildin=GrGc_Update(s_buildin);
+	return 0;
+}
 
 
 GrObject* buildin_float(GrObject* host,GrArray* args)

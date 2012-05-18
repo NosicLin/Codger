@@ -137,6 +137,7 @@ int GrFunc_GcUpdate(GrFunc* f)
 {
 	f->f_livein=GrGc_Update(f->f_livein);
 	f->f_default_args=GrGc_Update(f->f_default_args);
+	f->f_codes=GrGc_Update(f->f_codes);
 	return 0;
 }
 

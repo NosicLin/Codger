@@ -63,6 +63,9 @@ int GrGc_IsRefLow(void*);
 void GrGc_Disable();
 void GrGc_Enable();
 
+typedef int (*GcFunc)();
+void GrGc_RegisterRoot(GcFunc f);
+
 int GrModule_GcInit();
 int GrModule_GcExit();
 

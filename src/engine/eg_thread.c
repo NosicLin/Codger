@@ -270,6 +270,7 @@ next_instruct:
 			eg->t_sp=sp;
 			GrGc_CleanGarbage();
 			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+			cur_module=NULL;
 
 			goto next_instruct;
 		}

@@ -116,6 +116,12 @@ int GrSymbol_Print(GrSymbol* s,FILE* f)
 	GrString_Print(s->s_name,f);
 	return 0;
 }
+int GrSymbol_GcUpdate(GrSymbol* s)
+{
+	s->s_name=(GrString*)GrGc_Update(s->s_name);
+	return 0;
+}
+
 
 static struct  gr_type_ops symbol_type_ops=
 {
@@ -123,6 +129,7 @@ static struct  gr_type_ops symbol_type_ops=
 	.t_cmp=symbol_cmp,
 	.t_cmp_reverse=symbol_cmp_reverse,
 	.t_print=(GrPrintFunc)GrSymbol_Print,
+	.t_gc_update=(GrGcUpdateFunc)GrSymbol_GcUpdate,
 };
 
 GrTypeInfo Gr_Type_Symbol=

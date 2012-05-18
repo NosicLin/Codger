@@ -1,4 +1,5 @@
 #include"gr_opcode.h"
+#include"gr_module.h"
 #include<memory/memory.h>
 #include<memory/gc.h>
 #include<engine/except.h>
@@ -15,9 +16,19 @@ void GrOpcode_Destruct(GrOpcode* op)
 	}
 }
 
+int GrOpcode_GcUpdate(GrOpcode* op)
+{
+	op->o_name=GrGc_Update(op->o_name);
+	op->o_args_name=GrGc_Update(op->o_args_name);
+	op->o_module=GrGc_Update(op->o_module);
+	return 0;
+}
+
 struct gr_type_ops opcode_type_ops=
 {
 	.t_destruct=(GrDestructFunc)GrOpcode_Destruct,
+	.t_gc_update=(GrGcUpdateFunc)GrOpcode_GcUpdate,
+
 };
 
 struct gr_type_info Gr_Type_Opcode=

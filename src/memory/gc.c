@@ -12,6 +12,15 @@
 #define GC_ANALYZE 
 
 
+static int s_root_nu=0;
+static GcFunc s_roots[1024]={0,};
+
+void GrGc_RegisterRoot(GrGcUpdateFunc f) 
+{
+	s_roots[s_root_nu++]=f;
+}
+
+
 #ifdef GRGC_MEM_TOOL_DEBUG 
 void* __GrGc_New(size_t size,struct gr_type_info* info)
 {
@@ -490,6 +499,7 @@ static inline void gc_memcpy(GrObject* des,GrObject* src,size_t length)
 
 void* GrGc_Update(void* ptr)
 {
+	assert(ptr);
 #ifdef GRGC_DEBUG
 	GC_OBS_HEADER_CHECK(ptr);
 	struct block_header* bh=GC_GET_BLOCK_HEADER(ptr);
@@ -517,6 +527,7 @@ void* GrGc_Update(void* ptr)
 	 */
 	if(GC_GET_BLOCK_HEADER(g)->b_time_ticks==s_times_tick)
 	{
+		WARN_ON("ReUpdate %s add=%lx",GrObject_Name(g),(long)g);
 		return g;
 	}
 
@@ -902,7 +913,7 @@ static void gc_collection_end()
 
 int GrGc_CleanGarbage()
 {
-//	printf("Garbage Work\n");
+	//fprintf(stderr,"Garbage Work\n");
 
 	s_times_tick++;
 
@@ -925,57 +936,24 @@ int GrGc_CleanGarbage()
 
 	s_collection_working=1;
 	gc_collection_begin();
-
-	EgThread* t=EgThread_GetSelf();
-
-	/* Roots:
-	 *  1)Data Stack;
-	 *  2)StackFrame;
-	 *  3)Modules
-	 *  4)EgThread->relval
-	 */
-
-	/* First Update Data Stack */
-	GrObject** dstack=t->t_dstack;
-	assert(dstack);
-	size_t sp=t->t_sp;
-	size_t i;
-	//printf("begin scan data stack......\n");
-	for(i=0;i<sp;i++)
+	int i;
+	for(i=0;i<s_root_nu;i++)
 	{
-		dstack[i]=GrGc_Update(dstack[i]);
+		s_roots[i]();
 	}
-
-	/* Second Update StackFrame */
-	//printf("begin scan stack frame......\n");
-	EgSframe* cur_sf=t->t_fstack;
-	while(cur_sf!=NULL)
-	{
-		cur_sf->f_scope=(GrScope*)GrGc_Update((GrScope*)(cur_sf->f_scope));
-		cur_sf->f_host=GrGc_Update(cur_sf->f_host);
-		if(cur_sf->f_relval!=NULL)
-		{
-			cur_sf->f_relval=GrGc_Update(cur_sf->f_relval);
-		}
-		cur_sf=cur_sf->f_link;
-	}
-
-	/* Thirdth Update Module */
-	/* TODO */
-
 	/* Scan Heap And Update Object */
 	if(s_collection_level==GrGc_HEAP_YOUNG)
 	{
 		while(1)
 		{
 	//		printf("begin scan gc_static......\n");
-			//if(gc_heap_scan_all(gc_static))
+		//	if(gc_heap_scan_all(gc_static))
 			if(gc_heap_scan_mark_low(gc_static))
 			{
 				continue;
 			}
 	//		printf("begin scan gc_old......\n");
-			//if(gc_heap_scan_all(gc_old))
+		//	if(gc_heap_scan_all(gc_old))
 			if(gc_heap_scan_mark_low(gc_old))
 			{
 				continue;

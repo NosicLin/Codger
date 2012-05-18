@@ -197,6 +197,9 @@ int GrClass_GcUpdate(GrClass* c)
 	}
 	c->c_symbols=GrGc_Update(c->c_symbols);
 	c->c_template=GrGc_Update(c->c_template);
+	c->c_name=GrGc_Update(c->c_name);
+	c->c_instance_type->t_class=GrGc_Update(c->c_instance_type->t_class);
+
 	return 0;
 }
 

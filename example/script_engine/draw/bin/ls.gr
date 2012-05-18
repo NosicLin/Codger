@@ -21,7 +21,7 @@ class LSystem
 	attr stack
 	attr d_angle
 	func init(x,y,angle,length)
-		this.d_angle=angle
+		this.d_angle=angle/180.0*$math.pi
 		this.cur=$LState(x,y,0,length)
 		this.stack=[]
 	end 
@@ -52,17 +52,16 @@ class LSystem
 		angle=this.cur.angle
 		n_x=this.cur.x+this.cur.length*$math.cos(angle)
 		n_y=this.cur.y+this.cur.length*$math.sin(angle)
-		#drawLine(this.cur.x,this.cur.y,n_x,n_y)
-		#print this.cur.x,this.cur.y,n_x,n_y
+		drawLine(this.cur.x,this.cur.y,n_x,n_y)
 		this.cur.x=n_x
 		this.cur.y=n_y
 	end 
 
 	func ActionAdd()
-		this.cur.angle+=this.d_angle
+		this.cur.angle-=this.d_angle
 	end 
 	func ActionSub()
-		this.cur.angle-=this.d_angle
+		this.cur.angle+=this.d_angle
 	end 
 
 	func ActionPush()
@@ -76,4 +75,3 @@ end
 
 export LSystem
 
-print LSystem(3,3,3,3)

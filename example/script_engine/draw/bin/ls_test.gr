@@ -1,12 +1,10 @@
 import ls 
+import math
 
-i=1
-while 1
-	l=ls.LSystem(0,100,0,30)
-	l.Draw("FFFFFF[+F-F+-]FF")
-	i+=1
-	print i
-end 
+l=ls.LSystem(100,100,20,30)
+l.Draw("F+F+F+F+FF[+F-F+-]FF")
 #this.cur.x=3
+
+print math.cos(math.pi)
 
 

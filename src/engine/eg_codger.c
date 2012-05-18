@@ -23,6 +23,51 @@
 static GrHash* s_modules=NULL;
 
 
+int EgCodger_GcUpdate()
+{
+	EgThread* t=EgThread_GetSelf();
+
+	/* Roots:
+	 *  1)Data Stack;
+	 *  2)StackFrame;
+	 *  3)Modules
+	 *  4)Buidin
+	 */
+
+	/* First Update Data Stack */
+	GrObject** dstack=t->t_dstack;
+	assert(dstack);
+	size_t sp=t->t_sp;
+	size_t i;
+	//printf("begin scan data stack......\n");
+	for(i=0;i<sp;i++)
+	{
+		dstack[i]=GrGc_Update(dstack[i]);
+	}
+
+	/* Second Update StackFrame */
+	//printf("begin scan stack frame......\n");
+	EgSframe* cur_sf=t->t_fstack;
+	while(cur_sf!=NULL)
+	{
+		cur_sf->f_scope=(GrScope*)GrGc_Update((GrScope*)(cur_sf->f_scope));
+		cur_sf->f_host=GrGc_Update(cur_sf->f_host);
+		if(cur_sf->f_relval!=NULL)
+		{
+			cur_sf->f_relval=GrGc_Update(cur_sf->f_relval);
+		}
+		cur_sf=cur_sf->f_link;
+	}
+
+	/* Thirdth Update Module */
+	/* TODO */
+	s_modules=GrGc_Update(s_modules);
+	EgBuildin_GcUpdate();
+
+	return 0;
+
+}
+
 int EgCodger_StartThread(EgThread* eg)
 {
 	int ret;
@@ -191,6 +236,8 @@ int EgCodger_ModuleInit()
 
 	ret=ExMath_Init();
 	if(ret<0) goto s_math_failed;
+
+	GrGc_RegisterRoot(EgCodger_GcUpdate);
 	return 0;
 
 s_math_failed:

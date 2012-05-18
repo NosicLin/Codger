@@ -8,5 +8,7 @@ int EgCodger_BuildinAdd(GrObject* k,GrObject* v);
 
 int GrModule_BuildinInit();
 int GrModule_BuildinExit();
+
+int EgBuildin_GcUpdate();
 #endif 
 

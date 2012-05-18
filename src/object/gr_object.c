@@ -659,11 +659,13 @@ int GrObject_GcUpdate(GrObject* g)
 	GrTypeInfo* info=GrObject_Type(g);
 	struct gr_type_ops* g_ops=info->t_ops;
 	int ret;
+	/*
 	if(info->t_class)
 	{
 		info->t_class=GrGc_Update(info->t_class);
 		assert(info->t_class);
 	}
+	*/
 	if(!g_ops->t_gc_update)
 	{
 		return 0;
