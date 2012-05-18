@@ -23,6 +23,7 @@ EgSframe* EgSframe_NewFromFunc(GrFunc* func)
 	sf->f_host=Gr_Object_Nil;
 	sf->f_scope=sc;
 	sf->f_codes=func->f_codes;
+	sf->f_relval=NULL;
 	return sf;
 }
 

@@ -17,6 +17,8 @@ struct  eg_sframe
 	GrObject* f_host;
 	size_t f_pc;
 	size_t f_sp;
+
+	GrObject* f_relval;
 };
 
 typedef struct eg_sframe EgSframe;

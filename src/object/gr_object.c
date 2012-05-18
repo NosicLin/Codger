@@ -565,7 +565,9 @@ defalut_action:
 
 GrObject* GrObject_Call(GrObject* g,GrObject* host,GrObject* args)
 {
+	assert(g&&host&&args);
 	GrObject* ret;
+	//printf("addr=%lx,type_addr=%lx\n",(long)g,(long)g->g_type);
 	struct gr_type_ops* g_ops=GrObject_Type(g)->t_ops;
 	if(!g_ops->t_call)
 	{
@@ -660,6 +662,7 @@ int GrObject_GcUpdate(GrObject* g)
 	if(info->t_class)
 	{
 		info->t_class=GrGc_Update(info->t_class);
+		assert(info->t_class);
 	}
 	if(!g_ops->t_gc_update)
 	{

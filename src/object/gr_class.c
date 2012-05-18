@@ -181,10 +181,8 @@ GrInstance* GrClass_Call(GrClass* s,GrObject* host,GrArray* args)
 		return is;
 	}
 
-	EgThread* t=EgThread_GetSelf();
-	t->t_relval=(GrObject*)is;
-
-	if(GrFunc_Call((GrFunc*)init,(GrObject*)is,args)==NULL)
+	if(GrFunc_CallWithRetVal((GrFunc*)init,
+			(GrObject*)is,args,(GrObject*)is)==NULL)
 	{
 		return NULL;
 	}

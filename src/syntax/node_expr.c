@@ -1157,7 +1157,14 @@ static int call_to_opcode(AstObject* ab,GrModule* m,
 	if(ret<0) return -1;
 
 	GrOpcode_Push(op,OP_ARRAY_END);
-	GrOpcode_Push(op,OP_CALL);
+	if(expr->a_type->t_type==ATN_PERIOD)
+	{
+		GrOpcode_Push(op,OP_CALL_WITH_HOST);
+	}
+	else
+	{
+		GrOpcode_Push(op,OP_CALL);
+	}
 	return 0;
 }
 
@@ -1339,7 +1346,6 @@ static int period_to_opcode(AstObject* ab,GrModule* m,
 	if(flags&AST_OPCODE_FLAG_CALL)
 	{
 		GrOpcode_Push(op,OP_DUP_DATA1);
-		GrOpcode_Push(op,OP_SET_HOST);
 	}
 
 	if(GrOpcode_OpdataSize16(id))
@@ -1379,7 +1385,7 @@ static int  period_to_assign_opcode(AstObject* ab,GrModule* m,
 		return -1;
 	}
 
-	ret=Ast_ToOpcode(expr,m,op,5);
+	ret=Ast_ToOpcode(expr,m,op,0);
 	if(ret<0) return -1;
 
 	ret=GrOpcode_NeedMore(op,5);
@@ -1423,7 +1429,7 @@ static int  period_to_oper_and_assign_code(AstObject* ab,
 		return -1;
 	}
 
-	ret=Ast_ToOpcode(expr,m,op,5);
+	ret=Ast_ToOpcode(expr,m,op,0);
 	if(ret<0) return -1;
 
 	ret=GrOpcode_NeedMore(op,14);

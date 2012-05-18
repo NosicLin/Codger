@@ -1,0 +1,79 @@
+import math
+
+class LState
+	public attr x
+	public attr y
+	public attr angle
+	public attr length
+	func init(x,y,angle,length)
+		this.x=x
+		this.y=y
+		this.angle=angle
+		this.length=length
+	end 
+	func copy()
+		return $LState(this.x,this.y,this.angle,this.length)
+	end 
+end 
+
+class LSystem
+	attr cur
+	attr stack
+	attr d_angle
+	func init(x,y,angle,length)
+		this.d_angle=angle
+		this.cur=$LState(x,y,0,length)
+		this.stack=[]
+	end 
+	func Draw(lang)
+		size=lang.length()
+		i=0
+		while i<size
+			cur=lang[i]
+			if(cur=="F")
+				this.ActionF()
+			elif(cur=="+")
+				this.ActionAdd()
+			elif(cur=="-")
+				this.ActionSub()
+			elif(cur=="[")
+				this.ActionPush()
+			elif(cur=="]")
+				this.ActionPop()
+			else 
+				print "Err String"
+				return 
+			end 
+			i+=1
+		end 
+	end 
+
+	func  ActionF()
+		angle=this.cur.angle
+		n_x=this.cur.x+this.cur.length*$math.cos(angle)
+		n_y=this.cur.y+this.cur.length*$math.sin(angle)
+		#drawLine(this.cur.x,this.cur.y,n_x,n_y)
+		#print this.cur.x,this.cur.y,n_x,n_y
+		this.cur.x=n_x
+		this.cur.y=n_y
+	end 
+
+	func ActionAdd()
+		this.cur.angle+=this.d_angle
+	end 
+	func ActionSub()
+		this.cur.angle-=this.d_angle
+	end 
+
+	func ActionPush()
+		this.stack.push(this.cur.copy())
+	end 
+	func ActionPop()
+		this.cur=this.stack.pop()
+	end 
+		
+end 
+
+export LSystem
+
+print LSystem(3,3,3,3)

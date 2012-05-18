@@ -75,15 +75,14 @@ GrObject* GrUtil_BaseTypeGetAttr(GrObject* g,GrObject* k,long perm)
 	BUG_ON(g_class==NULL,"%s.t_class Filed Not Init",GrObject_Name(g));
 
 	GrHashEntry* entry=GrHash_GetEntry(g_class->c_template,k);
-	assert(GrSymbol_Verify(entry->e_key));
+	if(entry==NULL) return NULL;
 	if(!GrHashEntry_Valid(entry))
 	{
 		GrErr_NameFormat("%s Has No Symbol '%s'",
 				GrObject_Name(g),((GrString*)k)->s_value);
 		return NULL;
 	}
-
-
+	assert(GrSymbol_Verify(entry->e_key));
 	return entry->e_value;
 }
 
@@ -104,6 +103,7 @@ int GrUtil_BaseTypeSetAttr(GrObject* g,GrObject* k,GrObject* v,long perm)
 		return -1;
 	}
 
+	assert(GrSymbol_Verify(entry->e_key));
 	GrErr_PermFormat("%s Symbol In '%s' Is Protected",
 			((GrString*)k)->s_value,GrObject_Name(g));
 

@@ -37,7 +37,6 @@ EgThread* EgThread_New()
 		return NULL;
 	}
 	t->t_dstack_cap=EG_THREAD_DEFALUT_DATA_SIZE;
-	t->t_host=Gr_Object_Nil;
 	return t;
 }
 
@@ -81,15 +80,15 @@ inline EgSframe* EgThread_PopSframe(EgThread* eg)
 void EgThread_SFrameReturn(EgThread* eg)
 {
 	EgSframe* f=eg->t_fstack;
+	assert(f);
 	eg->t_fstack=f->f_link;
 
 	/* push return value to data stack */
 	if(eg->t_fstack)
 	{
-		assert(eg->t_relval);
-		eg->t_dstack[eg->t_fstack->f_sp++]=eg->t_relval;
+		assert(f->f_relval);
+		eg->t_dstack[eg->t_fstack->f_sp++]=f->f_relval;
 	}
-	eg->t_relval=NULL;
 	EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
 
 	EgSframe_Free(f);
@@ -136,6 +135,11 @@ void EgThread_SFrameReturn(EgThread* eg)
 #define ACC_PUSH \
 	do{ \
 		dstack[sp++]=acc; \
+		/*
+		printf("Push:%s,add=%lx,type_add=%lx\n", \
+				GrObject_Name(acc),(long)acc,(long)acc->g_type); \
+		GrObject_Print(acc,stderr,GR_PRINT_SPACE);\
+		*/ \
 	}while(0) 
 
 #define R0_PUSH \
@@ -200,7 +204,7 @@ int  EgThread_Run(EgThread* e)
 
 	register GrObject** dstack=eg->t_dstack;
 
-		
+
 	/* used for temp compute */
 	register u_int8_t cur_code;	/* instruction register*/
 	register u_int32_t rd; 		/* data register */
@@ -209,7 +213,7 @@ int  EgThread_Run(EgThread* e)
 	register GrObject* r0;
 	register GrObject* r1;
 	register GrObject* r2;
-	
+
 
 
 
@@ -236,7 +240,6 @@ next_instruct:
 
 	BUG_ON(sp>=(EG_THREAD_DEFALUT_DATA_SIZE-100),"sp=%d",sp);
 
-	//fprintf(stderr,"sp=%d\n",sp);
 	if(GrExcept_Happened())
 	{
 		/* FIXME Now i hava write code to handle except
@@ -267,9 +270,15 @@ next_instruct:
 			eg->t_sp=sp;
 			GrGc_CleanGarbage();
 			EG_THREAD_SET_FLAGS(eg,EG_THREAD_FLAGS_FRAME_CHANGE);
+
 			goto next_instruct;
 		}
 	}
+	/*
+	   fprintf(stderr,"sp=%d,pc=%d,module=%s,code_name=%s\n",
+	   sp,pc,cur_module->m_name->s_value,
+	   cur_frame->f_codes->o_name->s_value);
+	   */
 
 	//printf("pc=%d\n",pc);
 	cur_code=codes[pc++];
@@ -285,9 +294,14 @@ next_instruct:
 			UNPACK_TWO_OP;
 			eg->t_sp=sp;
 			eg->t_pc=pc;
-			r2=eg->t_host;
-			eg->t_host=Gr_Object_Nil;
-			acc=GrObject_Call(r0,r2,r1);
+			acc=GrObject_Call(r0,Gr_Object_Nil,r1);
+			ACC_PUSH;
+			goto next_instruct;
+		case OP_CALL_WITH_HOST:
+			UNPACK_THREE_OP;
+			eg->t_sp=sp;
+			eg->t_pc=pc;
+			acc=GrObject_Call(r1,r0,r2);
 			ACC_PUSH;
 			goto next_instruct;
 		case OP_SET_ITEM:
@@ -468,7 +482,7 @@ next_instruct:
 			goto next_instruct;
 
 
-		/* Data op */
+			/* Data op */
 		case OP_LOAD_NIL:
 			acc=Gr_Object_Nil;
 			ACC_PUSH;
@@ -501,31 +515,30 @@ next_instruct:
 			DATA_SWAP(0,3);
 			goto next_instruct;
 		case OP_SET_HOST:
-			UNPACK_ONE_OP;
-			eg->t_host=r0;
+			assert(0);
 			goto next_instruct;
 
-		/* frame op */
+			/* frame op */
 		case OP_EXIT:
 			assert(0);
 			goto over;
 		case OP_RETURN:
 			UNPACK_ONE_OP;
-			if(eg->t_relval==NULL)
+			if(cur_frame->f_relval==NULL)
 			{
-				eg->t_relval=r0;
+				cur_frame->f_relval=r0;
 			}
 			EgThread_SFrameReturn(eg);
 			goto next_instruct;
 		case OP_RETURN_NIL:
-			if(eg->t_relval==NULL)
+			if(cur_frame->f_relval==NULL)
 			{
-				eg->t_relval=Gr_Object_Nil;
+				cur_frame->f_relval=Gr_Object_Nil;
 			}
 			EgThread_SFrameReturn(eg);
 			goto next_instruct;
 
-		/* OP_NEED_PARAM2 OPCODE */
+			/* OP_NEED_PARAM2 OPCODE */
 		case OP_GET_ATTR:
 			UNPACK_ONE_OP;
 			r1=symbols_pool[rd];
@@ -560,7 +573,7 @@ next_instruct:
 			REF_ONE_OP;
 			GrFunc_SetOpcode((GrFunc*)r0,(GrOpcode*)(opcodes_pool[rd]));
 			goto next_instruct;
-			
+
 		case  OP_LOAD_CONST:
 			dstack[sp++]=consts_pool[rd];
 			goto next_instruct;
@@ -601,7 +614,7 @@ next_instruct:
 
 
 
-		/* flow control op */
+			/* flow control op */
 		case OP_BREAK:
 			assert(0);
 		case OP_CONTINUE:
@@ -648,8 +661,6 @@ over:
 	fprintf(stderr,"EgThread With Code(%d) sp=%d\n",exit_code,sp);
 	eg->t_sp=0;
 	eg->t_pc=0;
-	eg->t_host=Gr_Object_Nil;
-	eg->t_relval=NULL;
 	return exit_code;
 }
 

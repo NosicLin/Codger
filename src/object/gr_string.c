@@ -4,6 +4,9 @@
 #include<string.h>
 #include<engine/except.h>
 #include"gr_int.h"
+#include"gr_class.h"
+#include"gr_consts.h"
+#include"gr_util.h"
 
 /* string hash func 
  * search from google 
@@ -117,6 +120,10 @@ void GrString_Destruct(GrString* gs)
 	{
 		GrMem_Free(gs->s_value);
 	}
+}
+GrString* GrString_ToGrString(GrString* gs)
+{
+	return gs;
 }
 GrString* GrString_Get(GrString* gs,ssize_t index)
 {
@@ -241,10 +248,15 @@ static struct gr_type_ops string_type_ops=
 	.t_rich_eq=gs_rich_eq,
 	.t_destruct=(GrDestructFunc)GrString_Destruct,
 
+	.t_get_attr=GrUtil_BaseTypeGetAttr,
+	.t_set_attr=GrUtil_BaseTypeSetAttr,
+
 	.t_get_item=gs_get_item,
 	.t_plus=gs_plus,
 	.t_cmp=gs_cmp,
 	.t_bool=(GrBoolFunc)GrString_Bool,
+
+	.t_to_string=(GrCastFunc)GrString_ToGrString,
 };
 
 struct gr_type_info Gr_Type_String=
@@ -255,8 +267,70 @@ struct gr_type_info Gr_Type_String=
 };
 
 
+int GrModule_StringInit()
+{
+	Gr_Type_String.t_class=NULL;
+	GrClass* c=GrString_GetStringClass();
+	if(c==NULL) return -1;
+
+	Gr_Type_String.t_class=c;
+	return 0;
+}
+
+int GrModule_StringExit()
+{
+	return 0;
+}
+
+
+GrObject* GrString_MethodSize(GrObject* host,GrArray* args)
+{
+	if(!GrString_Verify(host))
+	{
+		return Gr_Object_Nil;
+	}
+	return (GrObject*)GrInt_GcNew(((GrString*)host)->s_length);
+}
 
 
 
+
+static GrInnerFuncEntry s_string_method[]=
+{
+	{
+		.e_name="length",
+		.e_permission=0,
+		.e_func=GrString_MethodSize,
+		.e_arg_nu=0,
+	},
+	{
+		.e_name=NULL,
+	},
+};
+
+GrClass* GrString_GetStringClass()
+{
+	if(Gr_Type_String.t_class!=NULL)
+	{
+		return Gr_Type_String.t_class;
+	}
+	GrClass* string_class=GrClass_GcNewFlag(GrGc_HEAP_STATIC);
+	if(string_class==NULL)
+	{
+		return NULL;
+	}
+	GrString* name=GrString_GcNewFlag("StringClass",GrGc_HEAP_STATIC);
+	if(name==NULL)
+	{
+		return NULL;
+	}
+
+	GrClass_SetName(string_class,name);
+
+	int ret=GrUtil_FillInnerMethodsFlag(string_class->c_template,
+			s_string_method,GrGc_HEAP_STATIC);
+	if(ret<0) return NULL;
+	return string_class;
+}
 
 

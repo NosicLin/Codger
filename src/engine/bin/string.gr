@@ -1,0 +1,3 @@
+print "fsfsf".length()
+print "".length()
+print ("fsf"+"fdsf").length()

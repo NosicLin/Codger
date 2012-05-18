@@ -14,6 +14,7 @@
 #include"object/gr_int.h"
 #include"object/gr_float.h"
 #include"object/gr_array.h"
+#include"object/gr_string.h"
 #include<memory/mem_base.h>
 #include"eg_buildin.h"
 #include<extends/ex_math.h>
@@ -123,8 +124,6 @@ GrModule* EgCodger_ImportModule(GrString* name)
 	EgThread* thread=EgThread_GetSelf();
 	assert(thread);
 
-	/* set module return value */
-	thread->t_relval=(GrObject*)module;
 	if(module==NULL)
 	{
 		return NULL;
@@ -136,6 +135,9 @@ GrModule* EgCodger_ImportModule(GrString* name)
 	{
 		return NULL;
 	}
+
+	/* set module return value */
+	sf->f_relval=(GrObject*)module;
 	EgThread_PushSframe(thread,sf);
 	EgCodger_AddModule(module);
 	return module;
@@ -172,6 +174,9 @@ int EgCodger_ModuleInit()
 	ret=GrModule_FloatInit();
 	if(ret<0) goto float_failed;
 
+	ret=GrModule_StringInit();
+	if(ret<0) goto string_failed;
+
 	ret=GrModule_ArrayInit();
 	if(ret<0) goto array_failed;
 
@@ -197,6 +202,8 @@ buildin_failed:
 const_failed:
 	GrModule_ArrayExit();
 array_failed:
+	GrModule_StringExit();
+string_failed:
 	GrModule_FloatExit();
 float_failed:
 	GrModule_IntExit();
@@ -213,6 +220,7 @@ int EgCodger_ModuleExit()
 	eg_codger_exit();
 	GrModule_ConstsExit();
 	GrModule_ArrayExit();
+	GrModule_StringExit();
 	GrModule_FloatExit();
 	GrModule_IntExit();
 	GrModule_GcExit();

@@ -10,7 +10,8 @@ FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../
 
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug \
-	-L../lib/  -lmemory -lobject -lutility_c  -llexical -lengine
+	-L../lib/  -lmemory -lobject -lutility_c  -llexical -lengine \
+	-lm -lextends
 
 
 

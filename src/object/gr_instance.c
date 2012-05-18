@@ -149,6 +149,7 @@ static int gi_set_attr(GrInstance* ic,GrObject* k,GrObject* v,long perm)
 	}
 
 
+	assert(cl->c_template);
 	entry=GrHash_GetEntry(cl->c_template,k);
 	if(entry==NULL) return -1;
 
@@ -229,6 +230,7 @@ static GrObject* gi_get_attr(GrInstance* ic, GrObject* k,long perm)
 int GrInstance_Print(GrInstance* ic,FILE* f)
 {
 	GrClass* cl=GrObject_Type((GrObject*)ic)->t_class;
+	assert(cl);
 
 	fprintf(f,"%s Instance At %lx",cl->c_name->s_value,(long)ic);
 	return 0;

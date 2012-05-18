@@ -37,8 +37,12 @@ GrFunc* GrFunc_GcNewFlag(long flags)
 	return func;
 }
 
-
 GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
+{
+	return GrFunc_CallWithRetVal(gf,host,args,NULL);
+}
+
+GrObject* GrFunc_CallWithRetVal(GrFunc* gf,GrObject* host,GrArray* args,GrObject* retval)
 {
 	assert(host);
 	int args_nu=GrArray_Size(args);
@@ -118,6 +122,8 @@ GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 	if(ret<0) goto error;
 
 	ef->f_host=host;
+	ef->f_relval=retval;
+
 	EgThread* t=EgThread_GetSelf();
 	EgThread_PushSframe(t,ef);
 

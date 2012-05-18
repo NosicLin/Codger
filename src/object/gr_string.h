@@ -24,9 +24,13 @@ GrString* GrString_GcNewEscWithQuote(const char*);
 int GrString_Init(GrString* ,const char*);
 int GrString_InitEscWithQuote(GrString*,const char*);
 
-GrString* GrString_Get(GrString*,ssize_t );
 
+GrString* GrString_ToGrString(GrString*);
+
+
+GrString* GrString_Get(GrString*,ssize_t );
 GrString* GrString_Plus(GrString*,GrString*);
+
 
 
 int GrString_Cmp(GrString* ,GrString*);
@@ -41,6 +45,10 @@ static inline int GrString_Verify(GrObject* g)
 }
 	
 
+struct gr_class;
+int GrModule_StringInit();
+int GrModule_StringExit();
+struct gr_class* GrString_GetStringClass();
 
 #ifdef GR_STRING_DEBUG
 static inline GrString* GR_TO_S(GrObject* g)

@@ -18,12 +18,10 @@ struct eg_thread
 
 	size_t t_dstack_cap;
 	GrObject** t_dstack;
-	GrObject* t_host;
 	size_t t_sp;
 	size_t t_pc;
 
 
-	GrObject* t_relval;
 };
 
 typedef struct eg_thread EgThread;

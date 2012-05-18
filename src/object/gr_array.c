@@ -352,6 +352,7 @@ int GrArray_Print(GrArray* ga,FILE* f)
 	if(ga->a_size==0)
 	{
 		fprintf(f,"[ ]");
+		ga->a_flags&=(~GR_ARRAY_FLAG_PRINT);
 		return 0;
 	}
 	ssize_t size=ga->a_size;
@@ -366,6 +367,7 @@ int GrArray_Print(GrArray* ga,FILE* f)
 	}
 
 	fprintf(f,"]");
+
 	ga->a_flags&=(~GR_ARRAY_FLAG_PRINT);
 
 	return 0;

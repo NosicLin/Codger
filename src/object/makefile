@@ -32,7 +32,8 @@ CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h
 INCLUDE=-I. -I./debug   -I../  
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  -L../lib  \
-	-llexical -lobject -lutility_c -lsyntax -lengine -lmemory
+	-llexical -lobject -lutility_c -lsyntax -lengine -lmemory \
+	-lm -lextends
 
 
 

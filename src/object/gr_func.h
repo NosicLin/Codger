@@ -42,6 +42,8 @@ static inline int GrFunc_Verify(GrObject* f)
 	return GrObject_Type(f)==&Gr_Type_Func;
 }
 
+GrObject* GrFunc_CallWithRetVal(GrFunc* gf,GrObject* host,
+			GrArray* args,GrObject* retval);
 GrObject* GrFunc_Call(GrFunc*,GrObject*,GrArray*);
 
 #ifdef GR_FUNC_DEBUG
