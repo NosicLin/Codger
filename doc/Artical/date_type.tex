@@ -1,0 +1,125 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{CJK}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.2em}
+\setlength{\itemsep}{0.1ex}
+
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\tableofcontents
+\newpage
+\section{数据类型}
+\subsection{对象}
+Codger语言的整体的设计思想为：一切皆是对象。整数，浮点数，字符串等基本的数据类型是对象，函数是对象，甚至类也是对象\ldots{} 因为这种特性，可以在源程序中使用类似于下面的语句:
+\begin{quote}
+\begin{verbatim}
+print 1.add(3)  #输出1+3的值
+print "Codger".length() #输出字符串"Codger"的长度
+\end{verbatim}
+\end{quote}
+对象Object是所有对象的父类，也就是说所有对象直接或者间接的继承对象Object。每个对象所携带的信息分为两部分：1）对象的类型信息，用于标识该对象的类型，所有同类型的对象共享对象的类型信息，类型信息里面保存了对象的所属类型，对象使用私有数据的方法，对象与其它对象交互的方式等。类型信息在对象创建时绑定到对象上。2）对象的私有数据，不同的对象有不同的私有数据，不同类型的对象对私有数据的使用方法也不同，例如整数对象的私有数据部分用于保存数值，字符串对象的私有数据用于保存字符序列。
+\subsection{变量}
+Codger是一门动态类型语言，所有对象的类型都是在运行时才能确定，变量在使用时不需要预先申明，也不需要申明变量的类型，可以不同的时刻给变量赋值不同类型的对象，例如下面的语句：
+\begin{quote}
+\begin{verbatim}
+a=2          #把整数对象2赋值给变量a
+a="Codger"   #把字符串对象"Codger"赋值变量a 
+\end{verbatim}
+\end{quote}
+当对一个变量赋值时，变量中会保存到该对象的引用，如果访问一个未引用对象的变量时，虚拟机会抛出变量未定义的异常。当把一个变量赋值给另一个变量，两个变量所引用的对象为同一个，例如：
+\begin{quote}
+\begin{verbatim}
+a=[3,4]       #变量a引用一个数组对象
+b=a           #把变量a赋值给变量b
+a.push(5)     #调用a引用数组对象的push方法
+print b       #输出b，结果为 [3,4,5]
+\end{verbatim}
+\end{quote}
+\subsection{基本数据类型}
+codegr现在支持8种基本数据类型：布尔值，整数，长整数，浮点数，字符串，数组，散列表，以及特殊类型Nil用于表示空对象,它们都可以在程序中显示定义。布尔值，整数，长整数，以及浮点数四种类型属于标量类型，一旦标量类型的对象被创建，在其生命周期内，对象的状态不会发生改变，其中：
+\begin{enumerate}
+\item 布尔值用于逻辑运算，也被称为逻辑值，它的值有两个，分别为真和假，假用`false'表示，真用`true'表示；
+\item 整数，浮点数，长整数，用于数值运算\footnote{它们3个以及字符串的定义规则见词法部分}；
+\item 字符串是由多个字符组成的有限序列；
+\end{enumerate}
+
+另一种为可变类型，可变类型的对象被创建后，状态可能发生多次改变，数组和散列表属于可变类型。其中：
+\begin{enumerate}
+\item 数组是一种顺序性的容器，用于存储对象，定义规则为：
+\begin{quote}
+\begin{verbatim}
+"[" [expr] { "," expr} [","] "]"
+\end{verbatim}
+\end{quote}
+\item 散列表则是一种关联性容器，散列表中每个元素都有键和值组成，键用于索引，值用于保存数据，定义规则为：
+\begin{quote}
+\begin{verbatim}
+"{" [ expr "->" expr ] { "," expr "->" expr } [","] "}"
+\end{verbatim}
+\end{quote}
+\end{enumerate}
+定义规则使用EBNF文法表示\footnote{EBNF的全称为：Extended Backus-Naur Form，后面涉及到的文法全部都为EBNF文法}，expr表示表达式，双引号中表示字符序列， [\ldots{}]表示可选，\{\ldots{}\}表示重复一次或多次。
+
+特殊类型Nil用于表示空对象，类似于java中的NULL对象或者是python中的None对象，在源程序中用`Nil'来访问。
+
+\subsection{函数与匿名函数}
+在Codger中一切皆为对象，函数也不例外。函数可以赋值给一个变量或者是保存在容器中，在解析器解析源程序，函数对象并不会被创建，这一点可能和其它动态语言差别很大，只有虚拟机运行到定义函数的字节码时，函数对象才被创建，同时把函数对象保存在定义函数名称同名的变量中，函数对象创建后，可以通过变量访问函数对象。如果在函数定义时，函数的名称没有指定，则该函数被视为匿名函数，匿名函数和函数属于同一种对象类型。
+\subsubsection{函数创建}
+每当函数对象创建时，会对当前作用域引用，当前作用域退出时，但不会被立即销毁，只有所有引用该作用域的函数对象毁销时，该作用域才会被毁销。只要函数对象存活，函数对象所在的作用域中的所有变量都被保存了下来，形成词法闭包\footnote{词法闭包：引用了自由变量的函数。这个被引用的自由变量将和这个函数一同存在，即使已经离开了创造它的环境也不例外}。如果某个函数对象所在作用域只被该函数对象引用，那么该作用域就可被视为该函数对象的私用数据空间。
+\subsubsection{函数调用}
+当函数对象被调用时，会创建一个新的作用域，新作用域的上层作用域会被设置为函数对象所在的作用域。多次调用函数对象，会创建多个作用域，保证了函数调用时内部变量的独立性。在Codger中变量的访问只会在当前作用域用查找，并不会查找上层作用域。在变量前面加上\$表示查找上层到顶层作用域中的变量，变量的赋值也是一样。
+
+如果一个函数对象直接或者间接调用自身，则被称递归调用，但对于动态语言来说，递归调用的代价很高，在递归过程中的临时变量会累积起来而得不到释放，如果递归深度过大，会消耗掉很大一块的内存,同时也加大了垃圾回收例程的负担。当递归算法可以使用等价的迭代算法实现时，优先选择迭代算法。
+\subsubsection{函数定义}
+在Codger中使用下面的语法定义函数：
+\begin{quote}
+\begin{verbatim}
+"func" [identifier] "(" [arg] { "," arg } [","] ")"
+        stmts
+"end"
+\end{verbatim}
+\end{quote}
+其中identifier为标识符，表示函数名，当函数名为空时，则为匿名函数。arg表示函数的参数类型，参数类型有3种：
+\begin{description}
+\item[简单参数:]只由参数名组成，当函数调用时，参数的个数比须与定义中简单参数的个数相匹配。
+\item[缺省参数:]由参数名和表达式组成：\verb|identifier "=" expr|,缺省参数必须位于简单参数的后面，当函数调用时，参数个数比须大于等于简单参数的个数，参数的个数的最大值不能超过简单参数与缺省参数的总和，如果在调用时，缺省参数部分的值没有被指定，则会传入其相对应的\verb|expr|的值。例如：
+\begin{quote}
+\begin{verbatim}
+func add_default(x,y=10)
+    return x+y
+end 
+print add_default(1)     #输出结果为11
+print add_default(1,20)  #输出结果为21
+\end{verbatim}
+\end{quote}
+\item[多参数:]在参数名前面加上*,表示接受多个参数，多参数只能出现在参数定义的最后面，并且最多只能定义一个。当函数调用时，多参数会以数组的形式传入。例如：
+\begin{quote}
+\begin{verbatim}
+func add_many(*x)
+    sum=0
+    for i in x            #遍边数组中的每一个元素
+        sum+=i
+    end
+    return sum
+end
+print add_many()          #输出为0
+print add_many(1,2)       #输出为3
+print add_many(1,2,3,4)   #输出为10
+\end{verbatim}
+\end{quote}
+\end{description}
+如果在函数定义时，没有return语句，则返回对象Nil
+\subsection{类与实例}
+\subsection{模块} 
+
+
+
+
+
+
+
+
+\end{CJK}
+\end{document}

@@ -1,0 +1,22 @@
+import ls 
+import math
+
+l=ls.LSystem(width*0.1,height*0.73,60,0.21)
+func make_koch(level)
+	if level==0
+		return "F"
+	else
+		return $make_koch(level-1)+"-"+$make_koch(level-1)+"++"+$make_koch(level-1)+"-"+$make_koch(level-1)
+	end 
+end 
+level= 7
+lang=make_koch(7)
+rel=lang+"++"+lang+"++"+lang
+setColor(1.0,1.0,0.0)
+#print lang
+l.Draw(rel)
+
+setColor(1.0,0.0,1.0)
+l=ls.LSystem(width*0.16,height*0.3,60,0.18)
+rel=lang+"--"+lang+"--"+lang+"-"
+l.Draw(rel);

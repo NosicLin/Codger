@@ -9,12 +9,12 @@ parm=[
 ]
 
 iter=ifs.make_ifs(0.0,0.0,parm)
-hshift=Float(width)*0.4
-vshift=Float(height)*0.15
-w=width*0.4
+hshift=Float(width)*0.47
+vshift=Float(height)*0.05
+w=width*0.5
 h=height*0.4
 i=0
-setColor(247.0/255.0,93.0/255.0,250.0/255.0)
+setColor(55.0/255.0,223.0/255.0,150.0/255.0)
 while i<100000
 	p=iter()
 	drawPixel(hshift+p.x*w,vshift+p.y*h)

@@ -1,0 +1,122 @@
+\section{运算符与表达式}
+表达式\footnote{表达式的完整EBNF文法请参考附录2}是由运算符将运算对象连接起来具有合法语义的式子，运算符分为这么三类：一元运算符，后缀运算符，二元运算符。不同类型的对象对于运算符的处理方式不同，对于运算符的处理方法保存在对象的类型信息里面，例如当二元运算符+的左右操作数都为字符串对象时，返回结果为连接后的字符串；当操作数为左右整数对象时，返回结果为两个数的和。
+
+\subsection{一元运算符}
+一元运算符也称为前缀运算符，有这么4个：\begin{textbf}+, -, \verb|~|, not\end{textbf}
+\begin{enumerate}
+\item 运算符\textbf{ not} 用于逻辑运算，表示逻辑非；
+\item 运算符\textbf{ +} 在数值运算中，表示负号。
+\item 运算符\textbf{ -} 在数值运算中，表示正号。
+\item 运算符\verb| ~| 在数值运算中，表示按位取反
+\end{enumerate}
+\subsection{后缀运算符}
+在Codger后缀运算符有\textbf{ [ ] , . , ( ) } 这么3个
+\begin{enumerate}
+\item 运算符\textbf{[ ]}，也被称为下标运算符的使用方法为：
+\begin{quote}
+\begin{verbatim}
+expr1 "[" expr2 "]"
+\end{verbatim}
+\end{quote}
+\begin{itemize}
+\item 当expr1为字符串对象时,表示下标访问，返回结果为一个新的字符串，该字符串的内容为位于 expr1 对象的expr2位置的字符。
+\item 当expr1为数组对象时，表示下标访问，返回结果为存储在 expr1 对象的expr2位置的对象。
+\item 当expr1为散列表对象时，表示查询，返回结果为存储在expr1对象中健值expr2所关联的对象。
+\end{itemize}
+\item 运算符 \textbf{ . } 用于访问对象的属性，所以也被称为属性访问运算符，使用方法为：
+\begin{quote}
+\begin{verbatim}
+expr "." identifier 
+\end{verbatim}
+\end{quote}
+其中identifier为标识符,表示访问对象expr的identifier属性。
+\item 运算符 \textbf{ ( ) } 用于过程调用，使用方法为：
+\begin{quote}
+\begin{verbatim}
+expr "(" [ expr ] {"," expr} [","] ")"
+\end{verbatim}
+\end{quote}
+当expr为函数对象时，则发生过程调用；当expr为类对象时，则会创建一个实例对象。
+\end{enumerate}
+\subsection{二元运算符}
+ Codger中的二元运算符有18个，分别为：
+\begin{quote}
+\begin{verbatim}
++  -  *  /  %  
+<<  >>  &  ^  |  
+<  <=  ==  !=  >=  > 
+and  or 
+\end{verbatim}
+\end{quote}
+这18个运算符又被分为4类：
+\begin{enumerate}
+\item 算术运算符:
+\begin{quote}
+\begin{verbatim}
++  -  *  /  %  
+\end{verbatim}
+\end{quote}
+在数值运算中，运算符 + 用于求和;，- 用于求差，* 用于求乘积； / 用于求商； \% 用于取模。
+\item 位运算符：
+\begin{quote}
+\begin{verbatim}
+<<  >>  &  ^  |  
+\end{verbatim}
+\end{quote}
+在数值运算中，运算符 \verb << {} 表示左移运算，\verb >> {} 表示右移运算， \verb & {} 表示按位与运算， \verb ^ {} 表示按位异或运算，\verb | {} 表示按位或运算
+\item 比较运算符:
+\begin{quote}
+\begin{verbatim}
+<  <=  ==  !=  >=  > 
+\end{verbatim}
+\end{quote}
+在数值运算中，运算符 \verb < {} 表示小于运算，\verb <= {} 表示小于或等于运算, \verb == {} 表示等于运算，\verb != {} 表示不等于运算，\verb >= {} 表示大于或等于运算， \verb > {} 表示大于运算。
+\item 逻辑运算符：
+\begin{quote}
+\begin{verbatim}
+and  or 
+\end{verbatim}
+\end{quote}
+运算符and表示逻辑与运算，如果左边表达式返回的左操作数为假，则立刻返回假，而不会对右边表达进行运算；运算符or表示逻辑或运算，如果左边表达式返回的结果右操作数为真，则立刻返回真，而不会对右边表达式进行运算。逻辑运算中，当操作数不为布尔值，会进行布尔转换：整数，浮点数，长整数为0时为假，其它情况为真；数组与散列表中的元素个数为0时，为假，其它情况为真；字符串为空串时为假，其它情况为真；特殊类型Nil为假
+\end{enumerate}
+
+\subsection{类型转换}
+在数值运算中，二元运算符的左右操作数为不同的数据类型时，会涉及到类型的转换，转换的优先级为：浮点数 \verb > {} 长整数 \verb > {} 整数 \verb > {} 布尔值，当转换优先级高的数据类型与转换优先级低的数据类型运算时，转换优先级低的数据类型会转换到优先级高的数据类型。
+
+\subsection{运算符优先级}
+表达式由多个运算符组成，合个运算之间的优先级别关系以及同级别运算符的运算顺序（结合方向）如下表： 
+\begin{center}
+\begin{tabular}{c|c|c|c}
+优先级别&运算符&运算形式&结合方向 \\
+\hline
+&( )&(e)& \\
+1&[ ]&a[e]& 从左至右 \\
+& . & a.x& \\
+\hline
+2&+ - \verb|~| &+a&从右至左 \\
+\hline
+3&* / \% &e1*e2&从左至右 \\
+\hline
+4& + - &e1-e2&从左至右 \\
+\hline 
+5& \verb|<< >>| &e1 \verb|<<| e2&从左至右 \\ 
+\hline
+6& \verb|&| &e1 \verb|&| e2&从左至右 \\
+\hline
+7& \verb|^| &e1 \verb|^| e2 &从左至右 \\
+\hline
+8& \verb | &e1 \verb |  e2 &从左至右  \\
+\hline 
+9& \verb|<  <=  >  >=|& e1 \verb|<| e2 &从左至右 \\
+\hline
+10& \verb|==  !=| & e1 \verb|==| e2 &从左至右 \\
+\hline 
+11& not & not e1 & 从左至右 \\
+\hline 
+12& and & e1 and e2 & 从左至右 \\
+\hline
+13& or & e1 or e2 & 从左至右 \\
+\hline
+\end{tabular}
+\end{center}
+在表中，优先级的数值越大，其优先级越低。优先级最高的为括号，最低的为运算符 or。
