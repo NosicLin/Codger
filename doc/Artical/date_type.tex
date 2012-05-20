@@ -1,15 +1,3 @@
-\documentclass[a4paper,10pt]{article}
-\usepackage{CJK}
-\usepackage{indentfirst}
-\usepackage{graphicx}
-\setlength{\parindent}{2em}
-\setlength{\parskip}{0.2em}
-\setlength{\itemsep}{0.1ex}
-
-\begin{document}
-\begin{CJK}{UTF8}{gbsn}
-\tableofcontents
-\newpage
 \section{数据类型}
 \subsection{对象}
 Codger语言的整体的设计思想为：一切皆是对象。整数，浮点数，字符串等基本的数据类型是对象，函数是对象，甚至类也是对象\ldots{} 因为这种特性，可以在源程序中使用类似于下面的语句:
@@ -53,14 +41,14 @@ codegr现在支持8种基本数据类型：布尔值，整数，长整数，浮�
 "[" [expr] { "," expr} [","] "]"
 \end{verbatim}
 \end{quote}
-\item 散列表则是一种关联性容器，散列表中每个元素都有键和值组成，键用于索引，值用于保存数据，定义规则为：
+\item 散列表则是一种关联性容器，散列表中每个元素由键和值组成，键用于索引，值用于保存数据，定义规则为：
 \begin{quote}
 \begin{verbatim}
 "{" [ expr "->" expr ] { "," expr "->" expr } [","] "}"
 \end{verbatim}
 \end{quote}
 \end{enumerate}
-定义规则使用EBNF文法表示\footnote{EBNF的全称为：Extended Backus-Naur Form，后面涉及到的文法全部都为EBNF文法}，expr表示表达式，双引号中表示字符序列， [\ldots{}]表示可选，\{\ldots{}\}表示重复一次或多次。
+定义规则使用EBNF\footnote{EBNF的全称为：Extended Backus-Naur Form，后面涉及到的文法全部都为EBNF文法}文法表示，expr表示表达式，双引号中表示字符序列， [\ldots{}]表示可选，\{\ldots{}\}表示重复零次或多次。
 
 特殊类型Nil用于表示空对象，类似于java中的NULL对象或者是python中的None对象，在源程序中用`Nil'来访问。
 
@@ -83,7 +71,16 @@ codegr现在支持8种基本数据类型：布尔值，整数，长整数，浮�
 \end{quote}
 其中identifier为标识符，表示函数名，当函数名为空时，则为匿名函数。arg表示函数的参数类型，参数类型有3种：
 \begin{description}
-\item[简单参数:]只由参数名组成，当函数调用时，参数的个数比须与定义中简单参数的个数相匹配。
+\item[简单参数:]只由参数名组成，当函数调用时，参数的个数比须与定义中简单参数的个数相匹配。例如：
+\begin{quote}
+\begin{verbatim}
+func add(x,y)
+    return x+y
+end 
+print add(3,5)   #输出结果为 8
+\end{verbatim}
+\end{quote}
+
 \item[缺省参数:]由参数名和表达式组成：\verb|identifier "=" expr|,缺省参数必须位于简单参数的后面，当函数调用时，参数个数比须大于等于简单参数的个数，参数的个数的最大值不能超过简单参数与缺省参数的总和，如果在调用时，缺省参数部分的值没有被指定，则会传入其相对应的\verb|expr|的值。例如：
 \begin{quote}
 \begin{verbatim}
@@ -112,14 +109,60 @@ print add_many(1,2,3,4)   #输出为10
 \end{description}
 如果在函数定义时，没有return语句，则返回对象Nil
 \subsection{类与实例}
+类是面向对象编程中基本的概念，类可以看做是有一个模板，这个模板决定了创建实例\footnote{为了和对象相区别，所以采用实例这个术语}的模样。类对象通过类似于函数调用的方法来创建实例，每个实例拥有属性和方法，实例的属性和方法统称为实例的成员。
+
+类可以在源程序中通过关键字class定义，同函数一样，类对象的创建是在运行时，而不是在解析源程序完成时。Codger中类也被视为对象，类可以拥有自己的属性和方法。
+\subsubsection{访问权限}
+在Codger中访问权限是从对象的角度来设计的，每个对象拥有0个或多个成员，当某个对象想要访问其它对象的某个成员时，要确保有足够的权限，否则虚拟机在运符时会抛出访问权限异常。Codger中对象成员的访问权限分为以下三类：
+\begin{enumerate}
+\item 私有的：该成员只有对象自身可以访问或者赋值。
+\item 受保护的：对象自身可以访问或者赋值该成员，其它对象只能访问，不能赋值。这一点和其它的面向对象编程语言例如C++或者java对受保护成员的定义差别很大。
+\item 公开的：对象自身可以访问或者赋值该成员，其它对象同样也可以访问和赋值。
+\end{enumerate}
+
+\subsubsection{继承}
+类可以看做是有一个模板，这个模板决定了创建实例的模样，如果另外一个类想要使用，修改或者是扩展这个模板，那么另一个类就需要继承该类。被继承的类称为父类，继承类称为子类，在源程序中可以通过关建字inherit实现。Codger中只支持单继承，一个类只能继承一个父类。继承时，父类的模板会被导入到子类的模块中，这个过程称为使用，如果在子类中，对父类模板中的某个成员重新进行了定义，则称作为修改，子类中定义父类模板中不存在的成员时，称作为父类模板的扩展。
+
+因为Codger的访问权限是从对象的角度设计的，所以在继承过程时，权限没有任何意义，即使有在父类模板中定义为私有的成员，也会被导入到子类模板中。并且子类可以对它的模块进行任意的修改，或者是重定义模板成员中的访问权限。
+
+\subsubsection{类定义}
+在Codger中使用下面的方法来定义一个类：
+\begin{quote}
+\begin{verbatim}
+"class" identifier [inherit expr]
+    {class_stmt}
+"end"
+
+class_stmt = [perm] [static] ( attr_declare |func_declare)
+attr_declare =  "attr" identifier ["=" expr] 
+perm ="public" | "protected" | "private"
+\end{verbatim}
+\end{quote}
+其中func\_declare见上一节中函数的定义， 在成员申明时如果没有指定访问权限，那么该成员的访问权限为缺省值受保护的，其中关键字static表示该成员属于类对象。在属性申明时，可以给该属性赋一个默认值，每当类创建一个实例时，实例的该属性会被设置为相应默认值。
+
+如果在类定义实现方法init，则在类创建实例时，init方法会被调用，用于初始化实例数据，init方法也称为构造函数。
+
 \subsection{模块} 
+模块是Codger组织源文件的一个基本方式，每个源文件被加载完成时，虚拟机内部会生成一个模块对象用于表示该源文件。当一个模块需要使用其它模块的数据时，可使用import关键字将其它模块导入到当前模块。虚拟机运行到import指令时，会首先检测需要导入的模块是否被加载，如果加载，则直接导入，如果需要导入的模块还没有被加载，虚拟机会加载该模块，然后再将该模块导入。
+
+模块可以使用export关键字，将对象导出，供其它模块访问。假设模块A导入了模块B，但模块A只能访问模块B中被导出的对象，例如：
+\begin{quote}
+\begin{verbatim}
+---------file b.gr ------------
+func add(x,y) return x+y end      #定义函数add
+export add                        #导出函数add
+func minus(x,y) return x-y end    #定义函数minus，但并未导出
+
+----------file a.gr -----------
+import b              #导入模块b
+print b.add(1,2)      #调用模块b中的add函数，输出为3
+print b.minus(2,1)    #虚拟机抛出成员minus在模块b中未定义异常
+
+\end{verbatim}
+\end{quote}
 
 
 
 
 
 
-
-
-\end{CJK}
-\end{document}
