@@ -1,9 +1,9 @@
 #ifndef _DRAW_FILE_LIST_H_
 #define _DRAW_FILE_LIST_H_
-#include<vector>
-#include<wx/listctrl.h>
+#include<wx/listbox.h>
 #include<wx/string.h>
 #include<wx/dir.h>
+#include<wx/treectrl.h>
 #include"DrawPlane.h"
 #include<wx/panel.h>
 #include<wx/dynarray.h>
@@ -15,8 +15,12 @@ class FileList:public wxPanel
 	private:
 		DrawPlane* m_draw_plane;
 		wxString m_dir;
-		wxListCtrl* m_list;
-		vector<wxString>* m_files;
+		//wxListBox* m_list;
+		wxTreeCtrl* m_tree;
+		wxTreeItemId m_tree_root;
+		wxTreeItemId m_tree_ifs;
+		wxTreeItemId m_tree_ls;
+		wxTreeItemId m_tree_simple;
 
 		wxFrame* m_parent;
 
@@ -32,7 +36,17 @@ class FileList:public wxPanel
 			int brefresh_id=wxNewId();
 
 			m_draw_plane=draw_plane;
-			m_list=new wxListCtrl(this,-1);
+			//m_list=new wxListBox(this,-1);
+
+			m_tree=new wxTreeCtrl(this,-1);
+			m_tree_root=m_tree->AddRoot(wxT("Scripts"));
+			m_tree_ifs=m_tree->AppendItem(m_tree_root,wxT("IFS"));
+			m_tree_ls=m_tree->AppendItem(m_tree_root,wxT("LSystem"));
+			m_tree_simple=m_tree->AppendItem(m_tree_root,wxT("Other"));
+
+
+
+
 			m_brefresh=new wxButton(this,brefresh_id,wxT("Refresh"));
 			m_bshow=new wxButton(this,bshow_id,wxT("Run"));
 			wxBoxSizer* vsizer=new wxBoxSizer(wxVERTICAL);
@@ -40,7 +54,7 @@ class FileList:public wxPanel
 
 			hsizer->Add(m_brefresh,1,wxALIGN_LEFT);
 			hsizer->Add(m_bshow,1,wxALIGN_RIGHT);
-			vsizer->Add(m_list,1,wxEXPAND);
+			vsizer->Add(m_tree,1,wxEXPAND);
 			vsizer->Add(hsizer,0,wxEXPAND);
 			this->SetSizer(vsizer);
 			this->SetAutoLayout(true);
@@ -50,7 +64,6 @@ class FileList:public wxPanel
 			this->Connect(bshow_id,wxEVT_COMMAND_BUTTON_CLICKED,
 					wxCommandEventHandler(FileList::OnShow));
 
-			m_files=new vector<wxString>();
 
 		}
 		void SetDir(wxString dir)
@@ -59,19 +72,39 @@ class FileList:public wxPanel
 		}
 		void OnRefresh(wxCommandEvent& event)
 		{
-			m_list->ClearAll();
-			m_files->clear();
+			ReloadFiles();
+		}
+		void ReloadFiles()
+		{
+			m_tree->DeleteChildren(m_tree_ifs);
+			m_tree->DeleteChildren(m_tree_ls);
+			m_tree->DeleteChildren(m_tree_simple);
 			wxDir dir(m_dir);
 			wxString file;
 			bool cont=dir.GetFirst(&file,wxEmptyString,wxDIR_FILES);
-			int i=0;
 			while(cont)
 			{
 				if(file.EndsWith(wxT(".gr")))
 				{
-					m_list->InsertItem(i,file);
-					m_files->push_back(file);
-					i++;
+					if(file.StartsWith(wxT("ifs")))
+					{
+						if(file.StartsWith(wxT("ifs_")))
+						{
+							m_tree->AppendItem(m_tree_ifs,file);
+						}
+					}
+					else if(file.StartsWith(wxT("ls")))
+					{
+						if(file.StartsWith(wxT("ls_")))
+						{
+							m_tree->AppendItem(m_tree_ls,file);
+						}
+					}
+					else 
+					{
+						m_tree->AppendItem(m_tree_simple,file);
+
+					}
 				}
 
 				cont=dir.GetNext(&file);
@@ -79,19 +112,21 @@ class FileList:public wxPanel
 		}
 		void OnShow(wxCommandEvent& event)
 		{
-			long item=-1;
-			item=m_list->GetNextItem(item,
-					wxLIST_NEXT_ALL,
-					wxLIST_STATE_SELECTED);
-			if(item==-1)
+			wxTreeItemId sel_id;
+			sel_id=m_tree->GetSelection();
+
+			wxString name=m_tree->GetItemText(sel_id);
+			wxPuts(wxT("File")+name);
+			if(name==wxT("")||name==wxT("Scripts")||
+				name==wxT("LSystem")||name==wxT("Other"))
 			{
 				
-				m_parent->SetStatusText(wxT("Please Selected An Item"));
+				m_parent->SetStatusText(wxT("Please Selected An Script To Draw"));
 			}
 			else
 			{
-				m_parent->SetStatusText(wxT("Run File: ")+m_files->at(item));
-				m_draw_plane->LoadFile(m_files->at(item));
+				m_parent->SetStatusText(wxT("Run File: ")+name);
+				m_draw_plane->LoadFile(name);
 			}
 		}
 };

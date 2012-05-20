@@ -247,8 +247,8 @@ try_stmt = ( try_part finally_part  "end") |
            ( try_part [catch_part] {catch_part} 
                       [finally_part] "end" )
 try_part = "try" try_demiliter stmts
-catch_part = "catch" [expr "->" identifier] 
-             {"," expr "->" identifier} try_demiliter stmts
+catch_part = "catch" [expr] { "," expr } ["as" identifier]
+             try_demiliter stmts
 finally = "finally" try_demiliter stmts
 try_demiliter = "\n"|";"
 \end{verbatim}
@@ -258,7 +258,7 @@ try_demiliter = "\n"|";"
 \begin{verbatim}
 try 
     i=a   #变量a未定义，运行时会抛出NameError
-catch NameError -> e
+catch NameError as e
     print "Catch "+e.name+"Not Defined"
 end 
 #输出为: "Catch a Not Defined"
@@ -291,7 +291,7 @@ print math.cos(math.pi)    #输出为: -1
 \end{verbatim}
 \end{quote}
 \subsubsection{export语句}
-export用于把当前模块的对象导出，供其它模块访问，使用语法规则为:
+export用于把当前模块的对象导出，供其它模块访问，使用语法规则用文法表示为:
 \begin{quote}
 \begin{verbatim}
 export_stmt = ( "export" identifier ) |

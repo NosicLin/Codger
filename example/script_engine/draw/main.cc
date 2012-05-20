@@ -51,6 +51,7 @@ bool  MyApp::OnInit()
 	m_frame->CreateStatusBar();
 
 	m_frame->Show(true);
+	m_files->ReloadFiles();
 
 	return true;
 
