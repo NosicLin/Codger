@@ -1,0 +1,40 @@
+import ls 
+
+func make_tree(level)
+	if level==0
+		return "F"
+	else
+		return $make_tree(level-1)+"[+"+$make_tree(level-1)+"]"+$make_tree(level-1)+"[-"+$make_tree(level-1)+"+"+$make_tree(level-1)+"]"
+	end 
+end 
+
+l=ls.LSystem(width*0.1,100,90,25,30)
+lang=make_tree(1)
+setColor(128.0/255.0,188.0/255.0,82.0/255.0)
+l.Draw(lang)
+
+l=ls.LSystem(width*0.25,100,90,25,5)
+lang=make_tree(5)
+setColor(128.0/255.0,188.0/255.0,82.0/255.0)
+l.Draw(lang)
+
+
+func make_tree2(level)
+	if level==0
+		return "F"
+	else
+		return $make_tree2(level-1)+$make_tree2(level-1)+"+[+"+$make_tree2(level-1)+"-"+$make_tree2(level-1)+"-"+$make_tree2(level-1)+"]-[-"+$make_tree2(level-1)+"+"+$make_tree2(level-1)+"+"+$make_tree2(level-1)+"]"
+	end
+end 
+
+l=ls.LSystem(width*0.45,100,90,25,30)
+lang=make_tree2(1)
+setColor(66.0/255.0,139.0/255.0,27.0/255.0)
+setColor(29.0/255.0,237.0/255.0,88.0/255.0)
+l.Draw(lang)
+#print lang
+
+l=ls.LSystem(width*0.65,100,90,25,7.5)
+lang=make_tree2(4)
+setColor(29.0/255.0,237.0/255.0,88.0/255.0)
+l.Draw(lang)

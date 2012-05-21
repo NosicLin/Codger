@@ -1,0 +1,87 @@
+\documentclass[a4paper,10pt]{article}
+% define the title
+\usepackage{graphicx}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage{CJK}
+\usepackage[dvipdfm,
+            pdfstartview=FitH,
+            CJKbookmarks=true,
+            bookmarksnumbered=true,
+            bookmarksopen=true,
+            colorlinks, %注释掉此项则交叉引用为彩色边框(将colorlinks和pdfborder同时注释掉)
+            pdfborder=001, %注释掉此项则交叉引用为彩色边框
+            linkcolor=blue,
+            anchorcolor=blue,
+            citecolor=blue
+            ]{hyperref}
+%===================== 重定义字体、字号命令 =====================%
+\newcommand{\song}{\CJKfamily{song}}    % 宋体   (Windows自带simsun.ttf)
+\newcommand{\fs}{\CJKfamily{fs}}        % 仿宋体 (Windows自带simfs.ttf)
+\newcommand{\kai}{\CJKfamily{kai}}      % 楷体   (Windows自带simkai.ttf)
+\newcommand{\hei}{\CJKfamily{hei}}      % 黑体   (Windows自带simhei.ttf)
+\newcommand{\li}{\CJKfamily{li}}        % 隶书   (Windows自带simli.ttf)
+\newcommand{\you}{\CJKfamily{you}}      % 幼圆   (Windows自带simyou.ttf)
+%
+\newcommand{\chaoda}{\fontsize{55pt}{\baselineskip}\selectfont}
+\newcommand{\chuhao}{\fontsize{42pt}{\baselineskip}\selectfont}     % 字号设置
+\newcommand{\xiaochuhao}{\fontsize{36pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\yihao}{\fontsize{28pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\erhao}{\fontsize{21pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaoerhao}{\fontsize{18pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\sanhao}{\fontsize{15.75pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\xiaosanhao}{\fontsize{15pt}{\baselineskip}\selectfont} % 字号设置
+\newcommand{\sihao}{\fontsize{14pt}{\baselineskip}\selectfont}      % 字号设置
+\newcommand{\xiaosihao}{\fontsize{12pt}{14pt}\selectfont}           % 字号设置
+\newcommand{\wuhao}{\fontsize{10.5pt}{12.6pt}\selectfont}           % 字号设置
+\newcommand{\xiaowuhao}{\fontsize{9pt}{11pt}{\baselineskip}\selectfont}   % 字号设置
+\newcommand{\liuhao}{\fontsize{7.875pt}{\baselineskip}\selectfont}  % 字号设置
+\newcommand{\qihao}{\fontsize{5.25pt}{\baselineskip}\selectfont}    % 字号设置
+%=============================================================================%
+\renewcommand\listfigurename{图　目　录}
+\renewcommand\listtablename{表　目　录}
+\renewcommand\figurename{图}
+\renewcommand\tablename{表}
+\begin{CJK}{GBK}{st}\end{CJK}
+
+%====================定义图，公式标编号等格式=============
+\numberwithin{figure}{section} \numberwithin{table}{section}
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{section}-\arabic{figure}}
+\renewcommand{\thetable}{\arabic{section}-\arabic{table}}
+%==========================================================
+%==================================================================
+%==================================================================
+%==================================================================
+%==================================================================
+%==================================================================
+%==================================================================
+\begin{document}
+\begin{CJK}{UTF8}{gbsn}
+\author{陈林}
+\title{Codger一种面向对象语言的设计和解析器的设计与实现}
+\date{2012-4-5}
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+%\input{introduction}
+%\input{lexical}
+%\input{date_type}
+%\input{expression}
+%\input{stmt}
+
+\include{introduction}
+\include{lexical}
+\include{date_type}
+\include{expression}
+\include{stmt}
+
+\appendix
+\include{bytecode_internal}
+
+\end{CJK}
+\end{document}

@@ -1,0 +1,83 @@
+\section{Codger文法}
+\begin{verbatim}
+#start symbol: module 
+module = stmts
+stmts = {stmt_delimiter} [stmt] 
+        { stmt_delimiter {stmt_delimiter} stmt } {stmt_delimiter}
+       
+stmt_delimiter = ";" | "\n"
+stmt= expr_stmt | assing_stmt | print_stmt | for_stmt |
+      while_stmt | if_stmt | break_stmt | continue_stmt |
+      return_stmt | throw_stmt | try_stmt | 
+      class_declare | import_stmt | export_stmt 
+
+expr_stmt = expr 
+assing_stmt = assing_object assing_oper expr 
+assing_oper = "=" | "*=" | "/=" | "%=" | "+=" |
+             "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
+assing_object= identifier | upper_id |
+              expr "[" expr "]" | expr "." identifier 
+print_stmt = "print" [expr] {"," expr}
+for_stmt = "for" assing_object "in" expr for_delimiter stmts "end"
+for_delimiter = "\n" | ";" | "do"
+while_stmt = "while" expr while_delimiter stmts "end"
+while_delimiter = "\n" |";" |"do"
+if_stmt = if_part {elif_part} [else_part] "end"
+if_part = "if" expr if_delimiter stmts 
+elif_part = "elif" expr if_delimiter stmts
+else_part = "else" stmts
+if_delimiter = "\n"|";"|"then"
+break_stmt="break"
+continue_stmt="continue"
+return_stmt="return"
+throw_stmt="throw" [expr]
+try_stmt = try_part finally_part "end" |
+           try_part [catch_part] {catch_part}
+           [finally_part] "end"
+try_part = "try" stmt_delimiter stmts
+catch_part = "catch" [expr] {"," exrp} ["as" identifier]
+             stmt_delimiter stmts
+finally_part = "finally" stmt_delimiter stmts
+class_stmt = "class" identifier ["inherit" expr ] 
+              stmt_delimiter {class_stmt} "end"
+class_stmt = [perm] ["static"] (attr_declare | func_declare )
+attr_declare = "attr" identifier ["=" expr]
+perm = "public" | "protected" | "private" 
+
+func_declare = "func" identifier "(" [arg] {"," arg} [","] ")"
+                stmt_delimiter  stmts "end"
+lambda_declar = "func" "(" [arg] {"," arg} [","] ")"
+                stmt_delimiter  stmts "end"
+#参数类型顺序的检测靠解析器完成
+arg = identifier | identifier "=" expr | "*" identifier  
+
+import_stmt = "import" identifier {"." identifier} ["as" identifier]
+export_stmt = "export" identifier | "export" expr "as" identifier
+
+literal = INTEGER | LONG_INTERGER | FLOAT | STRING | 
+          FALSE | TRUE |  NIL 
+identifier = NAME 
+upper_id ="$" NAME 
+
+array = "[" [expr] {"," expr} [","] "]"
+hash = "{" [expr "->" expr] {"," expr "->" expr} [","] "}"
+
+primary_expr = literal | "(" expr ")" |identifier | upper_id | 
+               array | hash | func_declare | lambda_declar 
+postfix_expr = primary_expr {postfix_oper}
+postfix_oper = "." identifier | "[" expr "]" | "(" arg_list ")"
+arg_list = [expr] {"," expr} [","]
+unary_expr = {("+"|"-"|"~") } postfix_expr 
+multiply_expr = unary_expr { ("*" |"/"|"%") unary_expr }
+addtive_expr = multiply_expr { ("+"|"-") multiply_expr }
+shift_expr = addtive_expr {("<<"|">>") addtive_expr} 
+bit_add_expr = shift_expr { "&" shift_expr }
+bit_xor_expr = bit_add_expr { "^" bit_add_expr }
+bit_or_expr = bit_xor_expr { "|" bit_or_expr }
+relation_expr = bit_or_expr {("<"|"<="|">="|">") bit_or_expr}
+equal_expr = "relation_expr {("=="|"!=") relation_expr }
+logic_not_expr = {"not"} equal_expr 
+logic_and_expr = logic_not_expr { "and" logic_not_expr }
+logic_or_expr = logic_and_expr { "or" logic_or_expr }
+expr = logic_or_expr
+\end{verbatim}

@@ -5,8 +5,8 @@ parm=[
 [0.5,0.5,-0.5,0.5,0.5,0.5,0.5],
 ]
 iter=ifs.make_ifs(0.0,0.0,parm)
-hshift=Float(width)/4
-vshift=Float(height)/4
+hshift=Float(width)*0.355
+vshift=Float(height)*0.4
 #w=width-hshift*2
 #h=height-vshift*2
 w=width/3

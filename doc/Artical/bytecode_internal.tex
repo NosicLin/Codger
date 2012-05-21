@@ -1,0 +1,685 @@
+\section{字节码的内部执行过程}
+\subsection{不带参数的字节码}
+\begin{enumerate}
+\item OP\_CALL: 方法调用，需要操作数2个，例如: cos(3) \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.call(Nil,r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_CALL\_WITH\_HOST: 调用对象的方法，需要操作数3个，例如:a.add(3)\\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r2=dstack.pop()
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r1.op_call(r1,r2)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_SET\_ITEM: 给集合指定的元素赋值，需要3个操用数。例如: a[3]=4  \\
+执行过程为: 
+\begin{quote}
+\begin{verbatim}
+r2=dstack.pop()
+r1=dstack.pop()
+r0=dstack.pop()
+r1.set_item(r2,r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_GET\_ITEM: 访问集合中指定的元素，需要2个操作数，例如: a[3] \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.get_item(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_POSITIVE: 一元运算符 + ，需要1个操作数，例如: +a \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=r0.positive()
+dstack.push(acc) 
+\end{verbatim}
+\end{quote}
+
+\item OP\_NEGATIVE: 一元运算符 - ，需要1个操作数，例如:-a \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=r0.negative()
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_NEGATED: 一元运算符 \verb|~| ，需要1个操作数，例如：\verb|~|a \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=r0.negated()
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_MUL: 二元运算符 * ，需要2个操作数，例如：1*2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.mul(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_DIV：二元运算符 \verb|/| ，需要2个操作数，例如：1\verb|/|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.div(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_MOD：二元运算符 \verb|%| ，需要2个操作数，例如：1\verb|%|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.mod(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_PLUS：二元运算符 \verb|+| ，需要2个操作数，例如：1\verb|+|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.plus(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_MINUS：二元运算符 \verb|-| ，需要2个操作数，例如：1\verb|-|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.minus(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LSHIFT：二元运算符 \verb|<<| ，需要2个操作数，例如：1\verb|<<|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.lshift(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_RSHIFT：二元运算符 \verb|>>| ，需要2个操作数，例如：1\verb|>>|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.rshift(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_AND：二元运算符 \verb|&| ，需要2个操作数，例如：1\verb|&|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.and(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_XOR：二元运算符 \verb|^| ，需要2个操作数，例如：1\verb|^|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.xor(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_OR：二元运算符 \verb^|^ ，需要2个操作数，例如：1\verb^|^2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.or(r1)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LT：二元运算符 \verb|<| ，需要2个操作数，例如：1\verb|<|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.lt(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LE：二元运算符 \verb|<=| ，需要2个操作数，例如：1\verb|<=|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.le(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_EQ：二元运算符 \verb|==| ，需要2个操作数，例如：1\verb|==|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.eq(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_NE：二元运算符 \verb|!=| ，需要2个操作数，例如：1\verb|!=|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.ne(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_GE：二元运算符 \verb|>=| ，需要2个操作数，例如：1\verb|>=|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.ge(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_GT：二元运算符 \verb|>| ，需要2个操作数，例如：1\verb|>|2 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.gt(r1)?true:false
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_BOOL：布尔类型转换，需要1个操作数\\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=r0.bool()
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_BOOL\_NOTAKE：布尔类型转换，需要1个操作数，但操作数不会被弹出数据栈\\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.top()
+acc=r0.bool()
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LOGIC\_NOT：逻辑运算符not，需要1个操作数，例如：not 1 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=not r0.bool()
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_PRINT：输出指令，需要1个操作数，例如： print ``Codger'' \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r0.print()
+\end{verbatim}
+\end{quote}
+
+\item OP\_PRINT\_LN：输出换行符指令，不需操作数，例如：print \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+print("\n")
+\end{verbatim}
+\end{quote}
+
+\item OP\_ITER：获取对象的迭代器，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+acc=r0.iter()
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_ITER\_NEXT：获取迭代器的下一个元素，需要1个操作数，但操作数不会被弹出数据栈 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.top()
+acc=r0.iter_next()
+if acc != iter_stop
+    pc+=3
+    dstack.push(acc)
+end
+\end{verbatim}
+\end{quote}
+
+\item OP\_ARRAY\_BEGIN：创建一个数组对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=Array()       #创建函数对象
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_ARRAY\_PUSH：向数组对象的尾部增加元素，需要2个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=dstack.pop()
+r0.push_back(r1)
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_ARRAY\_END：保留指令
+\item OP\_FUNC\_BEGIN：创建一个函数对象,需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=Func()                 #创建函数对象
+acc.set_scope(cur_scope)   #引用当前作用域
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_FUNC\_DEFAULT\_ARGS：设置函数对象的默认参数的值，如果函数有多个默认参数，该指令会把值赋给第一个还未设置的默认参数，需要2个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_defalut_arg(r1)
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_CLASS\_INHERIT：类对象继承另一个类对象，需要操作数2个 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_inherit(r1)
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LOAD\_NIL：把空对象Nil压入数据栈，需要0个操作数  \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=Nil
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_DISCARD：从数据栈中弹出一个对象，并抛弃，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+dstack.pop()
+\end{verbatim}
+\end{quote}
+
+\item OP\_DUP\_DATA1：复制数据栈栈顶的对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.top()
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_DUP\_DATA2：复制数据栈栈顶的2个对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r2=dstack[sp-1]
+r1=dstack[sp-2]
+dstack.push(r0)
+dstack.push(r1)
+\end{verbatim}
+\end{quote}
+
+\item OP\_DUP\_DATA3：复制数据栈栈顶的3个对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r2=dstack[sp-1]
+r1=dstack[sp-2]
+r0=dstack[sp-3]
+dstack.push(r0)
+dstack.push(r1)
+dstack.push(r2)
+\end{verbatim}
+\end{quote}
+
+\item OP\_DATA\_SWAP0\_1：交换数据栈栈顶第0个对象与第1个对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-2]
+dstack[sp-2]=acc
+\end{verbatim}
+\end{quote}
+
+\item OP\_DATA\_SWAP0\_2：交换数据栈栈顶第0个对象与第2个对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-3]
+dstack[sp-3]=acc
+\end{verbatim}
+\end{quote}
+
+\item OP\_DATA\_SWAP0\_3：交换数据栈栈顶第0个对象与第3个对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-4]
+dstack[sp-4]=acc
+\end{verbatim}
+\end{quote}
+
+\item OP\_EXIT：退出指令，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+EgThread.exit()
+\end{verbatim}
+\end{quote}
+
+\item OP\_RETURN：栈帧返回指令，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+EgThread.return(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_RETURN\_NIL：栈帧返回指令，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=Nil
+EgThread.return(r0)
+\end{verbatim}
+\end{quote}
+\end{enumerate}
+
+
+
+
+\subsection{带参数的字节码}
+\begin{enumerate}
+\item OP\_GET\_ATTR：访问对象成员，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=symbols_pool[rd]
+acc=r0.get_attr(r1,r0==sframe.host)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+其中sframe表示当前的栈帧，host为sframe的属主对象，rd是指令的参数。
+
+\item OP\_SET\_ATTR：给对象的成员赋值，需要2个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=dstack.pop()
+r2=symbols_pool[rd]
+r1.set_attr(r2,r0,r1==sframe.host)
+\end{verbatim}
+\end{quote}
+
+\item OP\_CLASS\_BEGIN：创建一个类对象，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=Class()
+r0=symbols_pool[rd]
+acc.set_name(r0)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_CLASS\_TEMPLATE：向类的模板中增加元素，需要2个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r2=perm_symbols_pool[rd]
+r1=dstack.pop()
+r0=dstack.pop()
+r0.add_template(r2,r1)
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_CLASS\_ATTR：设置类对象的属性或方法，需要2个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r2=perm_symbols_pool[rd]
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_attr(r2,r1)
+dstack.push(r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_FUNC\_OPCODE：设置函数对象的字节码，需要1个操作数,但不会弹出数据栈 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.top()
+r1=opcodes_pool[rd]
+r0.set_opcode(r1)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LOAD\_CONST：加载常量到数据栈,需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+acc=consts_pool[rd]
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LOAD\_SYMBOL：从当前作用域中查找符号的值到数据栈,需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=symbols_pool[rd]
+acc=scope.lookup(r0)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_LOAD\_U\_SYMBOL：从上层作用域到顶层作用域中查找符号的值到数据栈,需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=symbols_pool[rd]
+acc=scope.lookup_upper(r0)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_STORE\_SYMBOL：把符号的值到存入到当前作用域,需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=symbols_pool[rd]
+scope.map(r1,r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_STORE\_U\_SYMBOL：把符号的值到存入到上层作用域,需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=symbols_pool[rd]
+scope.map_upper(r1,r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_IMPORT：模块导入指令,需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=symbols_pool[rd]
+acc=EgThread.import(r0)
+dstack.push(acc)
+\end{verbatim}
+\end{quote}
+
+\item OP\_EXPORT：导出指令,需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+r1=symbols_pool[rd]
+cur_module.set_attr(r1,r0)
+\end{verbatim}
+\end{quote}
+
+\item OP\_BREAK：保留指令，用于辅助字节码生成，最终会被 OP\_JUMPR* 指令代替。
+\item OP\_CONTINUE：保留指令，用于辅助字节码生成，最终会被 OP\_JUMPR* 指令代替。
+
+\item OP\_JUMPR\_FORWARD：向前跳转指令，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+pc+=rd-3
+\end{verbatim}
+\end{quote}
+
+\item OP\_JUMPR\_BACK：向后跳转指令，需要0个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+pc-=rd+3
+\end{verbatim}
+\end{quote}
+
+\item OP\_JUMPR\_FALSE\_FORWARD：向前跳转指令，只有假时执行，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+rs=r0.bool()
+if(!rs) pc+=rd-3
+\end{verbatim}
+\end{quote}
+
+\item OP\_JUMPR\_TRUE\_FORWARD：向前跳转指令，只有真时执行，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+rs=r0.bool()
+if(rs) pc+=rd-3
+\end{verbatim}
+\end{quote}
+
+\item OP\_JUMPR\_FALSE\_BACK：向后跳转指令，只有假时执行，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+rs=r0.bool()
+if(!rs) pc-=rd+3
+\end{verbatim}
+\end{quote}
+
+\item OP\_JUMPR\_TRUE\_BACK：向后跳转指令，只有真时执行，需要1个操作数 \\
+执行过程为：
+\begin{quote}
+\begin{verbatim}
+r0=dstack.pop()
+rs=r0.bool()
+if(rs) pc-=rd+3
+\end{verbatim}
+\end{quote}
+\end{enumerate}

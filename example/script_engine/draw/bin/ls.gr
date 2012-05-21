@@ -20,9 +20,9 @@ class LSystem
 	attr cur
 	attr stack
 	attr d_angle
-	func init(x,y,angle,length)
+	func init(x,y,begin_angle,angle,length)
 		this.d_angle=angle/180.0*$math.pi
-		this.cur=$LState(x,y,0,length)
+		this.cur=$LState(x,y,begin_angle/180.0*$math.pi,length)
 		this.stack=[]
 	end 
 	func Draw(lang)
