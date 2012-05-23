@@ -133,7 +133,7 @@ print add_many(1,2,3,4)   #输出为10
     {class_stmt}
 "end"
 
-class_stmt = [perm] [static] ( attr_declare |func_declare)
+class_stmt = [perm] ["static"] ( attr_declare |func_declare)
 attr_declare =  "attr" identifier ["=" expr] 
 perm ="public" | "protected" | "private"
 \end{verbatim}

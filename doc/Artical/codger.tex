@@ -1,23 +1,93 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[a4paper,12pt]{article}
 \usepackage{CJK}
 \usepackage{indentfirst}
 \usepackage{graphicx}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+\usepackage{titletoc}
+\titlecontents{section}[2em]{\vspace{.25\baselineskip}} 
+    {\bf\large\thecontentslabel\quad}{} 
+    {\hspace{.5em}\titlerule*[10pt]{$\cdot$}\contentspage}
+
+\titlecontents{subsection}[2em]{\vspace{.25\baselineskip}} 
+    {\normalsize\thecontentslabel\quad}{} 
+    {\hspace{.5em}\titlerule*[10pt]{$\cdot$}\contentspage}
+
+\titlecontents{subsubsection}[2em]{\vspace{.25\baselineskip}} 
+    {\small\thecontentslabel\quad}{} 
+    {\hspace{.5em}\titlerule*[10pt]{$\cdot$}\contentspage}
 
 \setlength{\parindent}{2em}
 \setlength{\parskip}{0.2em}
 \setlength{\itemsep}{0.1ex}
+\setlength{\baselineskip}{20pt}
+
+
+
 
 %opening
 
 \begin{document}
-\begin{CJK}{UTF8}{gbsn}
-\author{陈林}
-\title{Codger一种面向对象语言的设计和解析器的设计与实现}
-\date{2012-4-5}
-\maketitle
+\begin{CJK}{UTF8}{song}
+\renewcommand{\contentsname}{\center{目\quad 录}}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\abstractname}{\Large摘\quad要}
+
+
+%\author{陈林}
+%\title{Codger一种面向对象语言的设计与实现}
+%\date{\today}
+%\maketitle
+\begin{abstract}
+中文摘要部分
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+\end{abstract}
 \newpage
+
+
+\renewcommand{\abstractname}{\Large Abstract}
+
+
+\begin{abstract}
+english abstract 
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary
+today is a good dary 
+\newline
+\newline
+\newline
+\large\textbf{keywords}  {asdas,fa,adfas,dsf}
+\end{abstract}
+
+\newpage
+
 \tableofcontents
-\newpage
+\clearpage
+\setcounter{page}{1}
+
+\addcontentsline{toc}{section}{\large引言}
+xjhf
+sfdsf 
+
+
+
 %\input{introduction}
 %\input{lexical}
 %\input{date_type}
@@ -29,10 +99,19 @@
 \include{date_type}
 \include{expression}
 \include{stmt}
+\include{translate_fw}
 
+
+\newpage
+\addcontentsline{toc}{section}{\large致谢}
+\begin{center}{致\quad\quad\quad\quad谢}
+\end{center}
+
+\addcontentsline{toc}{section}{\large参考文献}
+\addcontentsline{toc}{section}{\large附录}
 \appendix
+\include{grammer}	
 \include{bytecode_internal}
-\include{grammer}
 
 \end{CJK}
 \end{document}

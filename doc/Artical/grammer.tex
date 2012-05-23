@@ -6,17 +6,20 @@ stmts = {stmt_delimiter} [stmt]
         { stmt_delimiter {stmt_delimiter} stmt } {stmt_delimiter}
        
 stmt_delimiter = ";" | "\n"
+#like continue,break stmt can't not appear in stmts expect 
+#for_smt ,while_stmt. interpreter will check  
 stmt= expr_stmt | assing_stmt | print_stmt | for_stmt |
       while_stmt | if_stmt | break_stmt | continue_stmt |
       return_stmt | throw_stmt | try_stmt | 
       class_declare | import_stmt | export_stmt 
 
 expr_stmt = expr 
+#interpreter has extra restrictions for assing_object
 assing_stmt = assing_object assing_oper expr 
+assing_object=expr
 assing_oper = "=" | "*=" | "/=" | "%=" | "+=" |
              "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
-assing_object= identifier | upper_id |
-              expr "[" expr "]" | expr "." identifier 
+              
 print_stmt = "print" [expr] {"," expr}
 for_stmt = "for" assing_object "in" expr for_delimiter stmts "end"
 for_delimiter = "\n" | ";" | "do"
@@ -29,7 +32,7 @@ else_part = "else" stmts
 if_delimiter = "\n"|";"|"then"
 break_stmt="break"
 continue_stmt="continue"
-return_stmt="return"
+return_stmt="return" [expr]
 throw_stmt="throw" [expr]
 try_stmt = try_part finally_part "end" |
            try_part [catch_part] {catch_part}
@@ -48,7 +51,7 @@ func_declare = "func" identifier "(" [arg] {"," arg} [","] ")"
                 stmt_delimiter  stmts "end"
 lambda_declar = "func" "(" [arg] {"," arg} [","] ")"
                 stmt_delimiter  stmts "end"
-#参数类型顺序的检测靠解析器完成
+#interpreter will check arg type sequence
 arg = identifier | identifier "=" expr | "*" identifier  
 
 import_stmt = "import" identifier {"." identifier} ["as" identifier]

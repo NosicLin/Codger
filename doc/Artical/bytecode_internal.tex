@@ -649,7 +649,7 @@ pc-=rd+3
 \begin{verbatim}
 r0=dstack.pop()
 rs=r0.bool()
-if(!rs) pc+=rd-3
+if(not rs) pc+=rd-3
 \end{verbatim}
 \end{quote}
 
@@ -669,7 +669,7 @@ if(rs) pc+=rd-3
 \begin{verbatim}
 r0=dstack.pop()
 rs=r0.bool()
-if(!rs) pc-=rd+3
+if(not rs) pc-=rd+3
 \end{verbatim}
 \end{quote}
 

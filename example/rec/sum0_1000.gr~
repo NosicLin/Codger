@@ -9,7 +9,6 @@ end
 print sum(300000)
 
 x=0
-while x<100
-    sum(1000)
-    x+=1
+while 2
+	x+=1
 end 

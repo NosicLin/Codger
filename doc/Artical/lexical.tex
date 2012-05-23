@@ -3,18 +3,25 @@ codger源程序由一系列具有独立意义的基本语法单位--单词组成
 
 解析器中的语法识别模块用于对codger源程序进行词法分析，从输入字符流中扫描出由字符序列组成的单词。并把识别出的单词交给后面的语法分析模块进一步处理，并在识别过程中检测是否存在非法的单词。
 \subsection{关键字}
-codger中关键字具有专门的意义与用途，它们不能被当作一般的标识符来使用，这些关键字有：and, as, attr, break, catch, class,
-continue, do, elif, else, end, false, finally, for, from, func, if, import, in, inherit, new, not, 
-or, print, private, protected, public, return, static, then, to, true, try, while。
-\subsection{标识符}
-标识符用于定义变量，函数，类，方法等所使用的名称，解析器没有限定标识符的长度，但在定义标识符时，需要遵守一定的规则：以字母或者下画线开头，后面可以接零个或多个字母、数字、下画线，并且区会字母的大写与小写。用bnf文法表示为：
+codger中关键字具有专门的意义与用途，它们不能被当作一般的标识符来使用，这些关键字有：
 \begin{quote}
 \begin{verbatim}
-identifier ::=(letter|"_"|)(letter|digit|"_")*
-digit ::="0".."9"
-letter ::=lowercase|uppercase
-lowercase ::="a".."z"
-uppercase ::="A".."Z"
+and, as, attr, break, catch, class, continue, export,
+do, elif, else, end, false, finally, for, from, func, 
+if, import, in, inherit, new, not, or, print, private, 
+protected, public, return, static, then, to, true,
+try, while。
+\end{verbatim}
+\end{quote}
+\subsection{标识符}
+标识符用于定义变量，函数，类，方法等所使用的名称，解析器没有限定标识符的长度，但在定义标识符时，需要遵守一定的规则：以字母或者下画线开头，后面可以接零个或多个字母、数字、下画线，并且区会字母的大写与小写。用文法表示为：
+\begin{quote}
+\begin{verbatim}
+identifier =(letter|"_"|)(letter|digit|"_")*
+digit ="0".."9"
+letter =lowercase|uppercase
+lowercase ="a".."z"
+uppercase ="A".."Z"
 \end{verbatim}
 \end{quote}
 \subsection{特殊符号与运算符}
@@ -28,67 +35,69 @@ uppercase ::="A".."Z"
 \end{verbatim}
 \end{quote}
 \subsection{整数}
-整数是一种与机器平台相关的数据类型，在32位机上，其表示范围为 $-2^{31}$ 到 $2^{31}-1$。而在64位机上，其表示范围为$-2^{63}$ 到 $2^{63}-1$ 。整数的表示范围有限，在设计程序时需要考虑运算结果溢出的情况。整数可以在codger源程序中显示的定义，整数又被分为二进制整数，八进制整数，十进制整数，十六进制整数。二进制整数以0b或者0B开头，后面紧接着一个或多个0或1；八进制整数以0或者0o、0O开头，后面紧接数字一个或多个0－7；十进制整数以1－9开头，后面紧接数字零个或多个0－9，或者是十进制整数只有一位0；十六进制整数以0x或都0X开头，后面紧接一个或者多个数字0－9、a－f、A－F。用bnf文法表示为：
+整数是一种与机器平台相关的数据类型，在32位机上，其表示范围为 $-2^{31}$ 到 $2^{31}-1$。而在64位机上，其表示范围为$-2^{63}$ 到 $2^{63}-1$ 。整数的表示范围有限，在设计程序时需要考虑运算结果溢出的情况。整数可以在codger源程序中显示的定义，整数又被分为二进制整数，八进制整数，十进制整数，十六进制整数。二进制整数以0b或者0B开头，后面紧接着一个或多个0或1；八进制整数以0或者0o、0O开头，后面紧接数字一个或多个0－7；十进制整数以1－9开头，后面紧接数字零个或多个0－9，或者是十进制整数只有一位0；十六进制整数以0x或都0X开头，后面紧接一个或者多个数字0－9、a－f、A－F。用文法表示为：
 \begin{quote}
 \begin{verbatim}
-integer::=decimalinteger|octinteger|hexinteger|bininteger
-decimalinteger ::= nonzerodigit digit* | "0"
-octinteger ::= "0" ("o" | "O") octdigit+ | "0" octdigit+
-hexinteger ::= "0" ("x" | "X") hexdigit+
-bininteger ::= "0" ("b" | "B") bindigit+
-nonzerodigit ::= "1"..."9"
-octdigit ::= "0"..."7"
-bindigit ::= "0" | "1"
-hexdigit ::= digit | "a"..."f" | "A"..."F"
+integer =decimalinteger|octinteger|hexinteger|bininteger
+decimalinteger = nonzerodigit digit* | "0"
+octinteger = "0" ("o" | "O") octdigit+ | "0" octdigit+
+hexinteger = "0" ("x" | "X") hexdigit+
+bininteger = "0" ("b" | "B") bindigit+
+nonzerodigit = "1"..."9"
+octdigit = "0"..."7"
+bindigit = "0" | "1"
+hexdigit:= digit | "a"..."f" | "A"..."F"
 \end{verbatim}
 \end{quote}
 
 \subsection{长整数}
-整数表示范围有限，在进行大数据运算时受到限制，Codger 提贡长整数用于解决这种问题。长整数是一种与机器无关的数据类型，可以进行任意大小的数据运算，不用去考虑数据溢出问题，但是前提是你的计算机有中够大的内存空间，来保存这些数据。 长整数可以在源程序中显示的定义，定义方法同整数一样，只有在后面多了一位字符L或者是l。用bnf文法表示为：
+整数表示范围有限，在进行大数据运算时受到限制，Codger 提贡长整数用于解决这种问题。长整数是一种与机器无关的数据类型，可以进行任意大小的数据运算，不用去考虑数据溢出问题，但是前提是你的计算机有中够大的内存空间，来保存这些数据。 长整数可以在源程序中显示的定义，定义方法同整数一样，只有在后面多了一位字符L或者是l。用文法表示为：
 \begin{quote}
  \begin{verbatim}
-  longinteger ::= integer ("l" | "L")
+  longinteger = integer ("l" | "L")
  \end{verbatim}
 \end{quote}
 
 \subsection{浮点数}
-在codger中采用的是32位浮点数，其数值范围约为：$-3.4*10^{-38}$ 到 $-3.4*10^{38}$ 。浮点数由三个部分组成：整数部分，浮点部分，指数部分。浮点数可以在源程序中显示定义，定义时整数部分与指数部分可以省去。用bnf文法表示浮点数为：
+在codger中采用的是32位浮点数，其数值范围约为：$-3.4*10^{-38}$ 到 $-3.4*10^{38}$ 。浮点数由三个部分组成：整数部分，浮点部分，指数部分。浮点数可以在源程序中显示定义，定义时整数部分与指数部分可以省去。用文法表示浮点数为：
 \begin{quote}
  \begin{verbatim}
-floatnumber ::= pointfloat | exponentfloat
-pointfloat ::= [intpart] "." digit+
-exponentfloat ::= (intpart | pointfloat) exponent
-intpart ::= digit+
-exponent ::= ("e" | "E") ["+" | "-"] digit+
+floatnumber = pointfloat | exponentfloat
+pointfloat = [intpart] "." digit+
+exponentfloat = (intpart | pointfloat) exponent
+intpart = digit+
+exponent = ("e" | "E") ["+" | "-"] digit+
  \end{verbatim}
 \end{quote}
 \subsection{字符串}
-字符串可以在源程序中显示定义，使用规则为：以双引号开头和双引号结尾，中间可以是除 \verb \ 和换行符以处的任意字符，其中\verb \ 用于转义其它特殊字符，如果想要以多行的形式书写字符串，需要在每一行的未尾加上\verb \ 。用bnf文法表示为：
+字符串可以在源程序中显示定义，使用规则为：以双引号开头和双引号结尾，中间可以是除 \verb \ 和换行符以处的任意字符，其中\verb \ 用于转义其它特殊字符，如果想要以多行的形式书写字符串，需要在每一行的未尾加上\verb \ 。用文法表示为：
 \begin{quote}
  \begin{verbatim}
-string ::=`"'stringitem*`"'
-stringitem ::= <any source character except "\" 
+string =`"'stringitem*`"'
+stringitem = <any source character except "\" 
 				or newline or the quote> ｜"\"esc_item
-esc_item ::=<any source character >
+esc_item =<any source character >
  \end{verbatim}
 \end{quote}
 \subsection{注释}
 在Codger注释以\#号开头,直到这一行结果，解析器解析源程序，注释中的所有内容都分被忽略掉。用bnf文法表示为：
 \begin{quote}
  \begin{verbatim}
-comment ::="#" cm_item* newline
-cm_item:=<any source character except newline>
+comment ="#" cm_item* newline
+cm_item =<any source character except newline>
  \end{verbatim}
 \end{quote}
 \subsection{空白符}
-Codger中的空白符由一个或都多个空格或者是制表符组成，程序中的空白符用于区分开不同的单词，或者使源程序的可读性更强。当解析器识别到空白符时，不会对它做任何的处理，只是简单的将它抛弃。用bnf文法表示为：
+Codger中的空白符由一个或都多个空格或者是制表符组成，程序中的空白符用于区分开不同的单词，或者使源程序的可读性更强。当解析器识别到空白符时，不会对它做任何的处理，只是简单的将它抛弃。用文法表示为：
 \begin{quote}
  \begin{verbatim}
-white_space ::=ws_item+
-ws_item ::= space | tab 
+white_space =ws_item+
+ws_item = space | tab 
  \end{verbatim}
 \end{quote}
-%\newpage
+
+
+\newpage
 \section{词法识别算法}
 在前面一部分给出了在codger中所有的单词,以及描述单词结构的bnf文法，这些文法都是正则文法。正则文法与有限状态机具有等价性，它们之间可以相互转换\footnote{等价性的证明以及转换的方法可以参考``形式语言与自动机理论''}。而词法识别算法通常是通过构造有限状态机的方法来识别源程序中的不同类型的单词，状态机可以使用类似于lex的词法分析软件自动生成，这种方法处理起来简单，只需要遵守词法分析软件的使用规则即可，或者程序员可以通过手工来构造状态机。手工构造相比词法分析软件相比优点在于:
 \begin{enumerate}
@@ -265,8 +274,8 @@ end
 9) 除以上字符以外的所有字符, 命名为 Other
 \end{quote}
 其中状态机A中的输入类型D0\_7被分解成为了输入类型D0\_3和D4\_7；状态机中的输入类型D4\_9被分解成了输入类型D4\_7和D8\_9
-\item[第二步:]状态机A的开始状态为Abegin，状态机B的开始状态为Bbegin，创建一个状态复合状态\{Abeign,Bbegin\},把该复合状态命名为Cbegin，并且标记Cbegin。其中复合状态的定义为：复合状态中的任意一个状态能在某种输入类型下发生状态转移，该复合状态也能在该输入类型下发生状态转移，并且后继状态相同。
-\item[第三步:]找出一个被标记的复合状态，现在只有Cbeign被标记，所以取出Cbegin，然后取消标记Cbeign，并确定Cbegin的后继状态，Cbeign 为 \{Abegin,Bbegin\} 的复合状态：\\
+\item[第二步:]状态机A的开始状态为Abegin，状态机B的开始状态为Bbegin，创建一个状态复合状态 \{Abeign ,Bbegin\}, 把该复合状态命名为Cbegin，并且标记Cbegin。其中复合状态的定义为：复合状态中的任意一个状态能在某种输入类型下发生状态转移，该复合状态也能在该输入类型下发生状态转移，并且后继状态相同。
+\item[第三步:]找出一个被标记的复合状态，现在只有Cbeign被标记，所以取出 Cbegin，然后取消标记 Cbeign，并确定Cbegin的后继状态，Cbeign 为 \{Abegin ,Bbegin\} 的复合状态：\\
 因为：
 \begin{quote}
 \begin{verbatim}
@@ -323,7 +332,7 @@ C1&A1&A1,B1&B1&A2,B2&&&&& \\
 
 C1的后继中状态中有两个复合状态，其中复合状态\{A1,B1\}在以前已经被创建过，所以不对其进行处理。复合状态\{A2,B2\}以前没有出现过，则创建它，并且标记，把它命名为C2。
 
-现在还存在标记的复合状态C2，所以继续按照每二步的方法来处理，取出C2，取消标记，C2为\{A2,B2\}的复合状态: \\
+现在还存在标记的复合状态C2，所以继续按照每二步的方法来处理，取出C2，取消标记，C2为 \{A2, B2\} 的复合状态: \\
 因为：
 \begin{quote}
 \begin{verbatim}
@@ -349,7 +358,7 @@ C2&&&&&A3&B3&&& \\
 \end{tabular}
 \end{description}
 
-现在以经没有被标记过的状态，表示状态机的整个合并过程完成，合并后创建了3个新状态：CBegin,C1,C2。每个状态接受的输入类型有9个，但可以对其进行优化，因为三个状态在输入类型S\_d,S\_f,Other下都转移到err，可以把它们合并到输入类型Other中，即最终的输入类型7个：
+现在以经没有被标记过的状态，表示状态机的整个合并过程完成，合并后创建了3个新状态：CBegin, C1, C2。每个状态接受的输入类型有9个，但可以对其进行优化，因为三个状态在输入类型 S\_d, S\_f ,Other 下都转移到err，可以把它们合并到输入类型Other中，即最终的输入类型7个：
 \begin{quote}
 1) 数字0到3, 命名为 D0\_3 \\
 2) 数字4到7, 命名为 D4\_7 \\

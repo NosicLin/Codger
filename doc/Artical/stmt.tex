@@ -47,11 +47,10 @@ add(1+3)    #函数add返回结果4，被丢弃
 assign_stmt = assign_object assign_oper expr 
 assign_oper =  "=" | "*=" | "/=" | "%=" | "+=" |
                "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
-assign_object = identifier | "$" identifier |
-                expr "[" expr "]" | expr "." identifier 
+assign_object = expr
 \end{verbatim}
 \end{quote}
-其中\$identifier表示变量identifier不在当前作用域，它告诉虚拟机在上层作用域到顶层作用域之间查找。\\
+其中expr为以变量，[expr], .identifier 结尾的表达式。
 示例代码：
 \begin{quote}
 \begin{verbatim}
@@ -92,7 +91,7 @@ for_stmt = "for" assign_object "in" expr for_delimiter
 for_delimiter = "\n" | ";" | "do"
 \end{verbatim}
 \end{quote}
-在for语句运行时，每次从expr返回对象中取出一个元素，赋值给可赋值对象assign\_object，并执行语句stmts。当expr返回对象中的每个元素都被遍历完成时，for语句结束。\\
+在for语句运行时，每次从expr返回对象中取出一个元素，赋值给可赋值对象 assign\_object，并执行语句stmts。当expr返回对象中的每个元素都被遍历完成时，for语句结束。\\
 示例代码:
 \begin{quote}
 \begin{verbatim}
@@ -130,7 +129,7 @@ print sum  #输出为: 5050
 
 \subsection{选择语句}
 \subsubsection{if-elif-else语句}
-if-elif-else语句由一个if部分，零个或多个elif部分，零个或一个else部分组成。if和elif部分由控制表达式和子语句组成，else部分由一个子语句组成。if-elif-else语句运行时，先从if部分开始判断控制表达式是否为真，如果为真，则执行if部分的子语句，并退出if-elif-else语句，如果为假，则会依次判断elif的控制表达式，elif的控制表达式如果为真，则执行相对应的elif的子语句，并退出if-elif-else语句。如果elif的控制表达式为假，则判断下一个elif部分。最后如果if-elif-else还没有退出，则执行else部分的语句。语法规则用文法表示为:
+if-elif-else语句由一个if部分，零个或多个elif部分，零个或一个else部分组成。if 和 elif 部分由控制表达式和子语句组成，else部分由一个子语句组成。if-elif-else语句运行时，先从if部分开始判断控制表达式是否为真，如果为真，则执行if部分的子语句，并退出if-elif-else语句，如果为假，则会依次判断elif的控制表达式，elif的控制表达式如果为真，则执行相对应的elif的子语句，并退出if-elif-else语句。如果elif的控制表达式为假，则判断下一个elif部分。最后如果if-elif-else还没有退出，则执行else部分的语句。语法规则用文法表示为:
 \begin{quote}
 \begin{verbatim}
 if_stmt = if_part  {elif_part} [else_part] "end"
