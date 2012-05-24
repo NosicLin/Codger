@@ -1,0 +1,70 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: codger.aux
+A level-1 auxiliary file: foreword.aux
+A level-1 auxiliary file: introduction.aux
+A level-1 auxiliary file: lexical.aux
+A level-1 auxiliary file: date_type.aux
+A level-1 auxiliary file: expression.aux
+A level-1 auxiliary file: stmt.aux
+A level-1 auxiliary file: translate_fw.aux
+A level-1 auxiliary file: engine.aux
+A level-1 auxiliary file: memory.aux
+The style file: plain.bst
+A level-1 auxiliary file: code_source.aux
+A level-1 auxiliary file: grammer.aux
+A level-1 auxiliary file: bytecode_internal.aux
+Database file #1: codger.bib.bib
+Warning--to sort, need author, organization, or key in xs
+Warning--to sort, need author, organization, or key in xss
+Warning--to sort, need author, organization, or key in xsss
+Too many commas in name 1 of "David Detlefs, Christine Flood, Steve Heller, Tony Printezis Sun Microsystems, Incr" for entry y5
+while executing---line 1049 of file plain.bst
+Too many commas in name 1 of "David Detlefs, Christine Flood, Steve Heller, Tony Printezis Sun Microsystems, Incr" for entry y5
+while executing---line 1049 of file plain.bst
+Too many commas in name 1 of "David Detlefs, Christine Flood, Steve Heller, Tony Printezis Sun Microsystems, Incr" for entry y5
+while executing---line 1090 of file plain.bst
+Too many commas in name 1 of "David Detlefs, Christine Flood, Steve Heller, Tony Printezis Sun Microsystems, Incr" for entry y5
+while executing---line 1090 of file plain.bst
+Warning--empty journal in x5
+You've used 13 entries,
+            2118 wiz_defined-function locations,
+            565 strings with 5151 characters,
+and the built_in function-call counts, 2595 in all, are:
+= -- 238
+> -- 73
+< -- 0
++ -- 33
+- -- 20
+* -- 105
+:= -- 447
+add.period$ -- 36
+call.type$ -- 13
+change.case$ -- 39
+chr.to.int$ -- 0
+cite$ -- 17
+duplicate$ -- 140
+empty$ -- 268
+format.name$ -- 20
+if$ -- 557
+int.to.chr$ -- 0
+int.to.str$ -- 13
+missing$ -- 18
+newline$ -- 65
+num.names$ -- 20
+pop$ -- 85
+preamble$ -- 1
+purify$ -- 36
+quote$ -- 0
+skip$ -- 76
+stack$ -- 0
+substring$ -- 65
+swap$ -- 12
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 36
+warning$ -- 4
+while$ -- 20
+width$ -- 15
+write$ -- 123
+(There were 4 error messages)

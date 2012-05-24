@@ -1,0 +1,284 @@
+\section{内存管理}
+\subsection{内存管理模块的组成}
+Codger的内存管理分为四部分(如下图）,
+\begin{quote}
+\begin{verbatim}
++-------+
+| Cache |                     --- level 3
++-------+---+------------+ 
+| QuickMem  |     Gc     |    --- level 2
++-----------+------------+
+|     MemBase            |    --- level 1
++------------------------+
+|      c lib             |    --- level 0
++------------------------+
+\end{verbatim}
+\end{quote}
+\begin{description}
+\item[level 0:] C库的内存分配与释放接口malloc和free函数。
+\item[level 1:] MemBase用两个作用：封装c库接口和接供页分配接口：
+\begin{enumerate}
+\item 封装c库内存分配与释放的接口，这样做因为c库的malloc函数在分配0字节时，不同的平台会有不同返回值。在某些平台上，malloc(0)的返回值为指向一个固定地址的指针，该指针能被free函数识别到。而其它的一些平台上，malloc(0)的返回值为NULL。不同平台上malloc(0)的不同返回值会给解析器运行时带来了不确定性。MemBase负责对c库内存接口进行封装，让分配0字节大小的内存的返回值为指向一个固定地址的指针。
+\item level2 中的内存管理算法是建立在页的基础上面，要求分配的内存区域的起始地址页对齐，并且大小为页的大小。 C库的malloc函数只能分配指定大小字节的内存区域，不能指定区域的起始地址为页对齐，在C库中也没有提供以页为单位的分配接口。所以需要MemBase实现页分配与释放接口AllocPage和FreePage。
+\end{enumerate}
+\item[levle 2:] 由QuickMem和Gc两部分构成:
+\begin{enumerate}
+\item QuickMem和c库一样提供内存分配与释放接口，QuickMem采用以页为基础的内存管理算法，在小内存\footnote{小内存：大约小于300字节}分配时，内存分配的速度比c库能快到3\verb|~|4倍。从QuickMem中分配出去的内存必须调用释放函数归还，否则会造成内存遗漏。
+\item Gc的全称的Garbage Collection，Codger的所有对象比须从Gc中分配，这些对象不需要调用释放函数归还给Gc，Gc也没提供对象释放接口。每隔一段时间，Gc的垃圾回收例程会工作，收集那些在程序中不能被访问到的对象，这些对象被称作为垃圾对象。垃圾对象被回收后，它所占用的内存可被重新利用，Gc的垃圾回收算法为代式节点复制法。
+\end{enumerate}
+\item[level 3:] 虚拟机在运行时，会不停的分配也释放虚拟机本身管理所需要的内存，分配与释放频率很高的内存块会被缓存一定的数量。例如每当一个Codger方法分调用时，虚拟机会创建一个栈帧，当Codger方法返回时，栈帧会被释放，如果分次栈帧创建都从QuickMem中分配，释放时在返回给QuickMem，这样一来一回，会耗掉很多时间。
+\end{description}
+
+\subsection{页分配算法}
+页是整个内存管理模块的核心，QuickMem模块基于页实现快速内存分配，Gc模块中的堆也是基于页实现的。MemBase模块中实现的页分配接口，以供level2使用。它的实现方法为每次利用c库的malloc函数每配一大块内存，这一大块内存被称作为域(Area）。在Codger中域的大小为1M，从域的起始地起开始，找到第一个页对齐的起地址，从该地址开始，以页大小为基础分配内存，直到最后的内存小于页的大小。Area最前面和最尾部的一小段内存都无法使用。
+
+MemBase模块中，用AreaHeader来表示每一个Area，如果Area中的所有页都被会配完，则Area会被放到full\_list中。如果Area有页可以分配，则它会被放到free\_list中， cur\_area 表示用于当前分配页的Area。 \\
+MemBase的PageAlloc算法为：
+\begin{quote}
+\begin{verbatim}
+MemBase.AllocPage()
+    if cur_area==Nil
+        if free_list.not_empty()      #如果free_list 不分空
+             cur_area=free_list.take_front() #取出free_list中第一个Area
+        else
+             cur_area=AllocNewArea()  #分配一个新的Area
+        end
+     end 
+     page=cur_area.alloc()       #从当前area中分出一页
+     if cur_area.full()          #如果area没有空闲页，则放到full_list中
+        full_list.add(cur_area)
+        cur_area=Nil
+     end
+     return page
+end 
+\end{verbatim}
+\end{quote}
+MemBase的PageFree算法：
+\begin{quote}
+\begin{verbatim}
+MemBase.FreePage(page)
+    area = FindPageArea(page)    #找到page所在的area
+    if area.full()       #如果area以前没有空闲页，则它在full_list中
+       full_list.del(area)     #现在一页被释放后，从full_list中删除
+       free_list.add_front(are)  #放入到free_list中
+    end
+    area.FreePage(page)          #把页page还给area
+    if area.alloced_page_nu==0   #如果area的全部页都被归还
+       if area!=cur_area        
+           free_list.del(area)   #则把内存还给操作系统
+           FreeArea(area)
+       end
+    end
+end 
+\end{verbatim}
+\end{quote}
+其中FindPageArea首先判断page是否在cur\_area中，判断方法是通过page的地起是否在area的地起范围内，然后再遍历free\_list中的每一个area，最后是full\_list。
+
+AreaHeader用来管理一个Area中的所有数据，包括Area中的空闲页，总共可分配的页的数量，已分配页的数量等，它的结构如下：
+\begin{quote}
+\begin{verbatim}
+class AreaHeader 
+    attr area_link         #用于full_list或者是free_list
+    attr max_page_nu       #总共可分配的页的数量
+    attr alloced_page_nu   #已分配页的数量
+    attr free_pos          #指向下一页的地址
+    attr free_page_list    #空闲页链表
+end 
+\end{verbatim}
+\end{quote}
+当创建一个AreaHeader需要计算出它可分配页的最大数量，free\_pos从域的起始地起开始，指向第一个页对齐的起地址。其它属性则被初始化空或者0。可分配的最大数量的计算公式为：
+\[\frac{AreaSize}{PageSize}-1\]
+从AreaHeader中每配一页的算法为：
+\begin{quote}
+\begin{verbatim}
+AreaHeader.AllocPage()
+    if free_page_list.not_empty()   #如果free_page_list不为空
+        page = free_page_list.take_front()  #则从free_page_list中取出
+    else
+        page=free_pos               #在Area中划分出一页
+        free_pos+=PageSize          #更新free_pos的位置
+    end 
+    alloced_page_nu+=1              #更新已分配页的数量
+    return page                     #返回页
+end 
+\end{verbatim}
+\end{quote}
+MemBase的AllocPage算法保证，不向没有空闲页的area中分配页。 把页归还 AreaHeader 算法为：
+\begin{quote}
+\begin{verbatim}
+AreaHeader.FreePage(page)
+    free_page_list.add_front(page)
+    alloced_page_nu-=1
+end 
+\end{verbatim}
+\end{quote}
+
+\subsection{内存分配算法}
+c库的内存分配效率已经非常优秀，但毕竟c库的内存分配算法是一种通用算法，它能适应不同大小的内存分配请求，正是因为这种通用性，使内存中很容易堆积碎片。当内存碎片过多时，分配效率也会随着下降。QuickMem这一个模块是针对小内存分配设计的，小内存的界线SmallSize，可以在修改源码中的宏定义的值来改变，在Codger中小内存的定义为256字节。
+
+QuickMem工作原理是把不同大小的内存进行分组，每一组分配内存的单位是8个倍数。当需要分配的内存大小为1\verb|~|8时，从每0组中分配，分配内存大小为8字节；当分配的内存大小为9\verb|~|16时，从每1组中分配，分配内存大小为16字节；依此类推下去。如果需要分配的内存大于SmallSize，则QuickMem调用C库的内存分配函数。QuickMem的这种工作方式，使得从QuickMem分配到的内存，比需要的内存多出0\verb|~|7个字节，造成一定数量的内存浪费，但这种浪费并不是很多。现在的cpu大多数都是32位，编译器在编译程序时，会强制4字节对齐以获得更好的Cache性能，即使结构体只有一个char的成员，该结构体也会占用4字节。所以从QuickMem中每配到的内存只有两种情况：1）比需要的大出4字节；2）刚好等于需要的内存。
+
+QuickMem内存分配以组为单位，当需要每配一个小于 SmallSize 大小的内存size时，首先需要计算出它属于那一组，因为分配单位是8个倍数，只需要将size右移3位，就能得到它所在的分组，然后出它从所在分组中分配内存。
+
+假设现在的分组为N，分组调用MemBase页分配接口，用于获得一页，然后它在这一页的开头写入一些管理数据称为PageHeader(大小保证8字节对齐)。最后把页剩余的空间划分成该分组每配单位((N+1)*8)的相等的多个空间，用于分配。分组的数据结构与前面绍介的MemBase的管理数据相同，有free\_list， full\_list，cur\_page。free\_list保存所有还能分配空间的页，full\_list中的页没有剩余空间可以分配，cur\_page表示用于分配的当前页。PageHeader与AreaHeader的数据结构相似，只不过分配单位的大小不同，AreaHeader 一次性分配一页，PageHeader一次性分配(N+1)*8字节大小，它们的分配算法原理相同。
+
+当程序释放内存给QuickMem时，释放的内存有两种情况，每一种情况为释放的内存属于小内存，来自于分组中，每二种情况为释放的来自于C库，QuickMem需要对它们进行判断。这里首先讨论当内存属于小内存时的情况。每个小内存都是从分组中每配，分组在每一个页的开头(PageHeader)都写入管理数据(如下图)，只要释放内存的地址的低位屏蔽掉就可以获得它所在的PageHeader。假设释放内存的地址为addr，计算公式为： \verb|addr&(~(PageSize-1))|。得到释放内存所在的PageHeader，然后调用PageHeader.Free(addr)
+\begin{quote}
+\begin{verbatim}
+PageBeginAddr           addr           PageEndAddr
+   |                      |                |
+   v                      V                V
+   +----------+--------------\\------------+
+   |PageHeader|    ...        \\    ....   |
+   +----------+----------------\\----------+
+\end{verbatim}
+\end{quote}
+每二种情况是释放的内存来自于C库，QuickMem分在每个分配的页一个唯一的标识符，该标识符保存在PageHeader中，在QuickMem中有一个一维数组IDX，如果某一页的标识符为n，那么IDX[n]中就保存就该页的地址(如下图)：
+\begin{quote}
+\begin{verbatim}
+        _____________\\ ___________
+IDX->  |___|___|___|__\\___|___|___|
+        /    \         \\       |
+       V      V                 V
+    +-----+  +-----+          +-----+
+    |     |  |     |          |     |
+    |     |  |     |          |     |
+    +-----+  +-----+          +-----+
+\end{verbatim}
+\end{quote}
+判断释放内存的来源时，首先能过地址得到PageHeader，该PageHeader不一定是一个有效的数据，然后出PageHeader中取出标识符n，有下面几种情况:
+\begin{enumerate}
+\item n的值不在IDX的范围内，则可判定它来自于C库
+\item n的值在标识符范围内时:
+\begin{enumerate}
+\item IDX[n]!=PageHeader，则表明需要释放的内存来自于C库
+\item IDX[n]==PageHeader，则表明需要释放的内存来自于分组
+\end{enumerate}
+\end{enumerate}
+因为操作系统内部采用虚拟分页技术，在掉取PageHeader标识值时，即使释放内存来自于C库，也不会发生缺页异常或者是内存错误，而且只是提取，没有赋值，原来的值不会有任何的更改，这是一个安全的过程。
+
+\subsection{垃圾回收算法}
+Codger中的所有对象内存都必须从GC模块中分配，对象分配后，不必在程序中显示的释放，Gc模块也没有提供释放接口，如果一个对象不能直接或者间接的到达，那这个对象则被称为垃圾对象。垃圾对象会一直存在，直到垃圾回收例程启动，将它们收集，并释放它们所占用的内存。
+\subsubsection{堆的构成}
+在Gc模块中总共有四种不同类型的堆:静态区，惰性区，年老区，年轻区，不同类型的堆有不同的用途。
+\begin{enumerate}
+\item 静态区(Static)：用于分配静态数据,其它类型的堆的对象不会被提升到静态区。从静态区中分配的对象不会被回收，即使对象已经死亡，所以需要确保对象在解析器整个运行的生命周期类，不会成为垃圾对象。它被用于以下两种情况：
+\begin{enumerate}
+\item 解析器中某些非常固定的对象，它们的生命周期与解析器的生命周期相同。例如Codger中布尔值的false对象与true对象，Nil对象等都是从静态数据区中分配。
+\item 因为Codger中垃圾回收算法采用的是分代式节点复法，垃圾回收例程可能会把对象复制到另一块区域，对象被复制后地址也被改变了。然而某些扩展模块中，它们可能要求某些对象在其生命周期内，它的地址不能被改变。在静态区分配的对象，这点能够得到保证。
+\end{enumerate}
+\item 惰性区(Inertia)：用于分配程序中极少会变化对象，这些对象不能确保在解析器的整个生命周期内不会死亡，但是在大多数情况下，它们会存活很长一段时间或者是存活到解析器退出。惰性区中的对象会被回收，它回收频率很低，并且类型的堆对象不会被提升到惰性区。例如，解析器在解析源程序时，源程序中出现的常量，符号(字符串对象)，模块对象，类对象等都会从隋性区分配。
+\item 年老区(Old)：用于接受年轻区被提升上来的对象，年老区的回收频率相对比年轻区的低的很多。
+\item 年轻区(Young)：虚拟机运行时，所有的对象都是从年轻区分配，Codger是一门动态语言，每个时刻都会有大量的对象会被创建，但这些对象大多数都是计算过程中产生的临时对象，存活率很低，通常情况下是低于10\%，让这些对象在年轻区分配，垃圾回收例程在多数情况下回收年轻区的垃圾对象，这样就只需要把低于10\%的对象复制到另一个半区，很大程度上提高垃圾回收例程的效率。如果对象在年轻区被回收两次后依然存活，它就会被提升到年老区。
+\end{enumerate}
+
+Gc模块的堆和QuickMem一样是基于页实现了，它并不是一块连续的区域，而是由多个页连在一块的(如图\ref{fig:gc_heap}，如果需要分配一个对象，则从当前页中划分出一块区域分给对象，如果当前页并不会划分出中够大小的区域，那么堆会向MemBase申请一块新的页，把新页放入到page\_list中，并置cur\_page为新分配的页。
+\begin{figure}
+\begin{verbatim}
+ page_list                                  cur_page
+     \                                         |
+      V                                        V
+    +------+ ---> +------+ --->  .... -->+------+      
+    |      |      |      |               |      |
+    |      |      |      |       ....    |      |
+    |      |      |      |               |      |
+    +------+      +------+               +------+
+\end{verbatim}
+\caption{Gc堆的构成}
+\label{fig:gc_heap}
+\end{figure}
+堆的分配内存描述为：
+\begin{quote}
+\begin{verbatim}
+Heap.Alloc(size)
+    if !cur_page.CanAlloc(size)   #如果当前页不能分配size大小的内存
+       page=MemBase.AllocPage()    #申请一块新的页
+       HeapInitPage(page)          #初始化页数据
+       page_list.add_tail(page)    #把新页放入到page_list尾部
+       cur_page=page               #更新cur_page
+    end
+    return cur_page.Alloc(size)
+end
+\end{verbatim}
+\end{quote}
+Codger最大的对象也没有超过100字节，分配出的新页肯定能成功的划分出一块内存区域。和QuickMem中的页一样，Gc模块的页也会在页开始的区域写入一些管理数据，称作为GcPageHeader。因为Codger采用节点复制法，节点复制法一个优势在于它有很快的内存分配速度，几乎可以和基于栈式内存分配相媲美。在内存分配时，只需要每次向下划分一块区域即可。在垃圾回收例程工作时，会把一个半区的成活的对象复制到另一个半区，原来半区中的所有页都会被释放。下一次内存分配会从另一个新半区开始分配，整个过程不会存在内存碎片。GcPageHeader中有两上数据，一个保存Page有空闲空间的位置free\_pos，另一个保存Page的最大可分配位置max\_pos。在Page中分配内存描述为：
+\begin{quote}
+\begin{verbatim}
+GcPageHeader.Alloc(size)
+    ptr=free_pos
+    free_pos+=round8(size)　  #保证8字节对齐
+    return ptr
+end 
+\end{verbatim}
+\end{quote}
+从上面代码可以看出，分配只需要向下划分一块区域即可,判断页是否可分配的代码为:
+\begin{quote}
+\begin{verbatim}
+GcPageHeader.CanAlloc(size)
+    if free_pos+size>max_pos
+       return false
+    else 
+       return true
+    end
+end 
+\end{verbatim}
+\end{quote}
+
+\subsubsection{回收例程}
+垃圾回收例程的算法使用的是Cheney的节点复制收集法\footnote{详见：《垃圾收集》 Richard Jones,Rafael Lins著. 谢之易 译. 第6.1节},每次当垃圾回收例程工作时，都会有确定回收的级别CollectionLevel，每个不同类型的堆区的回收级别关系为：\verb|静态区>惰性区>年老区>年轻区|。CollectionLevel确定后，和CollectionLevel相等或小于的堆都要参与回收。例如，CollectionLevel为年老区时，则年老区和年轻区都会被回收，而惰性区和静态区则不会被回收。CollectionLevel的最大级别为惰性区，所以静态区永远都不会被回收。参与回收的堆，都会把存活的对象从当前半区移到与之相应的另一个半区。如果对象处于年轻半区，并且在上一次回收时存活了下来，则它们被提升到老年分代。如果在对象在上次回收之后创建，并且这次回收存活了下来，则会标记对象在下次回收时提升它。
+
+对于回收级别大于CollectionLevel的堆，它们同样也会被更新。Codger现在使用一种方法类似于线性扫描，线性扫描算法为依次扫描堆中所有对象，看该对象是引用了低级别的对象，如果是,则更新该对象。在每个对象中，如果引用了一个对象引用了底级别的对象，那么该对象的低级别引用位会被置1。这一位可以用于判断是否引用了底级别的对象。
+Codger在实现不仅在对象中保存标志位，同样该对象所在的页的头部(GrPageHeader)也会保存该标志位，这样就可以页头部来判断该页中是否有对象引用了底级别的对象，如果则扫描该页中的所有对象，找到所有低级别引用位为被置位的对象，并更新该对象，如果没有则跳过该页。
+
+\subsubsection{拦截器}
+如果一个对象引用了另一个对象，拦截器会对这个过程进行拦截，判断其是否引用的是低级别的对象，如果是则置对象的低级别引用位为1，同时更新该对象所在页头的标记位。在Codger中，为了提高内存利用率，在每个对象中并不会保存它所在堆的级别，它所在堆的级别信息保存在对象所在的页头中，每个对象获取页头的方法与QuickMem中的方法一样，假设对象的地址为addr，则可以通过\verb|addr&(~(PageSize-1))|得到。拦载器的工作过程为：
+\begin{quote}
+\begin{verbatim}
+Intercept(x,y)
+    header_x=x&(~(PageSize-1))         #得到对象x所在的页头
+    header_y=y&(~(PageSize-1))         #得到对象y所在的页头
+    if header_x.level>header_y.level   #x所在的级别大于y所在的级别
+        x.rel_low=1                    #标记对象x低分代引用位
+        header_x.ref_low=1             #标记x所在页头代分代引用位
+    end
+end
+\end{verbatim}
+\end{quote}
+
+\subsubsection{标记位}
+Codger中的对象总共需要2个标记位，一个为标记该对象是否需要在下次垃圾回收时提升到年老分代，一个用于标记对象是否引用了低级别的对象。这两个位如果单独给它们分配一个long型域用于保存它们，显得太浪费，这会让每个对象占用的空间多上4字节。即使在定义时，使用char型，编译器在编译时，会考虑在32位平台上4字节对齐，最后每个对象还是会多占用4字节的空间。
+
+在Codger中，每个对象都有一个指针域用于指向该对象类型的信息，如果类型信息是从QuickMem中动态分配,QuickMem能保证得到的指针是8字节对齐，如果类型信息是在程序中使用静态数据，也可通过编译器的扩展语法保证所得到的地址为4字节对齐。保证对象类型信息至少4字节对齐后，它的低2位就可用于对象的标记位，当需要获得对象类型信息时，只需要将低两位屏蔽掉即可。Codger在实现的代码如下，该结构体只适用于CPU为小端字节:
+\begin{quote}
+\begin{verbatim} 
+struct  gr_object 
+{
+    union{
+        struct gr_type_info* g_type;
+        struct 
+        {
+            long g_ref_low:1;  
+            long g_upgrade:1;
+            long g_reverse:30;
+        };
+    };
+};
+\end{verbatim}
+\end{quote}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
