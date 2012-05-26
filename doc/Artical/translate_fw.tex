@@ -11,6 +11,12 @@ Codger字节码转换算法采递归的形式把抽象语法树转换成字节�
 + ----------+--------------+-------+
 \end{verbatim}
 \end{quote}
+每种类型的节点有3种不同类型的转换：取值转换，赋值转换，运算并赋值转换。
+\begin{enumerate}
+\item 取值转换表示取当前节点的值，也就是上面谈到的getopcode方法，每个节点必须实现这种转换方式。
+\item 赋值转换用于直接赋值语句中，表示对该节点赋值，这种转换方式为可选。例如：语句 a=a 生成抽象语法树后有两个节点，虽然左节点和右节点的类型相同，但它们的转换方式却不同，左节点赋值转换，右节点却为取值转换。
+\item 运算并赋值转换转换，用于运算并赋值语句中，这种转换方式为可选。
+\end{enumerate}
 在实现在算法时，为了尽量减少动态内存的分配，每次先分配一块大的内存，该内存在转换时被所有的节点共享，父节点告诉子节点从那里开始写入它的转换后的字节码，这种方法能提高整个转换算法性能，这也时Codger采用的方法。
 \begin{figure}
  \centering
@@ -54,7 +60,7 @@ MapConst把LITERAL放入常量池中，并返回索引该LITERAL的id号。常�
 
 \subsection{变量}
 \begin{enumerate}
-\item 在当前作用的变量用identifier，转换成字节码为：
+\item 获当前作用的变量identifier，转换成字节码为：
 \begin{quote}
 \begin{verbatim}
 OP_LOAD_SYMBOL $(id)
@@ -73,7 +79,7 @@ MapSymbol把identifier放入符号池中，并返回索引该identifier的id号�
 转换在字节码为：
 \begin{quote}
 \begin{verbatim}
-OP_LOAD_U_SYMBOL$(id)
+OP_LOAD_U_SYMBOL $(id)
 \end{verbatim}
 \end{quote}
 其中
@@ -102,7 +108,6 @@ OP_ARRAY_PUSH
     exprn
 }
 OP_ARRAY_PUSH
-OP_ARRAY_END
 \end{verbatim}
 \end{quote}
 
@@ -132,7 +137,6 @@ OP_HASH_MAP
     expr_keyn
 }
 OP_HASH_MAP
-OP_HASH_END
 \end{verbatim}
 \end{quote}
 
@@ -186,7 +190,6 @@ OP_ARRAY_PUSH
     exprn
 }
 OP_ARRAY_PUSH
-OP_ARRAY_END 
 OP_$(BRACKET)
 \end{verbatim}
 \end{quote}
@@ -356,7 +359,26 @@ OP_DISCARD
 \end{quote}
 
 \subsection{直接赋值语句}
-赋值语句有左节点和右节点，左节点为被赋值的对象，右节点值。赋值语句需要根据左节点的类型，转换成不同的字节码。
+赋值语句有左节点和右节点，左节点为被赋值的对象，转换方式为赋值转换；右节点的转换方式为取值转换。
+\noindent语句形式：
+\begin{quote}
+\begin{verbatim}
+<expr1> = <expr2>
+\end{verbatim}
+\end{quote}
+转换成字节码为：
+\begin{quote}
+\begin{verbatim}
+{
+    expr2
+}
+{
+    expr1
+}
+\end{verbatim}
+\end{quote}
+其中expr1为赋值转换，它有下面的几种情况：
+
 \begin{enumerate}
 \item 给变量赋值，语句形式：
 \begin{quote}
@@ -442,7 +464,7 @@ id=MapSymbol(identifier)
 \end{enumerate}
 
 \subsection{运算并赋值语句}
-\noindent运算并赋值语句和赋值语句一样，需要根据左节点的类型转换成不同的字节码。
+\noindent运算并赋值语句和赋值语句一样有两上节点，左节点为运算并赋值转换，右节点为取值转换，左节点的类型有以下几种情况:
 \begin{enumerate}
 \item 变量运算并赋值，语句形式：
 \begin{quote}
@@ -619,7 +641,7 @@ OP_JUMPR_BACK $(Begin)
 OP_DISCARD 
 \end{verbatim}
 \end{quote}
-其中expr语句为赋值翻译，它的几种情况见直接赋值语句部分。最后需要更新stmts中的OP\_BREAK与OP\_CONTINUE指令
+其中expr语句为赋值转换，它的几种情况见直接赋值语句部分。最后需要更新stmts中的OP\_BREAK与OP\_CONTINUE指令
 \begin{quote}
 \begin{verbatim}
 Update OP_BREAK to OP_JUMPR_FORWARD $(End)
@@ -783,7 +805,6 @@ OP_ARRAY_PUSH
     exprm
 }
 OP_ARRAY_PUSH
-OP_ARRAY_END
 OP_FUNC_DEFALUT_ARGS
 OP_DUP_DATA1
 OP_STORE_SYMBOL  $(name_id)
@@ -906,7 +927,6 @@ OP_ARRAY_PUSH
     exprm
 }
 OP_ARRAY_PUSH
-OP_ARRAY_END
 OP_FUNC_DEFALUT_ARGS
 OP_CLASS_$(TEMP)  $(name_id)
 \end{verbatim}

@@ -1,0 +1,5 @@
+import timeout
+
+j=timeout.julia3(0.5363637,-0.1545455,width,height,500,400,500,50,0,0)
+j.draw()
+

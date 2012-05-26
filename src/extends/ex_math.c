@@ -38,7 +38,7 @@
 	{ \
 		return NULL; \
 	} \
-	GrFloat* value2=(GrFloat*)GrObject_ToGrFloat(item1); \
+	GrFloat* value2=(GrFloat*)GrObject_ToGrFloat(item2); \
 	if(value2==NULL) \
 	{ \
 		return NULL; \
@@ -137,7 +137,7 @@ static GrInnerFuncEntry s_math_func[]=
 	MATH_FUNC_ENTRY(exp2,1),
 	MATH_FUNC_ENTRY(log2,1),
 
-	MATH_FUNC_ENTRY(pow,1),
+	MATH_FUNC_ENTRY(pow,2),
 	MATH_FUNC_ENTRY(sqrt,1),
 
 	MATH_FUNC_ENTRY(ceil,1),

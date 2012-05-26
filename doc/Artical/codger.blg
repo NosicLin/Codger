@@ -1,5 +1,6 @@
 This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
 The top-level auxiliary file: codger.aux
+A level-1 auxiliary file: abstract.aux
 A level-1 auxiliary file: foreword.aux
 A level-1 auxiliary file: introduction.aux
 A level-1 auxiliary file: lexical.aux
@@ -28,7 +29,7 @@ while executing---line 1090 of file plain.bst
 Warning--empty journal in x5
 You've used 13 entries,
             2118 wiz_defined-function locations,
-            565 strings with 5151 characters,
+            566 strings with 5164 characters,
 and the built_in function-call counts, 2595 in all, are:
 = -- 238
 > -- 73

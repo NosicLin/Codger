@@ -1,0 +1,149 @@
+import math
+class point
+	attr x
+	attr y
+	func init(x,y)
+		this.x=x
+		this.y=y
+	end
+end 
+
+func make_julia(c_x,c_y,b_x,b_y)
+	func iter()
+		wx=$b_x-$c_x
+		wy=$b_y-$c_y
+		if wx>0.0
+			theta= $math.atan(Float(wy)/wx)
+		elif wx<0.0
+			theta=$math.pi+$math.atan(Float(wy)/wx)
+		else
+			theta=$math.pi/2.0
+		end
+		theta=theta/2.0
+		r=$math.sqrt(wx*wx+wy*wy)
+		if $math.random()%1000<500
+			r=$math.sqrt(r)
+		else
+			r=-$math.sqrt(r)
+		end 
+		$b_x=r*$math.cos(theta)
+		$b_y=r*$math.sin(theta)
+		return $point($b_x,$b_y)
+	end 
+	return iter
+end 
+
+export make_julia
+
+class julia
+	attr p
+	attr q 
+	attr wd
+	attr hg 
+	attr m
+	attr k0
+	attr a
+	attr b
+	attr offset_x
+	attr offset_y
+	func init(p,q,wd,hg,m,k0,a,b,offset_x,offset_y)
+		this.p=p
+		this.q=q
+
+		this.wd=wd
+		this.hg=hg
+
+		this.m=m
+		this.k0=k0
+
+		this.a=a
+		this.b=b
+		this.offset_x=offset_x
+		this.offset_y=offset_y
+	end 
+
+	func Color(r,g,b)
+		setColor(r/255.0,g/255.0,b/255.0)
+	end 
+		
+	func draw()
+		H=0
+		offset_x=this.offset_x
+		offset_y=this.offset_y
+		p=this.p
+		q=this.q
+		wd=this.wd
+		hg=this.hg
+		m=this.m
+		k0=this.k0
+
+		a=this.a
+		b=this.b
+
+		xs=-1.5
+		xl=1.5
+		ys=-1.5
+		yl=1.5
+
+		xb=0
+		yb=0
+		x0=0
+		y0=0
+		nk=0
+		r=0
+
+
+
+		xb=(xl-xs)/wd
+		yb=(yl-ys)/hg
+
+		nx=0
+		while nx<=wd
+			ny=0
+			while ny<=hg
+				x0=xs+nx*xb
+				y0=ys+ny*yb
+				k=0
+				while 1
+					xk=x0*x0-y0*y0+p
+					yk=2*x0*y0+q
+					k=k+1
+					x0=xk 
+					y0=yk
+					r=xk*xk+yk*yk
+					if r>m 
+						H=(Float(k)/k0)
+						setColor(H*3,H*9,H*0.2)
+						drawPixel(offset_x+nx,offset_y+ny)
+						break
+					end
+					if k>=k0
+						H=(Float(r)/m)*255
+						this.Color(H*3,H*9,(H+50))
+					#	this.Color(0,0,0)
+						drawPixel(offset_x+nx,offset_y+ny)
+						break
+					end
+					continue
+
+				end 
+				ny+=1
+			end 
+			nx+=1
+		end 
+	end
+end
+
+export julia
+
+
+
+
+
+
+
+
+
+
+
+

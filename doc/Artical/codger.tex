@@ -1,10 +1,15 @@
-\documentclass[a4paper,12pt]{article}
+\documentclass[a4paper,twoside,12pt]{article}
 \usepackage{CJK}
 \usepackage{indentfirst}
 \usepackage{graphicx}
 \usepackage{bibentry,natbib}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
 
+%\usepackage{iffalse} 
 \usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+
 
 \usepackage{titletoc}
  \titlecontents{section}[2em]{\vspace{.25\baselineskip}} 
@@ -25,11 +30,17 @@
 \setlength{\baselineskip}{20pt}
 
 
-
-%opening
-
 \begin{document}
 \begin{CJK}{UTF8}{song}
+
+\pagestyle{fancy}
+\fancyhead[LO,RE]{}
+\fancyhead[CO,CE]{ \small桂林电子科技大学毕业设计(论文)报告用纸} 
+\fancyhead[RO,LE]{第 \thepage{} 页\quad共 2 页}
+\cfoot{}
+\renewcommand{\headrulewidth}{0.4pt} 
+
+
 \renewcommand{\contentsname}{\center{目\quad 录}}
 \renewcommand{\figurename}{图}
 \renewcommand{\tablename}{表}
@@ -37,46 +48,35 @@
 \renewcommand\refname{参考文献}
 
 
-%\author{陈林}
-%\title{Codger一种面向对象语言的设计与实现}
-%\date{\today}
-%\maketitle
-\begin{abstract}
-近年来，随着计算机的运算速度以摩尔定律的方式增长，性能不在是大多软件开发者首要考虑的因素，加上软件需求的快速变更和复杂度的增加，以及不同平台之间的混合应用，使得脚本语言在应用中的地位越来越重要。为应用程序提供脚本支持已经成为实现软件可定制和可扩展的一种有效方案。
-
-Codger一门面向对象的脚本程序设计语言，它具有现在高级语言的很多特性，和丰富的数据类型,可以被用于计算，交互式编程，或者是作为一个脚本引擎集成软件中，用于动态扩展软件的功能。
-
-本文介绍了编写Codger程序的基本语法，设计思想，以及Codger解析器的设计与实现。解析器分为前端部分与后端部分，前端包括词法分析，语法分析，抽象语法树的生成，以及抽象语法树到字节码的转换框架, 词法识别模块给出了每个单词的正则文法，并且介绍一种非常实用，高效，并且易于手工构造的词法识别算法--状态链；语法部分给Codger语言的EBNF文法，字节码转换框架全部都在Codger解析器解析器的开发过程中得到的验证，并且工作的很好。解析器后端也被称为虚拟机，它用于运行字节码，并负责内存管理，垃圾回收，异常处理。内存管理模块实现了一种高效基于页内存分配算法，在分配小块内存时，比c库能快到\verb|3~4|倍，垃圾回收采用分代式节点复制法来回收死亡的对象。解析器所采用的这些技术在实践中具有良好的性能优势。
-\\
-\\
-\\
-\noindent{\large\textbf{关键字:}}  {面向对象；脚本语言；虚拟机；Codger}
-\end{abstract}
-\newpage
 
 
-\renewcommand{\abstractname}{\Large Abstract}
 
+\thispagestyle{plain}
+\author{陈林}
+\title{一种面向对象脚本语言及其解析器的设计与实现}
+\date{\today}
+\maketitle
 
-\begin{abstract}
-In recent years, with the growth of the computer's processing speed of Moore's Law way, performance is not mostly software developers first and foremost consideration, and the software requirements of rapid change and complexity increase, as well as between the different platforms develop hybrid applications,scripting language  is becoming increasingly important in the application. providing scripting support for application has become an effective way for the software to be customized and scalable.
-
-Codger an object-oriented scripting language, it has many high-level language features, and rich data types, can be used to calculate, interactive programming, or the software integrated codger as a script engine for dynamically expanding functionality.
-
-This article describes the basic syntax for writing Codger program, design ideas, Codger parser design and implementation. The parser is divided into front-end part and the back-end part. the front-end including lexical analysis, syntax parsing, abstract syntax tree generated, as well as the abstract syntax tree to bytecode transformation framework, lexical recognition module description the regular grammars of each word, and introduced a very practical, efficient, and easy to hand-constructed lexical recognition algorithms - state chain; The syntax part description Codger language EBNF grammar. In the development of the the Codger parser,bytecode transformation framework is work well. Parser back-end is also called a virtual machine, it used to run the bytecode, and is responsible for memory management, garbage collection, exception handling.The memory management module to implementation an efficient page-based memory allocation algorithm,when  allocation of a small piece of memory, about \verb|3~4| times faster than the c library, garbage collection Generational node replication to collection the death objects. interpreter using these techniques in practice has a good performance advantage.
-  \\
-  \\
-  \\
-\noindent{\large\textbf{keywords:}}  {object-oriented;script;virtual machine;Codger}
-\end{abstract}
-
-\newpage
-
-\tableofcontents
 \clearpage
 \setcounter{page}{1}
 
 
+\include{abstract}
+
+\pagestyle{empty}   
+
+\tableofcontents
+\clearpage
+
+\setcounter{page}{1}
+
+
+\pagestyle{fancy}
+\fancyhead[LO,RE]{}
+\fancyhead[CO,CE]{ \small桂林电子科技大学毕业设计(论文)报告用纸} 
+\fancyhead[RO,LE]{第 \thepage{} 页\quad共 \pageref{LastPage} 页}
+\cfoot{}
+\renewcommand{\headrulewidth}{0.4pt} 
 
 \include{foreword}
 \include{introduction}

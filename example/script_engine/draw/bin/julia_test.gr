@@ -1,0 +1,23 @@
+import julia
+
+start_x=300.0
+start_y=300.0
+c_x=-0.925
+c_y=0.255
+enlarge_x=150.0
+enlarge_y=150.0
+
+offset_x=300
+offset_y=300
+iter=julia.make_julia(c_x,c_y,start_x,start_y)
+i=0
+setColor(88.0/255.0,129.0/255.0,189.0/255.0)
+while i<100000
+	p=iter()
+	x=p.x*enlarge_x+offset_x
+	y=p.y*enlarge_y+offset_y
+	print x,y
+	drawPixel(x,y)
+	i+=1
+end 
+
