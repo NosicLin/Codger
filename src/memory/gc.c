@@ -260,9 +260,9 @@ static struct gc_heap* gc_old_another=__heap+3;
 
 /* two for gc_young,two for old,and one for static */
 
-static int s_collection_switch=1;
-static int s_collection_level=0;
-static int s_collection_working=0;
+static int s_collection_switch=0;   /* enable or disable */
+static int s_collection_level=0;    /* collection level */
+static int s_collection_working=0;  /* work or not*/
 
 static unsigned long s_times_tick=0;
 
@@ -287,6 +287,10 @@ static inline int gc_tigger_algrithom(struct gc_heap* g)
 	}
 	if(level==GrGc_HEAP_OLD)
 	{
+		if(s_times_tick%100==0)
+		{
+			return 1;
+		}
 		if(g->g_block_nu<GC_COLLECTION_TIGGER_MIN_BLOCK_NU)
 		{
 			return 0;
@@ -822,6 +826,7 @@ static inline int gc_heap_init(struct gc_heap* h,long level)
 		return -1;
 	}
 
+
 	return 0;
 }
 
@@ -913,7 +918,7 @@ static void gc_collection_end()
 
 int GrGc_CleanGarbage()
 {
-	//fprintf(stderr,"Garbage Work\n");
+//	fprintf(stderr,"Garbage Work=%ld\n",s_times_tick);
 
 	s_times_tick++;
 
@@ -1054,6 +1059,7 @@ int GrModule_GcInit()
 	{
 		return -1;
 	}
+	s_collection_switch=1;  /* enable gc */
 	return 0;
 }
 

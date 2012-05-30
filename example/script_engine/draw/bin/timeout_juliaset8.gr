@@ -1,0 +1,4 @@
+import julialib
+j=julialib.julia(-0.491762,-0.531657,200,20.0,width,height)
+j.setColParams(20.4,2,40.3,3,0.8,1)
+j.draw()

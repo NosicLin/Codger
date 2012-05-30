@@ -282,6 +282,40 @@ int GrHash_Map(GrHash* h,GrObject* key,GrObject* value)
 	return ret;
 }
 
+int GrHash_MapWithNewKey(GrHash* h,GrObject* key,GrObject* value)
+{
+	assert(value);
+	ssize_t code=GrObject_Hash(key);
+	ssize_t used=h->h_used;
+	int ret=0;
+	GrHashEntry* p=h->h_look_up(h,key,code);
+	if(p==NULL)
+	{
+		return -1;
+	}
+	if(p->e_key==NULL)
+	{
+		h->h_fill++;
+		h->h_used++;
+	}
+	if(p->e_key==Gr_Hash_Dummy)
+	{
+		h->h_used++;
+	}
+	p->e_key=key;
+	p->e_value=value;
+	p->e_code=code;
+
+	/* check space, make sure 1/3 free slot */
+	if(used<h->h_used &&  h->h_fill*3 >h->h_mask*2)
+	{
+		ret=ht_resize(h,(h->h_used>50000?2:4)*h->h_used);
+	}
+	GrGc_Intercept(h,key);
+	GrGc_Intercept(h,value);
+	return ret;
+}
+
 
 
 GrObject* GrHash_Lookup(GrHash* h,GrObject* key)

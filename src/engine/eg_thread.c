@@ -482,7 +482,6 @@ next_instruct:
 			sp--;
 			goto next_instruct;
 
-
 			/* Data op */
 		case OP_LOAD_NIL:
 			acc=Gr_Object_Nil;
@@ -659,7 +658,7 @@ next_instruct:
 
 over:
 
-	fprintf(stderr,"EgThread With Code(%d) sp=%d\n",exit_code,sp);
+//	fprintf(stderr,"EgThread With Code(%d) sp=%d\n",exit_code,sp);
 	eg->t_sp=0;
 	eg->t_pc=0;
 	return exit_code;

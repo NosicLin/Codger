@@ -19,8 +19,8 @@ typedef GrHashEntry* (*GrHashLookUpFunc)(struct gr_hash*,
 struct gr_hash
 {
 	INHERIT_GROBJECT;
-	ssize_t h_fill;
-	ssize_t h_used;
+	ssize_t h_fill;   /* key_nu and dummy_nu */
+	ssize_t h_used;   /* key_nu */
 	ssize_t h_mask;
 	struct gr_hash_entry* h_table;
 	long h_flags;
@@ -46,6 +46,7 @@ GrHash* GrHash_GcNewFlag(long);
 int GrHash_Init();
 
 int GrHash_Map(GrHash* h,GrObject* key,GrObject* value);
+int GrHash_MapWithNewKey(GrHash* h,GrObject* key,GrObject* value);
 GrObject* GrHash_Lookup(GrHash* h,GrObject* key);
 GrObject* GrHash_LookupName(GrHash* h,GrObject* key);
 GrHashEntry* GrHash_GetEntry(GrHash* h,GrObject* key);

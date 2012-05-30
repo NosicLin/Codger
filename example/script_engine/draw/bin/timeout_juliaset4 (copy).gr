@@ -1,0 +1,5 @@
+import julialib
+import julia256color
+j=julialib.julia(0.885,0.834545,400,2.0,width,height)
+j.setColParams(3,10,9,10,6,10)
+j.draw()

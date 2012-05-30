@@ -132,7 +132,7 @@ int GrClass_TemplateAdd(GrClass* s,GrObject* k,GrObject* v)
 {
 	assert(GrSymbol_Verify(k));
 	int ret;
-	ret=GrHash_Map(s->c_template,k,v);
+	ret=GrHash_MapWithNewKey(s->c_template,k,v);
 	if(ret<0) return -1;
 	return 0;
 }
@@ -144,7 +144,34 @@ int GrClass_SetInherit(GrClass* c,GrObject* g)
 		GrErr_TypeFormat("Can't Inherit '%s'",GrObject_Name(g));
 		return -1;
 	}
-	c->c_inhert=(GrClass*)g;
+
+	GrClass* father=(GrClass*)g;
+	c->c_inhert=father;
+	
+	GrHashEntry* f_entry=father->c_template->h_table;
+	GrHashEntry* cur;
+	int ret;
+	ssize_t  i=0;
+	ssize_t f_fill=father->c_template->h_fill;
+	while(i<f_fill)
+	{
+		cur=f_entry++;
+		if(cur->e_key==NULL)
+		{
+			continue;
+		}
+		if(cur->e_key!=Gr_Hash_Dummy)
+		{
+
+			ret=GrHash_Map(c->c_template,cur->e_key,cur->e_value);
+			if(ret<0)
+			{
+				return -1;
+			}
+		}
+		i++;
+	}
+
 	GrGc_Intercept(c,g);
 	return 0;
 }

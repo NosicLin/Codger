@@ -1,0 +1,19 @@
+class shape 
+	attr name =3
+	func getName()
+		return "shape"
+	end 
+end 
+class rectange inherit shape
+	attr width
+	attr height
+	public func getName()
+		return "rectange"
+	end 
+end 
+
+a=rectange()
+print a.getName()
+a.getName=3
+print a.getName
+

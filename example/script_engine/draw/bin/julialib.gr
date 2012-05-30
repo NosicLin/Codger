@@ -1,0 +1,111 @@
+import math
+
+class julia
+	attr c_re
+	attr c_im
+	attr w_width
+	attr w_height
+	attr iter_nu
+	attr radius
+
+	attr Ar=7
+	attr Br=2
+	attr Ag=4
+	attr Bg=3
+	attr Ab=2
+	attr Bb=7
+
+	func setColParams(Ar,Br,Ag,Bg,Ab,Bb)
+		this.Ar=Ar
+		this.Br=Br 
+		this.Ag=Ag 
+		this.Bg=Bg
+		this.Ab=Ab 
+		this.Bb=Bb 
+	end 
+
+	public attr set_color=func(k,r)
+		red=Int(k*this.Ar+this.Br)
+		green=Int(k*this.Ag+this.Bg)
+		blue=Int(k*this.Ab+this.Bb)
+
+		if (red&0x1ff)>0xff 
+			red=red^0xff 
+		end 
+
+		if (green&0x1ff)>0xff 
+			green=green^0xff 
+		end 
+		if (blue&0xff)>0xff 
+			blue=blue^0xff 
+		end 
+
+		setColor(red/255.0,blue/255.0,green/255.0)
+	end 
+		
+		
+
+	func init(re,im,iter_nu,radius,w_width,w_height)
+		this.c_re=re
+		this.c_im=im
+		this.iter_nu=iter_nu
+		this.radius=radius
+		this.w_width=w_width
+		this.w_height=w_height
+	end 
+
+	func draw()
+		c_re=this.c_re
+		c_im=this.c_im
+		w_width=this.w_width
+		w_height=this.w_height
+		iter_nu=this.iter_nu
+		radius=this.radius
+
+		xs=-1.5
+		xl=1.5
+
+		ys=-1.5
+		yl=1.5
+
+		dx=(xl-xs)/w_width
+		dy=(yl-ys)/w_height
+
+		i=0
+		while i<w_width
+			j=0
+			while j<w_height
+				x=xs+dx*i
+				y=ys+dy*j
+
+				k=0
+				while k<iter_nu
+					r=x*x+y*y
+					r=$math.sqrt(r)
+					if r >radius
+						break
+					else
+						x0=x*x-y*y+c_re
+						y0=2*x*y+c_im
+						x=x0
+						y=y0
+					end 
+					k=k+1
+				end 
+				this.set_color(k,r)
+				drawPixel(i,j)
+				j+=1
+			end 
+			i+=1
+		end 
+	end 
+end 
+
+export julia
+
+
+
+
+
+
+	

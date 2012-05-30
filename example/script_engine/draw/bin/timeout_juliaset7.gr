@@ -1,0 +1,3 @@
+import julialib
+j=julialib.julia(-0.70176,-0.3842,400,2.0,width,height)
+j.draw()

@@ -1,3 +1,20 @@
-import math
-print math.pow(3.0,3.0)
+import julia256color 
+color256=julia256color.vga256
+
+col=color256[0]
+j=0
+while j<width
+	col=color256[Int(j/(width/250.0))]
+	k=0                     
+	while k<height            
+		red=col[0]/256.0
+		green=col[1]/256.0
+		blue=col[2]/256.0
+		setColor(red,green,blue)
+		drawPixel(j,k)
+		k+=1
+	end 
+	j+=1
+end 
+
 

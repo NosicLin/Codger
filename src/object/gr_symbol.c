@@ -99,6 +99,10 @@ static int symbol_cmp(GrObject* x,GrObject* y)
 	{
 		return GrString_Cmp(((GrSymbol*)x)->s_name,(GrString*)y);
 	}
+	if(GrSymbol_Verify(y))
+	{
+		return GrString_Cmp(((GrSymbol*)x)->s_name,((GrSymbol*)y)->s_name);
+	}
 
 	return GR_CMP_NOT_SUPPORT;
 }

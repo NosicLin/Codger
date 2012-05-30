@@ -151,6 +151,10 @@ class FileList:public wxPanel
 
 				cont=dir.GetNext(&file);
 			}
+			for(unsigned int i=0;i<type_nu;i++)
+			{
+				m_tree->SortChildren(m_category[i]);
+			}
 		}
 		void OnShow(wxCommandEvent& event)
 		{

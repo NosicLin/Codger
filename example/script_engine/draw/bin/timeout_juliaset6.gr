@@ -1,0 +1,5 @@
+import math
+import julialib
+import julia256color
+j=julialib.julia(-0.835,-0.2321,200,2.0,width,height)
+j.draw()
