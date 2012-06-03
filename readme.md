@@ -6,8 +6,8 @@ Codger是一门面向对象，直译式的动态程序设计语言,Codger语言�
 ==================
 ```
 git clone git://github.com/NosicLin/Codger.git 
-git co master       #切换到主分支
 cd Codger           #进入开载目录
+git co master       #切换到主分支
 make                #编译
 sudo make install   #安装
 ```
