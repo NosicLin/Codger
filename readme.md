@@ -5,10 +5,11 @@ Codger是一门面向对象，直译式的动态程序设计语言,Codger语言�
 下载与安装
 ==================
 ```
-git://github.com/NosicLin/Codger.git 
-cd Codger 
-make 
-sudo make install
+git clone git://github.com/NosicLin/Codger.git 
+git co master       #切换到主分支
+cd Codger           #进入开载目录
+make                #编译
+sudo make install   #安装
 ```
 
 运行Codger程序
