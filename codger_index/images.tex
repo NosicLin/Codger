@@ -1,4 +1,15 @@
 \batchmode
+\documentclass[a4paper,twoside,12pt]{article}
+\RequirePackage{ifthen}
+
+
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{bibentry,natbib}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+
 
 
 \usepackage[dvips]{color}
@@ -137,16 +148,46 @@
 \stepcounter{subsection}
 \stepcounter{subsection}
 {\newpage\clearpage
-\lthtmlinlinemathA{tex2html_wrap_inline193}%
+\lthtmlinlinemathA{tex2html_wrap_inline204}%
 $-2^{31}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline206}%
+$2^{31}-1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline208}%
+$-2^{63}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline210}%
+$2^{63}-1$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+\stepcounter{subsection}
+\stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline212}%
+$-3.4*10^{-38}$%
+\lthtmlinlinemathZ
+\lthtmlcheckvsize\clearpage}
+
+{\newpage\clearpage
+\lthtmlinlinemathA{tex2html_wrap_inline214}%
+$-3.4*10^{38}$%
 \lthtmlinlinemathZ
 \lthtmlcheckvsize\clearpage}
 
 \stepcounter{subsection}
 \stepcounter{subsection}
 \stepcounter{subsection}
-\stepcounter{subsection}
-\stepcounter{subsection}
 \stepcounter{section}
 \stepcounter{subsection}
 \stepcounter{subsection}
@@ -167,6 +208,12 @@ $-2^{31}$%
 \stepcounter{subsection}
 \stepcounter{section}
 \stepcounter{subsection}
+{\newpage\clearpage
+\lthtmlfigureA{textbf385}%
+\begin{textbf}+, -, \verb|~|, not\end{textbf}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
 \stepcounter{subsection}
 \stepcounter{subsection}
 \stepcounter{subsection}
@@ -229,11 +276,39 @@ $-2^{31}$%
 \stepcounter{section}
 \stepcounter{subsection}
 \stepcounter{subsection}
+{\newpage\clearpage
+\lthtmldisplayA{displaymath1272}%
+\begin{displaymath}\frac{AreaSize}{PageSize}-1\end{displaymath}%
+\lthtmldisplayZ
+\lthtmlcheckvsize\clearpage}
+
 \stepcounter{subsection}
 \stepcounter{subsection}
 \stepcounter{subsubsection}
+{\newpage\clearpage
+\lthtmlfigureA{figure1242}%
+\begin{figure}\begin{verbatim}
+
+ page_list                                  cur_page
+     \                                         |
+      V                                        V
+    +------+ ---> +------+ --->  .... -->+------+      
+    |      |      |      |               |      |
+    |      |      |      |       ....    |      |
+    |      |      |      |               |      |
+    +------+      +------+               +------+\end{verbatim}
+
+\end{figure}%
+\lthtmlfigureZ
+\lthtmlcheckvsize\clearpage}
+
 \stepcounter{subsubsection}
 \stepcounter{subsubsection}
 \stepcounter{subsubsection}
+\stepcounter{section}
+\stepcounter{section}
+\stepcounter{subsection}
+\stepcounter{subsection}
+\stepcounter{section}
 
 \end{document}

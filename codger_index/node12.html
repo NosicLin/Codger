@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>注释</TITLE>
-<META NAME="description" CONTENT="注释">
+<TITLE>解析器源码</TITLE>
+<META NAME="description" CONTENT="解析器源码">
 <META NAME="keywords" CONTENT="index">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,43 +20,50 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node13.html">
 <LINK REL="previous" HREF="node11.html">
-<LINK REL="up" HREF="node4.html">
+<LINK REL="up" HREF="index.html">
 <LINK REL="next" HREF="node13.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html251"
+<A NAME="tex2html340"
   HREF="node13.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html249"
-  HREF="node4.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html243"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html338"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html332"
   HREF="node11.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
 <BR>
-<B> Next:</B> <A NAME="tex2html252"
-  HREF="node13.html">空白符</A>
-<B> Up:</B> <A NAME="tex2html250"
-  HREF="node4.html">词法</A>
-<B> Previous:</B> <A NAME="tex2html244"
-  HREF="node11.html">字符串</A>
+<B> Next:</B> <A NAME="tex2html341"
+  HREF="node13.html">About this document ...</A>
+<B> Up:</B> <A NAME="tex2html339"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html333"
+  HREF="node11.html">字节码的内部执行过程</A>
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00028000000000000000">
-注释</A>
-</H2>
-在Codger注释以#号开头,直到这一行结果，解析器解析源程序，注释中的所有内容都分被忽略掉。用文法表示为：<PRE>
-comment ="#" cm_item* newline
-cm_item =&lt;any source character except newline&gt;
+<H1><A NAME="SECTION000120000000000000000">
+解析器源码</A>
+</H1>
+Codger解析器是一款开源的软件，源代码可以通过以下方式获得：
+
+<OL>
+<LI>通过git下载：<PRE>
+git clone git://github.com/NosicLin/Codger.git
 </PRE>
+</LI>
+<LI>直接下载：<PRE>
+https://github.com/NosicLin/Codger/downloads
+</PRE>
+</LI>
+</OL>
+
+<P>
 <BR><HR>
 <ADDRESS>
 NosicLin

@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>浮点数</TITLE>
-<META NAME="description" CONTENT="浮点数">
+<TITLE>Codger文法</TITLE>
+<META NAME="description" CONTENT="Codger文法">
 <META NAME="keywords" CONTENT="index">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,51 +20,120 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node11.html">
 <LINK REL="previous" HREF="node9.html">
-<LINK REL="up" HREF="node4.html">
+<LINK REL="up" HREF="index.html">
 <LINK REL="next" HREF="node11.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html231"
+<A NAME="tex2html318"
   HREF="node11.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html229"
-  HREF="node4.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html223"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html316"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html310"
   HREF="node9.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
 <BR>
-<B> Next:</B> <A NAME="tex2html232"
-  HREF="node11.html">字符串</A>
-<B> Up:</B> <A NAME="tex2html230"
-  HREF="node4.html">词法</A>
-<B> Previous:</B> <A NAME="tex2html224"
-  HREF="node9.html">长整数</A>
+<B> Next:</B> <A NAME="tex2html319"
+  HREF="node11.html">字节码的内部执行过程</A>
+<B> Up:</B> <A NAME="tex2html317"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html311"
+  HREF="node9.html">内存管理</A>
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
 
-<H2><A NAME="SECTION00026000000000000000">
-浮点数</A>
-</H2>
-在codger中采用的是32位浮点数，其数值范围约为：<SPAN CLASS="MATH"><IMG
- WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img5.png"
- ALT="$-3.4*10^{-38}$"></SPAN> 到 <SPAN CLASS="MATH"><IMG
- WIDTH="89" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
- SRC="img6.png"
- ALT="$-3.4*10^{38}$"></SPAN> 。浮点数由三个部分组成：整数部分，浮点部分，指数部分。浮点数可以在源程序中显示定义，定义时整数部分与指数部分可以省去。用文法表示浮点数为：<PRE>
-floatnumber = pointfloat | exponentfloat
-pointfloat = [intpart] "." digit+
-exponentfloat = (intpart | pointfloat) exponent
-intpart = digit+
-exponent = ("e" | "E") ["+" | "-"] digit+
+<H1><A NAME="SECTION000100000000000000000">
+Codger文法</A>
+</H1>
+<PRE>
+#start symbol: module 
+module = stmts
+stmts = {stmt_delimiter} [stmt] 
+        { stmt_delimiter {stmt_delimiter} stmt } {stmt_delimiter}
+       
+stmt_delimiter = ";" | "\n"
+#like continue,break stmt can't not appear in stmts expect 
+#for_smt ,while_stmt. interpreter will check  
+stmt= expr_stmt | assing_stmt | print_stmt | for_stmt |
+      while_stmt | if_stmt | break_stmt | continue_stmt |
+      return_stmt | throw_stmt | try_stmt | 
+      class_declare | import_stmt | export_stmt 
+
+expr_stmt = expr 
+#interpreter has extra restrictions for assing_object
+assing_stmt = assing_object assing_oper expr 
+assing_object=expr
+assing_oper = "=" | "*=" | "/=" | "%=" | "+=" |
+             "-=" | "&lt;&lt;=" | "&gt;&gt;=" | "&amp;=" | "^=" | "|="
+              
+print_stmt = "print" [expr] {"," expr}
+for_stmt = "for" assing_object "in" expr for_delimiter stmts "end"
+for_delimiter = "\n" | ";" | "do"
+while_stmt = "while" expr while_delimiter stmts "end"
+while_delimiter = "\n" |";" |"do"
+if_stmt = if_part {elif_part} [else_part] "end"
+if_part = "if" expr if_delimiter stmts 
+elif_part = "elif" expr if_delimiter stmts
+else_part = "else" stmts
+if_delimiter = "\n"|";"|"then"
+break_stmt="break"
+continue_stmt="continue"
+return_stmt="return" [expr]
+throw_stmt="throw" [expr]
+try_stmt = try_part finally_part "end" |
+           try_part [catch_part] {catch_part}
+           [finally_part] "end"
+try_part = "try" stmt_delimiter stmts
+catch_part = "catch" [expr] {"," exrp} ["as" identifier]
+             stmt_delimiter stmts
+finally_part = "finally" stmt_delimiter stmts
+class_stmt = "class" identifier ["inherit" expr ] 
+              stmt_delimiter {class_stmt} "end"
+class_stmt = [perm] ["static"] (attr_declare | func_declare )
+attr_declare = "attr" identifier ["=" expr]
+perm = "public" | "protected" | "private" 
+
+func_declare = "func" identifier "(" [arg] {"," arg} [","] ")"
+                stmt_delimiter  stmts "end"
+lambda_declar = "func" "(" [arg] {"," arg} [","] ")"
+                stmt_delimiter  stmts "end"
+#interpreter will check arg type sequence
+arg = identifier | identifier "=" expr | "*" identifier  
+
+import_stmt = "import" identifier {"." identifier} ["as" identifier]
+export_stmt = "export" identifier | "export" expr "as" identifier
+
+literal = INTEGER | LONG_INTERGER | FLOAT | STRING | 
+          FALSE | TRUE |  NIL 
+identifier = NAME 
+upper_id ="$" NAME 
+
+array = "[" [expr] {"," expr} [","] "]"
+hash = "{" [expr "-&gt;" expr] {"," expr "-&gt;" expr} [","] "}"
+
+primary_expr = literal | "(" expr ")" |identifier | upper_id | 
+               array | hash | func_declare | lambda_declar 
+postfix_expr = primary_expr {postfix_oper}
+postfix_oper = "." identifier | "[" expr "]" | "(" arg_list ")"
+arg_list = [expr] {"," expr} [","]
+unary_expr = {("+"|"-"|"~") } postfix_expr 
+multiply_expr = unary_expr { ("*" |"/"|"%") unary_expr }
+addtive_expr = multiply_expr { ("+"|"-") multiply_expr }
+shift_expr = addtive_expr {("&lt;&lt;"|"&gt;&gt;") addtive_expr} 
+bit_add_expr = shift_expr { "&amp;" shift_expr }
+bit_xor_expr = bit_add_expr { "^" bit_add_expr }
+bit_or_expr = bit_xor_expr { "|" bit_or_expr }
+relation_expr = bit_or_expr {("&lt;"|"&lt;="|"&gt;="|"&gt;") bit_or_expr}
+equal_expr = "relation_expr {("=="|"!=") relation_expr }
+logic_not_expr = {"not"} equal_expr 
+logic_and_expr = logic_not_expr { "and" logic_not_expr }
+logic_or_expr = logic_and_expr { "or" logic_or_expr }
+expr = logic_or_expr
 </PRE>
 <BR><HR>
 <ADDRESS>

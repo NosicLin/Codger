@@ -7,8 +7,8 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
   Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
 <HTML>
 <HEAD>
-<TITLE>关键字</TITLE>
-<META NAME="description" CONTENT="关键字">
+<TITLE>运算符与表达式</TITLE>
+<META NAME="description" CONTENT="运算符与表达式">
 <META NAME="keywords" CONTENT="index">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
@@ -20,47 +20,261 @@ original version by:  Nikos Drakos, CBLU, University of Leeds
 
 <LINK REL="next" HREF="node6.html">
 <LINK REL="previous" HREF="node4.html">
-<LINK REL="up" HREF="node4.html">
+<LINK REL="up" HREF="index.html">
 <LINK REL="next" HREF="node6.html">
 </HEAD>
 
 <BODY >
 
 <DIV CLASS="navigation"><!--Navigation Panel-->
-<A NAME="tex2html181"
+<A NAME="tex2html203"
   HREF="node6.html">
-<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
- SRC="/usr/share/latex2html/icons/next.png"></A> 
-<A NAME="tex2html179"
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html201"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html195"
   HREF="node4.html">
-<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
- SRC="/usr/share/latex2html/icons/up.png"></A> 
-<A NAME="tex2html173"
-  HREF="node4.html">
-<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
- SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
 <BR>
-<B> Next:</B> <A NAME="tex2html182"
-  HREF="node6.html">标识符</A>
-<B> Up:</B> <A NAME="tex2html180"
-  HREF="node4.html">词法</A>
-<B> Previous:</B> <A NAME="tex2html174"
-  HREF="node4.html">词法</A>
+<B> Next:</B> <A NAME="tex2html204"
+  HREF="node6.html">基本语句</A>
+<B> Up:</B> <A NAME="tex2html202"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html196"
+  HREF="node4.html">数据类型</A>
 <BR>
 <BR></DIV>
 <!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
 
-<H2><A NAME="SECTION00021000000000000000">
-关键字</A>
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html205"
+  HREF="node5.html#SECTION00051000000000000000">一元运算符</A>
+<LI><A NAME="tex2html206"
+  HREF="node5.html#SECTION00052000000000000000">后缀运算符</A>
+<LI><A NAME="tex2html207"
+  HREF="node5.html#SECTION00053000000000000000">二元运算符</A>
+<LI><A NAME="tex2html208"
+  HREF="node5.html#SECTION00054000000000000000">类型转换</A>
+<LI><A NAME="tex2html209"
+  HREF="node5.html#SECTION00055000000000000000">运算符优先级</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00050000000000000000">
+运算符与表达式</A>
+</H1>
+表达式<A NAME="tex2html12"
+  HREF="footnode.html#foot383"><SUP><SPAN CLASS="arabic">8</SPAN></SUP></A>是由运算符将运算对象连接起来具有合法语义的式子，运算符分为这么三类：一元运算符，后缀运算符，二元运算符。不同类型的对象对于运算符的处理方式不同，对于运算符的处理方法保存在对象的类型信息里面，例如当二元运算符+的左右操作数都为字符串对象时，返回结果为连接后的字符串；当左右操作数为整数对象时，返回结果为两个数的和。
+
+<P>
+
+<H2><A NAME="SECTION00051000000000000000">
+一元运算符</A>
 </H2>
-codger中关键字具有专门的意义与用途，它们不能被当作一般的标识符来使用，这些关键字有：<PRE>
-and, as, attr, break, catch, class, continue, export,
-do, elif, else, end, false, finally, for, from, func, 
-if, import, in, inherit, new, not, or, print, private, 
-protected, public, return, static, then, to, true,
-try, while。
+一元运算符也称为前缀运算符，有这么4个：
+<BR>
+<IMG
+ WIDTH="93" HEIGHT="16" ALIGN="BOTTOM" BORDER="0"
+ SRC="img7.png"
+ ALT="\begin{textbf}+, -, \verb\vert~\vert, not\end{textbf}">
+<BR>
+
+<OL>
+<LI>运算符<SPAN  CLASS="textbf"> not</SPAN> 用于逻辑运算，表示逻辑非；
+</LI>
+<LI>运算符<SPAN  CLASS="textbf"> +</SPAN> 在数值运算中，表示负号。
+</LI>
+<LI>运算符<SPAN  CLASS="textbf"> -</SPAN> 在数值运算中，表示正号。
+</LI>
+<LI>运算符<code> ~</code> 在数值运算中，表示按位取反
+</LI>
+</OL>
+<H2><A NAME="SECTION00052000000000000000">
+后缀运算符</A>
+</H2>
+在Codger后缀运算符有<SPAN  CLASS="textbf"> [ ] , . , ( ) </SPAN> 这么3个
+
+<OL>
+<LI>运算符<SPAN  CLASS="textbf">[ ]</SPAN>，也被称为下标运算符的使用方法为：<PRE>
+expr1 "[" expr2 "]"
 </PRE>
-<BR><HR>
+
+<UL>
+<LI>当expr1为字符串对象时,表示下标访问，返回结果为一个新的字符串，该字符串的内容为位于 expr1 对象的expr2位置的字符。
+</LI>
+<LI>当expr1为数组对象时，表示下标访问，返回结果为存储在 expr1 对象的expr2位置的对象。
+</LI>
+<LI>当expr1为散列表对象时，表示查询，返回结果为存储在expr1对象中键值expr2所关联的对象。
+</LI>
+</UL>
+</LI>
+<LI>运算符 <SPAN  CLASS="textbf"> . </SPAN> 用于访问对象的属性，所以也被称为属性访问运算符，使用方法为：<PRE>
+expr "." identifier
+</PRE>
+其中identifier为标识符,表示访问对象expr的identifier属性。
+</LI>
+<LI>运算符 <SPAN  CLASS="textbf"> ( ) </SPAN> 用于过程调用，使用方法为：<PRE>
+expr "(" [ expr ] {"," expr} [","] ")"
+</PRE>
+当expr为函数对象时，则发生过程调用；当expr为类对象时，则会创建一个实例对象。
+</LI>
+</OL>
+<H2><A NAME="SECTION00053000000000000000">
+二元运算符</A>
+</H2>
+ Codger中的二元运算符有18个，分别为：<PRE>
++  -  *  /  %  
+&lt;&lt;  &gt;&gt;  &amp;  ^  |  
+&lt;  &lt;=  ==  !=  &gt;=  &gt; 
+and  or
+</PRE>
+这18个运算符又被分为4类：
+
+<OL>
+<LI>算术运算符:<PRE>
++  -  *  /  %  
+</PRE>
+在数值运算中，运算符 + 用于求和;，- 用于求差，* 用于求乘积； / 用于求商； % 用于取模。
+</LI>
+<LI>位运算符：<PRE>
+&lt;&lt;  &gt;&gt;  &amp;  ^  |
+</PRE>
+在数值运算中，运算符 &#171;  表示左移运算，&#187;  表示右移运算， &amp;  表示按位与运算， ^  表示按位异或运算，|  表示按位或运算
+</LI>
+<LI>比较运算符:<PRE>
+&lt;  &lt;=  ==  !=  &gt;=  &gt;
+</PRE>
+在数值运算中，运算符 &lt;  表示小于运算，&lt;=  表示小于或等于运算, ==  表示等于运算，!=  表示不等于运算，&gt;=  表示大于或等于运算， &gt;  表示大于运算。
+</LI>
+<LI>逻辑运算符：<PRE>
+and  or
+</PRE>
+运算符and表示逻辑与运算，如果左边表达式返回的左操作数为假，则立刻返回假，而不会对右边表达进行运算；运算符or表示逻辑或运算，如果左边表达式返回的结果右操作数为真，则立刻返回真，而不会对右边表达式进行运算。逻辑运算中，当操作数不为布尔值，会进行布尔转换：整数，浮点数，长整数为0时为假，其它情况为真；数组与散列表中的元素个数为0时，为假，其它情况为真；字符串为空串时为假，其它情况为真；特殊类型Nil为假
+</LI>
+</OL>
+
+<P>
+
+<H2><A NAME="SECTION00054000000000000000">
+类型转换</A>
+</H2>
+在数值运算中，二元运算符的左右操作数为不同的数据类型时，会涉及到类型的转换，转换的优先级为：浮点数 &gt;  长整数 &gt;  整数 &gt;  布尔值，当转换优先级高的数据类型与转换优先级低的数据类型运算时，转换优先级低的数据类型会转换到优先级高的数据类型。
+
+<P>
+
+<H2><A NAME="SECTION00055000000000000000">
+运算符优先级</A>
+</H2>
+表达式由多个运算符组成，合个运算之间的优先级别关系以及同级别运算符的运算顺序（结合方向）如下表： 
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="CENTER">优先级别</TD>
+<TD ALIGN="CENTER">运算符</TD>
+<TD ALIGN="CENTER">运算形式</TD>
+<TD ALIGN="CENTER">结合方向</TD>
+</TR>
+<TR><TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">( )</TD>
+<TD ALIGN="CENTER">(e)</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER">1</TD>
+<TD ALIGN="CENTER">[ ]</TD>
+<TD ALIGN="CENTER">a[e]</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">.</TD>
+<TD ALIGN="CENTER">a.x</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="CENTER">2</TD>
+<TD ALIGN="CENTER">+ - <code>~</code></TD>
+<TD ALIGN="CENTER">+a</TD>
+<TD ALIGN="CENTER">从右至左</TD>
+</TR>
+<TR><TD ALIGN="CENTER">3</TD>
+<TD ALIGN="CENTER">* / %</TD>
+<TD ALIGN="CENTER">e1*e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">4</TD>
+<TD ALIGN="CENTER">+ -</TD>
+<TD ALIGN="CENTER">e1-e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">5</TD>
+<TD ALIGN="CENTER"><code>&lt;&lt; &gt;&gt;</code></TD>
+<TD ALIGN="CENTER">e1 <code>&lt;&lt;</code> e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">6</TD>
+<TD ALIGN="CENTER"><code>&amp;</code></TD>
+<TD ALIGN="CENTER">e1 <code>&amp;</code> e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">7</TD>
+<TD ALIGN="CENTER"><code>^</code></TD>
+<TD ALIGN="CENTER">e1 <code>^</code> e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">8</TD>
+<TD ALIGN="CENTER">|</TD>
+<TD ALIGN="CENTER">e1 |  e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">9</TD>
+<TD ALIGN="CENTER"><code>&lt;  &lt;=  &gt;  &gt;=</code></TD>
+<TD ALIGN="CENTER">e1 <code>&lt;</code> e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">10</TD>
+<TD ALIGN="CENTER"><code>==  !=</code></TD>
+<TD ALIGN="CENTER">e1 <code>==</code> e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">11</TD>
+<TD ALIGN="CENTER">not</TD>
+<TD ALIGN="CENTER">not e1</TD>
+<TD ALIGN="CENTER">从右至左</TD>
+</TR>
+<TR><TD ALIGN="CENTER">12</TD>
+<TD ALIGN="CENTER">and</TD>
+<TD ALIGN="CENTER">e1 and e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+<TR><TD ALIGN="CENTER">13</TD>
+<TD ALIGN="CENTER">or</TD>
+<TD ALIGN="CENTER">e1 or e2</TD>
+<TD ALIGN="CENTER">从左至右</TD>
+</TR>
+</TABLE>
+</DIV>
+在表中，优先级的数值越大，其优先级越低。优先级最高的为括号，最低的为运算符 or。
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html203"
+  HREF="node6.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html201"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html195"
+  HREF="node4.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html204"
+  HREF="node6.html">基本语句</A>
+<B> Up:</B> <A NAME="tex2html202"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html196"
+  HREF="node4.html">数据类型</A></DIV>
+<!--End of Navigation Panel-->
 <ADDRESS>
 NosicLin
 2012-06-03
