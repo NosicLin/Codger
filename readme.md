@@ -20,7 +20,7 @@ codger <文件名>
 
 文档
 =======
-[使用文档](https://github.com/NosicLin/Codger/wiki/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3)  
+[使用文档](http://nosiclin.github.com/Codger/codger_index/index.html)  
 [开发文档](https://github.com/NosicLin/Codger/wiki/%E5%BC%80%E5%8F%91%E6%96%87%E6%A1%A3)
 
 应用实例：
