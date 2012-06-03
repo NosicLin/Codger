@@ -5,6 +5,7 @@ tags
 *.o
 *.a
 *.dat
+*~
 grammar.tab.c
 
 temp

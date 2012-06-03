@@ -7,7 +7,7 @@ SRC=gr_int.c gr_object.c gr_hash.c gr_array.c gr_string.c \
 
 DEBUG=
 
-BIN=int_unit.c hash_unit.c array_unit.c
+#BIN=int_unit.c hash_unit.c array_unit.c
 
 
 

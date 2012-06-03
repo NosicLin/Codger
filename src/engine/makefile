@@ -4,8 +4,8 @@ SRC=eg_codger.c eg_sframe.c eg_thread.c  except.c eg_buildin.c
 
 
 DEBUG=
-
-BIN= codger.c codger_nogc.c
+BIN= codger.c
+#BIN= codger.c codger_nogc.c
 
 
 

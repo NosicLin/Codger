@@ -2,7 +2,7 @@ PROJECT=memory
 
 SRC=mem_base.c memory.c gc.c
 DEBUG=
-BIN=test_page.c test_memory.c test_memory2.c test_clib.c  \
+#BIN=test_page.c test_memory.c test_memory2.c test_clib.c  \
 	test_gc.c
 
 

@@ -4,6 +4,7 @@ class shape
 		return "shape"
 	end 
 end 
+
 class rectange inherit shape
 	attr width
 	attr height

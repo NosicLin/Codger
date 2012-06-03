@@ -3,7 +3,7 @@ PROJECT=syntax
 SRC=ast_object.c  parser.c yylex.c grammar.tab.c \
 	node_expr.c node_stmt.c
 DEBUG=
-BIN=bytecode.c
+#BIN=bytecode.c
 
 CC=gcc
 FLAGS=-g -Wall  -Werror -include sys/types.h  
