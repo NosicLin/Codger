@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>垃圾回收算法</TITLE>
+<META NAME="description" CONTENT="垃圾回收算法">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="previous" HREF="node96.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node98.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1169"
+  HREF="node98.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1167"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1163"
+  HREF="node96.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1170"
+  HREF="node98.html">堆的构成</A>
+<B> Up:</B> <A NAME="tex2html1168"
+  HREF="node93.html">内存管理</A>
+<B> Previous:</B> <A NAME="tex2html1164"
+  HREF="node96.html">内存分配算法</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00094000000000000000">
+垃圾回收算法</A>
+</H2>
+Codger中的所有对象内存都必须从GC模块中分配，对象分配后，不必在程序中显示的释放，Gc模块也没有提供释放接口，如果一个对象不能直接或者间接的到达，那这个对象则被称为垃圾对象。垃圾对象会一直存在，直到垃圾回收例程启动，将它们收集，并释放它们所占用的内存。
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html1171"
+  HREF="node98.html">堆的构成</A>
+<LI><A NAME="tex2html1172"
+  HREF="node99.html">回收例程</A>
+<LI><A NAME="tex2html1173"
+  HREF="node100.html">拦截器</A>
+<LI><A NAME="tex2html1174"
+  HREF="node101.html">标记位</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>整数</TITLE>
+<META NAME="description" CONTENT="整数">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node9.html">
+<LINK REL="previous" HREF="node7.html">
+<LINK REL="up" HREF="node4.html">
+<LINK REL="next" HREF="node9.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html211"
+  HREF="node9.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html209"
+  HREF="node4.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html203"
+  HREF="node7.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html212"
+  HREF="node9.html">长整数</A>
+<B> Up:</B> <A NAME="tex2html210"
+  HREF="node4.html">词法</A>
+<B> Previous:</B> <A NAME="tex2html204"
+  HREF="node7.html">特殊符号与运算符</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00024000000000000000">
+整数</A>
+</H2>
+整数是一种与机器平台相关的数据类型，在32位机上，其表示范围为 <SPAN CLASS="MATH"></SPAN> 到 <SPAN CLASS="MATH"><IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$2^{31}-1$"></SPAN>。而在64位机上，其表示范围为<SPAN CLASS="MATH"><IMG
+ WIDTH="50" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$-2^{63}$"></SPAN> 到 <SPAN CLASS="MATH"><IMG
+ WIDTH="35" HEIGHT="32" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$2^{63}-1$"></SPAN> 。整数的表示范围有限，在设计程序时需要考虑运算结果溢出的情况。整数可以在codger源程序中显示的定义，整数又被分为二进制整数，八进制整数，十进制整数，十六进制整数。二进制整数以0b或者0B开头，后面紧接着一个或多个0或1；八进制整数以0或者0o、0O开头，后面紧接数字一个或多个0－7；十进制整数以1－9开头，后面紧接数字零个或多个0－9，或者是只有一位十进制整数0；十六进制整数以0x或都0X开头，后面紧接一个或者多个数字0－9、a－f、A－F。用文法表示为：<PRE>
+integer =decimalinteger|octinteger|hexinteger|bininteger
+decimalinteger = nonzerodigit digit* | "0"
+octinteger = "0" ("o" | "O") octdigit+ | "0" octdigit+
+hexinteger = "0" ("x" | "X") hexdigit+
+bininteger = "0" ("b" | "B") bindigit+
+nonzerodigit = "1"..."9"
+octdigit = "0"..."7"
+bindigit = "0" | "1"
+hexdigit:= digit | "a"..."f" | "A"..."F"
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

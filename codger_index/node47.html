@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>if-elif-else语句</TITLE>
+<META NAME="description" CONTENT="if-elif-else语句">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="previous" HREF="node46.html">
+<LINK REL="up" HREF="node46.html">
+<LINK REL="next" HREF="node48.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html638"
+  HREF="node48.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html636"
+  HREF="node46.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html632"
+  HREF="node46.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html639"
+  HREF="node48.html">跳转语句</A>
+<B> Up:</B> <A NAME="tex2html637"
+  HREF="node46.html">选择语句</A>
+<B> Previous:</B> <A NAME="tex2html633"
+  HREF="node46.html">选择语句</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00063100000000000000">
+if-elif-else语句</A>
+</H3>
+if-elif-else语句由一个if部分，零个或多个elif部分，零个或一个else部分组成。if 和 elif 部分由控制表达式和子语句组成，else部分由一个子语句组成。if-elif-else语句运行时，先从if部分开始判断控制表达式是否为真，如果为真，则执行if部分的子语句，并退出if-elif-else语句，如果为假，则会依次判断elif的控制表达式，elif的控制表达式如果为真，则执行相对应的elif的子语句，并退出if-elif-else语句。如果elif的控制表达式为假，则判断下一个elif部分。最后如果if-elif-else还没有退出，则执行else部分的语句。语法规则用文法表示为:<PRE>
+if_stmt = if_part  {elif_part} [else_part] "end"
+if_part = "if" expr if_delimiter stmts 
+elif_part = "elif" expr if_delimiter stmts
+else_part = "else" stmts
+if_delimiter = "\n" | ";" | "then"
+</PRE>
+示例代码：<PRE>
+a=2
+if a==1
+    print 1
+elif a==2
+    print 2
+else 
+    print "unkown"
+end 
+#输出为 2
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

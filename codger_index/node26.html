@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>函数定义</TITLE>
+<META NAME="description" CONTENT="函数定义">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="previous" HREF="node25.html">
+<LINK REL="up" HREF="node23.html">
+<LINK REL="next" HREF="node27.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html404"
+  HREF="node27.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html402"
+  HREF="node23.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html398"
+  HREF="node25.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html405"
+  HREF="node27.html">类与实例</A>
+<B> Up:</B> <A NAME="tex2html403"
+  HREF="node23.html">函数与匿名函数</A>
+<B> Previous:</B> <A NAME="tex2html399"
+  HREF="node25.html">函数调用</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00044300000000000000">
+函数定义</A>
+</H3>
+在Codger中使用下面的语法定义函数：<PRE>
+"func" [identifier] "(" [arg] { "," arg } [","] ")"
+        stmts
+"end"
+</PRE>
+其中identifier为标识符，表示函数名，当函数名为空时，则为匿名函数。arg表示函数的参数类型，参数类型有3种：
+<DL>
+<DT><STRONG>简单参数:</STRONG></DT>
+<DD>只由参数名组成，当函数调用时，参数的个数比须与定义中简单参数的个数相匹配。例如：<PRE>
+func add(x,y)
+    return x+y
+end 
+print add(3,5)   #输出结果为 8
+</PRE>
+
+<P>
+</DD>
+<DT><STRONG>缺省参数:</STRONG></DT>
+<DD>由参数名和表达式组成：<code>identifier "=" expr</code>,缺省参数必须位于简单参数的后面，当函数调用时，参数个数比须大于等于简单参数的个数，参数的个数的最大值不能超过简单参数与缺省参数的总和，如果在调用时，缺省参数部分的值没有被指定，则会传入其相对应的<code>expr</code>的值。例如：<PRE>
+func add_default(x,y=10)
+    return x+y
+end 
+print add_default(1)     #输出结果为11
+print add_default(1,20)  #输出结果为21
+</PRE>
+</DD>
+<DT><STRONG>多参数:</STRONG></DT>
+<DD>在参数名前面加上*,表示接受多个参数，多参数只能出现在参数定义的最后面，并且最多只能定义一个。当函数调用时，多参数会以数组的形式传入。例如：<PRE>
+func add_many(*x)
+    sum=0
+    for i in x            #遍边数组中的每一个元素
+        sum+=i
+    end
+    return sum
+end
+print add_many()          #输出为0
+print add_many(1,2)       #输出为3
+print add_many(1,2,3,4)   #输出为10
+</PRE>
+</DD>
+</DL>
+如果在函数定义时，没有return语句，则返回对象Nil
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

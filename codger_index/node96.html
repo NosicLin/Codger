@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>内存分配算法</TITLE>
+<META NAME="description" CONTENT="内存分配算法">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node97.html">
+<LINK REL="previous" HREF="node95.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node97.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1161"
+  HREF="node97.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1159"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1153"
+  HREF="node95.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1162"
+  HREF="node97.html">垃圾回收算法</A>
+<B> Up:</B> <A NAME="tex2html1160"
+  HREF="node93.html">内存管理</A>
+<B> Previous:</B> <A NAME="tex2html1154"
+  HREF="node95.html">页分配算法</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00093000000000000000">
+内存分配算法</A>
+</H2>
+c库的内存分配效率已经非常优秀，但毕竟c库的内存分配算法是一种通用算法，它能适应不同大小的内存分配请求，正是因为这种通用性，使内存中很容易堆积碎片。当内存碎片过多时，分配效率也会随着下降。QuickMem这一个模块是针对小内存分配设计的，小内存的界线SmallSize，可以在修改源码中的宏定义的值来改变，在Codger中小内存的定义为256字节。当分配的内存大小大于SmallSize时，QiuckMem会使用C库来分配内存。
+
+<P>
+QuickMem工作原理是把不同大小的内存进行分组，每一组分配内存的单位是8个倍数。当需要分配的内存大小为1<code>~</code>8时，从每0组中分配，分配内存大小为8字节；当分配的内存大小为9<code>~</code>16时，从每1组中分配，分配内存大小为16字节；依此类推下去。如果需要分配的内存大于SmallSize，则QuickMem调用C库的内存分配函数。QuickMem的这种工作方式，使得从QuickMem分配到的内存，比需要的内存多出0<code>~</code>7个字节，造成一定数量的内存浪费，但这种浪费并不是很多。现在的cpu大多数都是32位，编译器在编译程序时，会强制4字节对齐以获得更好的Cache性能，即使结构体只有一个char的成员，该结构体也会占用4字节。所以从QuickMem中每配到的内存只有两种情况：1）比需要的大出4字节；2）刚好等于需要的内存。
+
+<P>
+QuickMem内存分配以组为单位，当需要每配一个小于 SmallSize 大小的内存size时，首先需要计算出它属于那一组，因为分配单位是8个倍数，只需要将size右移3位，就能得到它所在的分组，然后出它从所在分组中分配内存。
+
+<P>
+假设现在的分组为N，分组调用MemBase页分配接口，用于获得一页，然后它在这一页的开头写入一些管理数据称为PageHeader(大小保证8字节对齐)。最后把页剩余的空间划分成该分组每配单位((N+1)*8)的相等的多个空间，用于分配。分组的数据结构与前面绍介的MemBase的管理数据相同，有free_list， full_list，cur_page。free_list保存所有还能分配空间的页，full_list中的页没有剩余空间可以分配，cur_page表示用于分配的当前页。PageHeader与AreaHeader的数据结构相似，只不过分配单位的大小不同，AreaHeader 一次性分配一页，PageHeader一次性分配(N+1)*8字节大小，它们的分配算法原理相同。
+
+<P>
+当程序释放内存给QuickMem时，释放的内存有两种情况，每一种情况为释放的内存属于小内存，来自于分组中，每二种情况为释放的来自于C库，QuickMem需要对它们进行判断。这里首先讨论当内存属于小内存时的情况。每个小内存都是从分组中每配，分组在每一个页的开头(PageHeader)都写入管理数据(如下图)，只要释放内存的地址的低位屏蔽掉就可以获得它所在的PageHeader。假设释放内存的地址为addr，计算公式为： <code>addr&amp;(~(PageSize-1))</code>。得到释放内存所在的PageHeader，然后调用PageHeader.Free(addr)<PRE>
+PageBeginAddr           addr           PageEndAddr
+   |                      |                |
+   v                      V                V
+   +----------+--------------\\------------+
+   |PageHeader|    ...        \\    ....   |
+   +----------+----------------\\----------+
+</PRE>
+每二种情况是释放的内存来自于C库，QuickMem分在每个分配的页一个唯一的标识符，该标识符保存在PageHeader中，在QuickMem中有一个一维数组IDX，如果某一页的标识符为n，那么IDX[n]中就保存就该页的地址(如下图)：<PRE>
+        _____________\\ ___________
+IDX-&gt;  |___|___|___|__\\___|___|___|
+        /    \         \\       |
+       V      V                 V
+    +-----+  +-----+          +-----+
+    |     |  |     |          |     |
+    |     |  |     |          |     |
+    +-----+  +-----+          +-----+
+</PRE>
+判断释放内存的来源时，首先能过地址得到PageHeader，该PageHeader不一定是一个有效的数据，然后出PageHeader中取出标识符n，有下面几种情况:
+
+<OL>
+<LI>n的值不在IDX的范围内，则可判定它来自于C库
+</LI>
+<LI>n的值在标识符范围内时:
+
+<OL>
+<LI>IDX[n]!=PageHeader，则表明需要释放的内存来自于C库
+</LI>
+<LI>IDX[n]==PageHeader，则表明需要释放的内存来自于分组
+</LI>
+</OL>
+</LI>
+</OL>
+因为操作系统内部采用虚拟分页技术，在掉取PageHeader标识值时，即使释放内存来自于C库，也不会发生缺页异常或者是内存错误，而且只是提取，没有赋值，原来的值不会有任何的更改，这是一个安全的过程。
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>堆的构成</TITLE>
+<META NAME="description" CONTENT="堆的构成">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node99.html">
+<LINK REL="previous" HREF="node97.html">
+<LINK REL="up" HREF="node97.html">
+<LINK REL="next" HREF="node99.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1183"
+  HREF="node99.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1181"
+  HREF="node97.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1175"
+  HREF="node97.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1184"
+  HREF="node99.html">回收例程</A>
+<B> Up:</B> <A NAME="tex2html1182"
+  HREF="node97.html">垃圾回收算法</A>
+<B> Previous:</B> <A NAME="tex2html1176"
+  HREF="node97.html">垃圾回收算法</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00094100000000000000">
+堆的构成</A>
+</H3>
+在Gc模块中总共有四种不同类型的堆:静态区，惰性区，年老区，年轻区，不同类型的堆有不同的用途。
+
+<OL>
+<LI>静态区(Static)：用于分配静态数据,其它类型的堆的对象不会被提升到静态区。从静态区中分配的对象不会被回收，即使对象已经死亡，所以需要确保对象在解析器整个运行的生命周期类，不会成为垃圾对象。它被用于以下两种情况：
+
+<OL>
+<LI>解析器中某些非常固定的对象，它们的生命周期与解析器的生命周期相同。例如Codger中布尔值的false对象与true对象，Nil对象等都是从静态数据区中分配。
+</LI>
+<LI>因为Codger中垃圾回收算法采用的是分代式节点复法，垃圾回收例程可能会把对象复制到另一块区域，对象被复制后地址也被改变了。然而某些扩展模块中，它们可能要求某些对象在其生命周期内，它的地址不能被改变。在静态区分配的对象，这点能够得到保证。
+</LI>
+</OL>
+</LI>
+<LI>惰性区(Inertia)：用于分配程序中极少会变化对象，这些对象不能确保在解析器的整个生命周期内不会死亡，但是在大多数情况下，它们会存活很长一段时间或者是存活到解析器退出。惰性区中的对象会被回收，它回收频率很低，并且其它类型的堆对象不会被提升到惰性区。例如，解析器在解析源程序时，源程序中出现的常量，符号(字符串对象)，模块对象，类对象等都会从隋性区分配。
+</LI>
+<LI>年老区(Old)：用于接受年轻区被提升上来的对象，年老区的回收频率相对比年轻区的低的很多。
+</LI>
+<LI>年轻区(Young)：虚拟机运行时，所有的对象都是从年轻区分配，Codger是一门动态语言，每个时刻都会有大量的对象会被创建，但这些对象大多数都是计算过程中产生的临时对象，存活率很低，通常情况下是低于10%，让这些对象在年轻区分配，垃圾回收例程在多数情况下回收年轻区的垃圾对象，这样就只需要把低于10%的对象复制到另一个半区，很大程度上提高垃圾回收例程的效率。如果对象在年轻区被回收两次后依然存活，它就会被提升到年老区。
+</LI>
+</OL>
+
+<P>
+Gc模块的堆和QuickMem一样是基于页实现了，它并不是一块连续的区域，而是由多个页连在一块的(如图<A HREF="#fig:gc_heap"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>)，如果需要分配一个对象，则从当前页中划分出一块区域分给对象，如果当前页并不会划分出中够大小的区域，那么堆会向MemBase申请一块新的页，把新页放入到page_list中，并置cur_page为新分配的页。
+
+<DIV ALIGN="CENTER"><A NAME="fig:gc_heap"></A><A NAME="1234"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+Gc堆的构成</CAPTION>
+<TR><TD><IMG
+ WIDTH="96" HEIGHT="38" BORDER="0"
+ SRC="img9.png"
+ ALT="\begin{figure}\begin{verbatim}page_list cur_page
+ \vert
+V V
++---+ --&gt;...
+...t \vert \vert \vert \vert
++---+ +---+ +---+\end{verbatim}
+\end{figure}"></TD></TR>
+</TABLE>
+</DIV>
+
+堆的分配内存描述为：<PRE>
+Heap.Alloc(size)
+    if !cur_page.CanAlloc(size)   #如果当前页不能分配size大小的内存
+       page=MemBase.AllocPage()    #申请一块新的页
+       HeapInitPage(page)          #初始化页数据
+       page_list.add_tail(page)    #把新页放入到page_list尾部
+       cur_page=page               #更新cur_page
+    end
+    return cur_page.Alloc(size)
+end
+</PRE>
+Codger中最大的对象也没有超过100字节，分配出的新页肯定能成功的划分出一块内存区域。和QuickMem中的页一样，Gc模块的页也会在页开始的区域写入一些管理数据，称作为GcPageHeader。因为Codger采用节点复制法，节点复制法一个优势在于它有很快的内存分配速度，几乎可以和基于栈式内存分配相媲美。在内存分配时，只需要每次向下划分一块区域即可。在垃圾回收例程工作时，会把一个半区的成活的对象复制到另一个半区，原来半区中的所有页都会被释放。下一次内存分配会从另一个新半区开始分配，整个过程不会存在内存碎片。GcPageHeader中有两上数据，一个保存Page有空闲空间的位置free_pos，另一个保存Page的最大可分配位置max_pos。在Page中分配内存描述为：<PRE>
+GcPageHeader.Alloc(size)
+    ptr=free_pos
+    free_pos+=round8(size)　  #保证8字节对齐
+    return ptr
+end
+</PRE>
+从上面代码可以看出，分配只需要向下划分一块区域即可,判断页是否可分配的代码为:<PRE>
+GcPageHeader.CanAlloc(size)
+    if free_pos+size&gt;max_pos
+       return false
+    else 
+       return true
+    end
+end
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

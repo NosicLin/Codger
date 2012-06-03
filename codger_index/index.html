@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>index</TITLE>
+<META NAME="description" CONTENT="index">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node1.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html20"
+  HREF="node1.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev_g.png">   
+<BR>
+<B> Next:</B> <A NAME="tex2html21"
+  HREF="node1.html">简介</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<BIG CLASS="XLARGE">引&nbsp;&nbsp;&nbsp;&nbsp;言</BIG>
+<BR>
+这篇论文主要介绍一门面向对象，直译式的动态程序设计语言Codger，以及用于运行Codger语言的解析器的内部原理，论文的内容有：
+<DL>
+<DT><STRONG>第一章</STRONG></DT>
+<DD>简单介绍了Codger语言。
+</DD>
+<DT><STRONG>第二章</STRONG></DT>
+<DD>讲述了Codger语言单词是基本词法单位-单词，并且给出了构成每个单词的正则文法。
+</DD>
+<DT><STRONG>第三章</STRONG></DT>
+<DD>介绍了在Codger开发过程中，总结出的一种高效，简单，而且易于手工构造的词法识别算法。
+</DD>
+<DT><STRONG>每四章</STRONG></DT>
+<DD>介绍了在编写Codger语言时可以使用了基本数据类型，每种数据类型的使用方法以及它些数据类型的特性。这部分中还介绍了怎么在Codger中使用类，函数，以及用于管理和抽象源文件的模块对象。
+</DD>
+<DT><STRONG>第五章</STRONG></DT>
+<DD>介绍了Codger语言中的运算符与表达式，以及这些运算符之间的代先级关系。
+</DD>
+<DT><STRONG>第六章</STRONG></DT>
+<DD>介绍了使用Codger编写程序的基本语法，并且给出了每种类型语句相应于EBNF。这部分还为每种类型的语句，给出了一个小的，示例性的代码。
+</DD>
+<DT><STRONG>第七章</STRONG></DT>
+<DD>给出了每种不同类型的语句转换成字节码的框架。这些转换框架都在Codger解析器中实际开发中得到了验证。
+</DD>
+<DT><STRONG>第八章</STRONG></DT>
+<DD>介绍了Codger虚拟机的组成，以及每个模块的作用。
+</DD>
+<DT><STRONG>第九章</STRONG></DT>
+<DD>Codger解析器中的内存管理系统，这部分给出了一个小内存的快速分配算法，它比c库能快到<code>3~4</code>倍左右；Codger语言中的垃圾回收系统所使用的分代式节点复制法，以及怎么在页的基础上构造不连续性的堆。
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html22"
+  HREF="node1.html">简介</A>
+<UL>
+<LI><A NAME="tex2html23"
+  HREF="node2.html">Codger简介</A>
+<LI><A NAME="tex2html24"
+  HREF="node3.html">解析器简介</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html25"
+  HREF="node4.html">词法</A>
+<UL>
+<LI><A NAME="tex2html26"
+  HREF="node5.html">关键字</A>
+<LI><A NAME="tex2html27"
+  HREF="node6.html">标识符</A>
+<LI><A NAME="tex2html28"
+  HREF="node7.html">特殊符号与运算符</A>
+<LI><A NAME="tex2html29"
+  HREF="node8.html">整数</A>
+<LI><A NAME="tex2html30"
+  HREF="node9.html">长整数</A>
+<LI><A NAME="tex2html31"
+  HREF="node10.html">浮点数</A>
+<LI><A NAME="tex2html32"
+  HREF="node11.html">字符串</A>
+<LI><A NAME="tex2html33"
+  HREF="node12.html">注释</A>
+<LI><A NAME="tex2html34"
+  HREF="node13.html">空白符</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html35"
+  HREF="node14.html">词法识别算法</A>
+<UL>
+<LI><A NAME="tex2html36"
+  HREF="node15.html">状态链简介</A>
+<LI><A NAME="tex2html37"
+  HREF="node16.html">状态的结构</A>
+<LI><A NAME="tex2html38"
+  HREF="node17.html">识别算法</A>
+<LI><A NAME="tex2html39"
+  HREF="node18.html">状态机的合并</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html40"
+  HREF="node19.html">数据类型</A>
+<UL>
+<LI><A NAME="tex2html41"
+  HREF="node20.html">对象</A>
+<LI><A NAME="tex2html42"
+  HREF="node21.html">变量</A>
+<LI><A NAME="tex2html43"
+  HREF="node22.html">基本数据类型</A>
+<LI><A NAME="tex2html44"
+  HREF="node23.html">函数与匿名函数</A>
+<UL>
+<LI><A NAME="tex2html45"
+  HREF="node24.html">函数创建</A>
+<LI><A NAME="tex2html46"
+  HREF="node25.html">函数调用</A>
+<LI><A NAME="tex2html47"
+  HREF="node26.html">函数定义</A>
+</UL>
+<LI><A NAME="tex2html48"
+  HREF="node27.html">类与实例</A>
+<UL>
+<LI><A NAME="tex2html49"
+  HREF="node28.html">访问权限</A>
+<LI><A NAME="tex2html50"
+  HREF="node29.html">继承</A>
+<LI><A NAME="tex2html51"
+  HREF="node30.html">类定义</A>
+</UL>
+<LI><A NAME="tex2html52"
+  HREF="node31.html">模块</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html53"
+  HREF="node32.html">运算符与表达式</A>
+<UL>
+<LI><A NAME="tex2html54"
+  HREF="node33.html">一元运算符</A>
+<LI><A NAME="tex2html55"
+  HREF="node34.html">后缀运算符</A>
+<LI><A NAME="tex2html56"
+  HREF="node35.html">二元运算符</A>
+<LI><A NAME="tex2html57"
+  HREF="node36.html">类型转换</A>
+<LI><A NAME="tex2html58"
+  HREF="node37.html">运算符优先级</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html59"
+  HREF="node38.html">基本语句</A>
+<UL>
+<LI><A NAME="tex2html60"
+  HREF="node39.html">简单语句</A>
+<UL>
+<LI><A NAME="tex2html61"
+  HREF="node40.html">表达式语句</A>
+<LI><A NAME="tex2html62"
+  HREF="node41.html">赋值语句</A>
+<LI><A NAME="tex2html63"
+  HREF="node42.html">print语句</A>
+</UL>
+<LI><A NAME="tex2html64"
+  HREF="node43.html">循环语句</A>
+<UL>
+<LI><A NAME="tex2html65"
+  HREF="node44.html">for语句</A>
+<LI><A NAME="tex2html66"
+  HREF="node45.html">while语句</A>
+</UL>
+<LI><A NAME="tex2html67"
+  HREF="node46.html">选择语句</A>
+<UL>
+<LI><A NAME="tex2html68"
+  HREF="node47.html">if-elif-else语句</A>
+</UL>
+<LI><A NAME="tex2html69"
+  HREF="node48.html">跳转语句</A>
+<UL>
+<LI><A NAME="tex2html70"
+  HREF="node49.html">break语句</A>
+<LI><A NAME="tex2html71"
+  HREF="node50.html">continue语句</A>
+<LI><A NAME="tex2html72"
+  HREF="node51.html">return语句</A>
+</UL>
+<LI><A NAME="tex2html73"
+  HREF="node52.html">异常语句</A>
+<UL>
+<LI><A NAME="tex2html74"
+  HREF="node53.html">throw语句</A>
+<LI><A NAME="tex2html75"
+  HREF="node54.html">try-catch-finally语句</A>
+</UL>
+<LI><A NAME="tex2html76"
+  HREF="node55.html">定义语句</A>
+<UL>
+<LI><A NAME="tex2html77"
+  HREF="node56.html">函数定义语句</A>
+<LI><A NAME="tex2html78"
+  HREF="node57.html">类定义语句</A>
+</UL>
+<LI><A NAME="tex2html79"
+  HREF="node58.html">模块管理语句</A>
+<UL>
+<LI><A NAME="tex2html80"
+  HREF="node59.html">import语句</A>
+<LI><A NAME="tex2html81"
+  HREF="node60.html">export语句</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html82"
+  HREF="node61.html">字节码转换框架</A>
+<UL>
+<LI><A NAME="tex2html83"
+  HREF="node62.html">常量</A>
+<LI><A NAME="tex2html84"
+  HREF="node63.html">变量</A>
+<LI><A NAME="tex2html85"
+  HREF="node64.html">数组</A>
+<LI><A NAME="tex2html86"
+  HREF="node65.html">散列表</A>
+<LI><A NAME="tex2html87"
+  HREF="node66.html">一元运算符</A>
+<LI><A NAME="tex2html88"
+  HREF="node67.html">下标运算符()</A>
+<LI><A NAME="tex2html89"
+  HREF="node68.html">下标运算符[ ]</A>
+<LI><A NAME="tex2html90"
+  HREF="node69.html">下标运算符 . </A>
+<LI><A NAME="tex2html91"
+  HREF="node70.html">二元运算符</A>
+<LI><A NAME="tex2html92"
+  HREF="node71.html">逻辑运算符AND</A>
+<LI><A NAME="tex2html93"
+  HREF="node72.html">逻辑运算符OR</A>
+<LI><A NAME="tex2html94"
+  HREF="node73.html">表达式语句</A>
+<LI><A NAME="tex2html95"
+  HREF="node74.html">直接赋值语句</A>
+<LI><A NAME="tex2html96"
+  HREF="node75.html">运算并赋值语句</A>
+<LI><A NAME="tex2html97"
+  HREF="node76.html">print语句</A>
+<LI><A NAME="tex2html98"
+  HREF="node77.html">for语句</A>
+<LI><A NAME="tex2html99"
+  HREF="node78.html">while语句</A>
+<LI><A NAME="tex2html100"
+  HREF="node79.html">if-elif-else语句</A>
+<LI><A NAME="tex2html101"
+  HREF="node80.html">break语句</A>
+<LI><A NAME="tex2html102"
+  HREF="node81.html">continue语句</A>
+<LI><A NAME="tex2html103"
+  HREF="node82.html">return语句</A>
+<LI><A NAME="tex2html104"
+  HREF="node83.html">函数定义语句</A>
+<LI><A NAME="tex2html105"
+  HREF="node84.html">类定义语句</A>
+<LI><A NAME="tex2html106"
+  HREF="node85.html">import语句</A>
+<LI><A NAME="tex2html107"
+  HREF="node86.html">export语句</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html108"
+  HREF="node87.html">虚拟机</A>
+<UL>
+<LI><A NAME="tex2html109"
+  HREF="node88.html">模块对象</A>
+<LI><A NAME="tex2html110"
+  HREF="node89.html">数据栈</A>
+<LI><A NAME="tex2html111"
+  HREF="node90.html">栈帧</A>
+<LI><A NAME="tex2html112"
+  HREF="node91.html">异常处理</A>
+<LI><A NAME="tex2html113"
+  HREF="node92.html">字节码</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html114"
+  HREF="node93.html">内存管理</A>
+<UL>
+<LI><A NAME="tex2html115"
+  HREF="node94.html">内存管理模块的组成</A>
+<LI><A NAME="tex2html116"
+  HREF="node95.html">页分配算法</A>
+<LI><A NAME="tex2html117"
+  HREF="node96.html">内存分配算法</A>
+<LI><A NAME="tex2html118"
+  HREF="node97.html">垃圾回收算法</A>
+<UL>
+<LI><A NAME="tex2html119"
+  HREF="node98.html">堆的构成</A>
+<LI><A NAME="tex2html120"
+  HREF="node99.html">回收例程</A>
+<LI><A NAME="tex2html121"
+  HREF="node100.html">拦截器</A>
+<LI><A NAME="tex2html122"
+  HREF="node101.html">标记位</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html123"
+  HREF="node102.html">About this document ...</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

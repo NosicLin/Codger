@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>后缀运算符</TITLE>
+<META NAME="description" CONTENT="后缀运算符">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node35.html">
+<LINK REL="previous" HREF="node33.html">
+<LINK REL="up" HREF="node32.html">
+<LINK REL="next" HREF="node35.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html488"
+  HREF="node35.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html486"
+  HREF="node32.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html480"
+  HREF="node33.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html489"
+  HREF="node35.html">二元运算符</A>
+<B> Up:</B> <A NAME="tex2html487"
+  HREF="node32.html">运算符与表达式</A>
+<B> Previous:</B> <A NAME="tex2html481"
+  HREF="node33.html">一元运算符</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00052000000000000000">
+后缀运算符</A>
+</H2>
+在Codger后缀运算符有<SPAN  CLASS="textbf"> [ ] , . , ( ) </SPAN> 这么3个
+
+<OL>
+<LI>运算符<SPAN  CLASS="textbf">[ ]</SPAN>，也被称为下标运算符的使用方法为：<PRE>
+expr1 "[" expr2 "]"
+</PRE>
+
+<UL>
+<LI>当expr1为字符串对象时,表示下标访问，返回结果为一个新的字符串，该字符串的内容为位于 expr1 对象的expr2位置的字符。
+</LI>
+<LI>当expr1为数组对象时，表示下标访问，返回结果为存储在 expr1 对象的expr2位置的对象。
+</LI>
+<LI>当expr1为散列表对象时，表示查询，返回结果为存储在expr1对象中键值expr2所关联的对象。
+</LI>
+</UL>
+</LI>
+<LI>运算符 <SPAN  CLASS="textbf"> . </SPAN> 用于访问对象的属性，所以也被称为属性访问运算符，使用方法为：<PRE>
+expr "." identifier
+</PRE>
+其中identifier为标识符,表示访问对象expr的identifier属性。
+</LI>
+<LI>运算符 <SPAN  CLASS="textbf"> ( ) </SPAN> 用于过程调用，使用方法为：<PRE>
+expr "(" [ expr ] {"," expr} [","] ")"
+</PRE>
+当expr为函数对象时，则发生过程调用；当expr为类对象时，则会创建一个实例对象。
+</LI>
+</OL>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

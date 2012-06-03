@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>模块对象</TITLE>
+<META NAME="description" CONTENT="模块对象">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node89.html">
+<LINK REL="previous" HREF="node87.html">
+<LINK REL="up" HREF="node87.html">
+<LINK REL="next" HREF="node89.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1075"
+  HREF="node89.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1073"
+  HREF="node87.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1067"
+  HREF="node87.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1076"
+  HREF="node89.html">数据栈</A>
+<B> Up:</B> <A NAME="tex2html1074"
+  HREF="node87.html">虚拟机</A>
+<B> Previous:</B> <A NAME="tex2html1068"
+  HREF="node87.html">虚拟机</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00081000000000000000">
+模块对象</A>
+</H2>
+模块是Codger组成源程序文件的一种基本的方式，模块也是一种的对象，模块对象可以赋值给一个变量，可以保存在集合对象中。每当一个源程序文件被加载时，虚拟机内部分生成一个模块对象来表示该文件，模块对象以一种等价的形式包含有源程序中的所有信息。模块对象（命名为A）可以import语句导入其它模块，在导入时，虚拟机首先检查被导入的模块是否被加载，如果已经加载，则直接返回给模块A；如果模块还没有被加载，意为着被导入的模块是每一次被其它模块导入，虚拟机会首先加载被导入的模块，然后再返回给模块A。
+
+<P>
+模块是一个可执行的对象，当模块第一次被加载时，模块对象中的字节码会被执行。在执行过程中所得到的对象可以通过export语句导出。当模块A导入模块B时，是把模块B存入到模块A当前作用域的一个变量里面，模块A可以访问成员的方法来得到模块B通过export导出的对象。
+
+<P>
+Codger的源程序被解析后会生成一个模块对象，在模块对象中保存了源程序中所有必要的信息，这些信息有：
+
+<OL>
+<LI>常量池：在程序中，布尔值，整数，浮点数，字符串，长整数，Nil这6种标量的数据类型是构成源程序的最基本的单位，它们不能在分解成其它更小的对象。在解析源文件完成时，源文件中出现的这6种标量数据类型都会被保存都常量池中。
+</LI>
+<LI>符号池：在源文件中出现的标识符，标识符指程序中出现在变量，函数名，类名等，它们都会被保存在符号池中。符号用于变量，成员访问或赋值，当源程序访问一个变量，虚拟机会在当前作用域中查找该变量的值，当前作用域可以被想象成一个符号表，里面存储了多个元素，每个元素由一个符号和一个值组成。当源程序访问对象成员时，虚拟机会从对象的符号表中查找值。虚拟机工作时，大部分时间都查询符号表或者时改变符号表中的值。
+</LI>
+<LI>带权限的符号池：对象的成员有访问权限，对象成员被其它对象访问时，虚拟机会检测是否有足够的访问权限，权限信息保存在带权限的符号中。当一个类对象创建一个实例对象时，实例对象的符号表中的符号使用的是带权限的符号。
+</LI>
+<LI>字节码池：在Codger源程序中，如果定义函数，或者是定义了类方法，解析器会它们单独生成字节码，这些字节码保存在字节码池中。函数对象创建时，会设置它在定义时所对应的字节码。
+</LI>
+<LI>模块字节码：解析器解析完成源文件后，源程序会转换成与之等价的这字节码，这些这节码被俣存在模块对象中。当模块第一次被加载时，这些字节码会被执行。
+</LI>
+<LI>符号表：模块的符号表保存模块export语句导出的对象。
+</LI>
+</OL>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

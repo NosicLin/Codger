@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>直接赋值语句</TITLE>
+<META NAME="description" CONTENT="直接赋值语句">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node75.html">
+<LINK REL="previous" HREF="node73.html">
+<LINK REL="up" HREF="node61.html">
+<LINK REL="next" HREF="node75.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html932"
+  HREF="node75.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html930"
+  HREF="node61.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html924"
+  HREF="node73.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html933"
+  HREF="node75.html">运算并赋值语句</A>
+<B> Up:</B> <A NAME="tex2html931"
+  HREF="node61.html">字节码转换框架</A>
+<B> Previous:</B> <A NAME="tex2html925"
+  HREF="node73.html">表达式语句</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION000713000000000000000">
+直接赋值语句</A>
+</H2>
+赋值语句有左节点和右节点，左节点为被赋值的对象，转换方式为赋值转换；右节点的转换方式为取值转换。
+语句形式：<PRE>
+&lt;expr1&gt; = &lt;expr2&gt;
+</PRE>
+转换成字节码为：<PRE>
+{
+    expr2
+}
+{
+    expr1
+}
+</PRE>
+其中expr1为赋值转换，它有下面的几种情况：
+
+<P>
+
+<OL>
+<LI>给变量赋值，语句形式：<PRE>
+&lt;identifier&gt; = &lt;expr&gt;
+</PRE>
+转换成字节码为：<PRE>
+{
+   expr
+}
+OP_STORE_SYMBOL $(id)
+</PRE>
+其中:
+<BLOCKQUOTE>
+id=MapSymbol(identifier)
+
+</BLOCKQUOTE>
+</LI>
+<LI>给上层作用域的变量赋值，如果上层作用域没有找到该变量，则到上层的上层作用域中查找，并依次下去，语句形式：<PRE>
+&lt;$identifier&gt; = &lt;expr&gt;
+</PRE>
+转换成字节码为：<PRE>
+{
+   expr
+}
+OP_STORE_U_SYMBOL $(id)
+</PRE>
+其中:
+<BLOCKQUOTE>
+id=MapSymbol(identifier)
+
+</BLOCKQUOTE>
+</LI>
+<LI>给集合指令的元素赋值，语句形式<PRE>
+&lt;expr&gt; [ &lt;expr1&gt; ] = &lt;expr2&gt;
+</PRE>
+转换成字节码为：<PRE>
+{
+    expr2
+}
+{
+    expr  
+}
+{
+    expr1
+}
+OP_SET_ITEM
+</PRE>
+</LI>
+<LI>给对象的成员赋值，语句形式<PRE>
+&lt;expr&gt; . &lt;identifier&gt; = &lt;expr1&gt;
+</PRE>
+转换成字节码为：<PRE>
+{
+    expr1
+}
+{
+    expr  
+}
+OP_SET_ATTR $(id)
+</PRE>
+其中:
+<BLOCKQUOTE>
+id=MapSymbol(identifier)
+
+</BLOCKQUOTE>
+</LI>
+</OL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

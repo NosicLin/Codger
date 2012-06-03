@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>回收例程</TITLE>
+<META NAME="description" CONTENT="回收例程">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node100.html">
+<LINK REL="previous" HREF="node98.html">
+<LINK REL="up" HREF="node97.html">
+<LINK REL="next" HREF="node100.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1193"
+  HREF="node100.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1191"
+  HREF="node97.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1185"
+  HREF="node98.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1194"
+  HREF="node100.html">拦截器</A>
+<B> Up:</B> <A NAME="tex2html1192"
+  HREF="node97.html">垃圾回收算法</A>
+<B> Previous:</B> <A NAME="tex2html1186"
+  HREF="node98.html">堆的构成</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00094200000000000000">
+回收例程</A>
+</H3>
+垃圾回收例程的算法使用的是Cheney的节点复制收集法<A NAME="tex2html18"
+  HREF="footnode.html#foot1250"><SUP><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/footnote.png"></SUP></A>,每次当垃圾回收例程工作时，都会有确定回收的级别CollectionLevel，每个不同类型的堆区的回收级别关系为：<code>静态区&gt;惰性区&gt;年老区&gt;年轻区</code>。CollectionLevel确定后，和CollectionLevel相等或小于的堆都要参与回收。例如，CollectionLevel为年老区时，则年老区和年轻区都会被回收，而惰性区和静态区则不会被回收。CollectionLevel的最大级别为惰性区，所以静态区永远都不会被回收。参与回收的堆，都会把存活的对象从当前半区移到与之相应的另一个半区。如果对象处于年轻半区，并且在上一次回收时存活了下来，则它们被提升到老年分代。如果在对象在上次回收之后创建，并且这次回收存活了下来，则会标记对象在下次回收时提升它。
+
+<P>
+对于回收级别大于CollectionLevel的堆，它们同样也会被更新。Codger现在使用一种方法类似于线性扫描，线性扫描算法为依次扫描堆中所有对象，看该对象是引用了低级别的对象，如果是,则更新该对象。在每个对象中，如果一个对象引用了底级别的对象，那么该对象的低级别引用位会被置1。这一位可以用于判断是否引用了底级别的对象。
+Codger在实现不仅在对象中保存标志位，同样该对象所在的页的头部(GrPageHeader)也会保存该标志位，这样就可以页头部来判断该页中是否有对象引用了底级别的对象，如果则扫描该页中的所有对象，找到所有低级别引用位为被置位的对象，并更新该对象，如果没有则跳过该页。
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

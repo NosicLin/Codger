@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>对象</TITLE>
+<META NAME="description" CONTENT="对象">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node21.html">
+<LINK REL="previous" HREF="node19.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node21.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html343"
+  HREF="node21.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html341"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html335"
+  HREF="node19.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html344"
+  HREF="node21.html">变量</A>
+<B> Up:</B> <A NAME="tex2html342"
+  HREF="node19.html">数据类型</A>
+<B> Previous:</B> <A NAME="tex2html336"
+  HREF="node19.html">数据类型</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00041000000000000000">
+对象</A>
+</H2>
+Codger语言的整体的设计思想为：一切皆是对象。整数，浮点数，字符串等基本的数据类型是对象，函数是对象，甚至类也是对象... 因为这种特性，可以在源程序中使用类似于下面的语句:<PRE>
+print 1.add(3)  #输出1+3的值
+print "Codger".length() #输出字符串"Codger"的长度
+</PRE>
+对象Object是所有对象的父类，也就是说所有对象直接或者间接的继承对象Object。每个对象所携带的信息分为两部分：1）对象的类型信息，用于标识该对象的类型，所有同类型的对象共享对象的类型信息，类型信息里面保存了对象的所属类型，对象使用私有数据的方法，对象与其它对象交互的方式等。类型信息在对象创建时绑定到对象上。2）对象的私有数据，不同的对象有不同的私有数据，不同类型的对象对私有数据的使用方法也不同，例如整数对象的私有数据部分用于保存数值，字符串对象的私有数据用于保存字符序列。
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

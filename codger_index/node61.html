@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>字节码转换框架</TITLE>
+<META NAME="description" CONTENT="字节码转换框架">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node87.html">
+<LINK REL="previous" HREF="node38.html">
+<LINK REL="up" HREF="index.html">
+<LINK REL="next" HREF="node62.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html777"
+  HREF="node62.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html775"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html769"
+  HREF="node60.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html778"
+  HREF="node62.html">常量</A>
+<B> Up:</B> <A NAME="tex2html776"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html770"
+  HREF="node60.html">export语句</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00070000000000000000">
+字节码转换框架</A>
+</H1>
+Codger解析器加载源程序时，前先对源程序进行词法分析，词别出由字符序列组成的单词，接着把单词交给语法分析模块处理。语法分析模块会生与源程序等价的抽象语法树，交给字节码转换模块。字节码转换模块负责根据抽象语法树生成字节码。
+
+<P>
+抽象语法树（abstract syntax tree，AST）是源代码的抽象语法结构的树状表示，它并不依赖于源语言的语法，树上的每个节点都表示源代码中的一种结构，这所以说是抽象的，是因为抽象语法树并不会表示出真实语法出现的每一个细节，比如说，嵌套括号被隐含在树的结构中，并没有以节点的形式呈现。
+
+<P>
+Codger字节码转换算法采递归的形式把抽象语法树转换成字节码。语法树的每个节点实现了方法getopocde，当父节点getopcode方法被调用时，它会依次调用子节点的getopcode方法得到子节点的字节码，最后把所有子节点的字节码加工后返回。例如：a+b*c生成抽象语法后(如图<A HREF="#fig:abs_tree2"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>)得到根节点root,根节点root指向节点plus，节点plus有两个子节点，左节点为variable_a，右节点为mul。当plus的 getopcode 被调用时，plus会先调用左节点variable_a的 getopcode 方法得到左节点的字节码，然后调用右节点mul的 getopcode 方法得到右节点的字节码，最后把两个字节码加在一起，在后面增加一条OP_PLUS，如下图：<PRE>
++-----------+--------------+-------+
+|左节点字节码| 右节点字节码 |OP_PLUS|
++ ----------+--------------+-------+
+</PRE>
+每种类型的节点有3种不同类型的转换：取值转换，赋值转换，运算并赋值转换。
+
+<OL>
+<LI>取值转换表示取当前节点的值，也就是上面谈到的getopcode方法，每个节点必须实现这种转换方式。
+</LI>
+<LI>赋值转换用于直接赋值语句中，表示对该节点赋值，这种转换方式为可选。例如：语句 a=a 生成抽象语法树后有两个节点，虽然左节点和右节点的类型相同，但它们的转换方式却不同，左节点赋值转换，右节点却为取值转换。
+</LI>
+<LI>运算并赋值转换转换，用于运算并赋值语句中，这种转换方式为可选。
+</LI>
+</OL>
+在实现在算法时，为了尽量减少动态内存的分配，每次先分配一块大的内存，该内存在转换时被所有的节点共享，父节点告诉子节点从那里开始写入它的转换后的字节码，这种方法能提高整个转换算法性能，这也时Codger采用的方法。
+
+<DIV ALIGN="CENTER"><A NAME="fig:abs_tree2"></A><A NAME="634"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+抽象语法树 a+b*c</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+
+</DIV> [scale=1]abs_tree2.png</TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+下面的部分会依次介始每一种类型的节点，它转换字节码的框架。被<code>&lt;  &gt;</code>的内容表示这是一个节点，例如图<A HREF="#fig:abs_tree2"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>节点plus，它有两个子节点，在表示时用<code>&lt;节点名&gt;</code>，为了保持整体的可读性，一条语句的所有信息都会出现。节点plus用后面的表示法为：<PRE>
+&lt;expr1&gt; + &lt;expr2&gt;
+</PRE>
+其中<code>&lt;expr1&gt;</code>表示左节点，<code>&lt;expr2&gt;</code>表示右节点，它被转换后的字节码表示为:<PRE>
+{
+    expr1
+}
+{
+    expr2
+}
+OP_PLUS
+</PRE>
+大括号表示调用子节点的getopcode方法。从上到下表示转换过后的字节码的排列顺序，节点expr1排在最前面，所以它在上面，最以OP_PLUS结尾。
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html779"
+  HREF="node62.html">常量</A>
+<LI><A NAME="tex2html780"
+  HREF="node63.html">变量</A>
+<LI><A NAME="tex2html781"
+  HREF="node64.html">数组</A>
+<LI><A NAME="tex2html782"
+  HREF="node65.html">散列表</A>
+<LI><A NAME="tex2html783"
+  HREF="node66.html">一元运算符</A>
+<LI><A NAME="tex2html784"
+  HREF="node67.html">下标运算符()</A>
+<LI><A NAME="tex2html785"
+  HREF="node68.html">下标运算符[ ]</A>
+<LI><A NAME="tex2html786"
+  HREF="node69.html">下标运算符 . </A>
+<LI><A NAME="tex2html787"
+  HREF="node70.html">二元运算符</A>
+<LI><A NAME="tex2html788"
+  HREF="node71.html">逻辑运算符AND</A>
+<LI><A NAME="tex2html789"
+  HREF="node72.html">逻辑运算符OR</A>
+<LI><A NAME="tex2html790"
+  HREF="node73.html">表达式语句</A>
+<LI><A NAME="tex2html791"
+  HREF="node74.html">直接赋值语句</A>
+<LI><A NAME="tex2html792"
+  HREF="node75.html">运算并赋值语句</A>
+<LI><A NAME="tex2html793"
+  HREF="node76.html">print语句</A>
+<LI><A NAME="tex2html794"
+  HREF="node77.html">for语句</A>
+<LI><A NAME="tex2html795"
+  HREF="node78.html">while语句</A>
+<LI><A NAME="tex2html796"
+  HREF="node79.html">if-elif-else语句</A>
+<LI><A NAME="tex2html797"
+  HREF="node80.html">break语句</A>
+<LI><A NAME="tex2html798"
+  HREF="node81.html">continue语句</A>
+<LI><A NAME="tex2html799"
+  HREF="node82.html">return语句</A>
+<LI><A NAME="tex2html800"
+  HREF="node83.html">函数定义语句</A>
+<LI><A NAME="tex2html801"
+  HREF="node84.html">类定义语句</A>
+<LI><A NAME="tex2html802"
+  HREF="node85.html">import语句</A>
+<LI><A NAME="tex2html803"
+  HREF="node86.html">export语句</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

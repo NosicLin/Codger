@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>内存管理模块的组成</TITLE>
+<META NAME="description" CONTENT="内存管理模块的组成">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node95.html">
+<LINK REL="previous" HREF="node93.html">
+<LINK REL="up" HREF="node93.html">
+<LINK REL="next" HREF="node95.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1141"
+  HREF="node95.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1139"
+  HREF="node93.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1133"
+  HREF="node93.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1142"
+  HREF="node95.html">页分配算法</A>
+<B> Up:</B> <A NAME="tex2html1140"
+  HREF="node93.html">内存管理</A>
+<B> Previous:</B> <A NAME="tex2html1134"
+  HREF="node93.html">内存管理</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00091000000000000000">
+内存管理模块的组成</A>
+</H2>
+Codger的内存管理分为四部分(如下图）,<PRE>
++-------+
+| Cache |                     --- level 3
++-------+---+------------+ 
+| QuickMem  |     Gc     |    --- level 2
++-----------+------------+
+|     MemBase            |    --- level 1
++------------------------+
+|      c lib             |    --- level 0
++------------------------+
+</PRE>
+<DL>
+<DT><STRONG>level 0:</STRONG></DT>
+<DD>C库的内存分配与释放接口malloc和free函数。
+</DD>
+<DT><STRONG>level 1:</STRONG></DT>
+<DD>MemBase用两个作用：封装c库接口和接供页分配接口：
+
+<OL>
+<LI>封装c库内存分配与释放的接口，这样做因为c库的malloc函数在分配0字节时，不同的平台会有不同返回值。在某些平台上，malloc(0)的返回值为指向一个固定地址的指针，该指针能被free函数识别到。而其它的一些平台上，malloc(0)的返回值为NULL。不同平台上malloc(0)的不同返回值会给解析器运行时带来了不确定性。MemBase负责对c库内存接口进行封装，让分配0字节大小的内存的返回值为指向一个固定地址的指针。
+</LI>
+<LI>level2 中的内存管理算法是建立在页的基础上面，要求分配的内存区域的起始地址页对齐，并且大小为页的大小。 C库的malloc函数只能分配指定大小字节的内存区域，不能指定区域的起始地址为页对齐，在C库中也没有提供以页为单位的分配接口。所以需要MemBase实现页分配与释放接口AllocPage和FreePage。
+</LI>
+</OL>
+</DD>
+<DT><STRONG>levle 2:</STRONG></DT>
+<DD>由QuickMem和Gc两部分构成:
+
+<OL>
+<LI>QuickMem和c库一样提供内存分配与释放接口，QuickMem采用以页为基础的内存管理算法，在小内存<A NAME="tex2html16"
+  HREF="footnode.html#foot1185"><SUP><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/footnote.png"></SUP></A>分配时，内存分配的速度比c库能快到3<code>~</code>4倍。从QuickMem中分配出去的内存必须调用释放函数归还，否则会造成内存遗漏。
+</LI>
+<LI>Gc的全称的Garbage Collection，Codger的所有对象比须从Gc中分配，这些对象不需要调用释放函数归还给Gc，Gc也没提供对象释放接口。每隔一段时间，Gc的垃圾回收例程会工作，收集那些在程序中不能被访问到的对象，这些对象被称作为垃圾对象。垃圾对象被回收后，它所占用的内存可被重新利用，Gc的垃圾回收算法为分代式节点复制法。
+</LI>
+</OL>
+</DD>
+<DT><STRONG>level 3:</STRONG></DT>
+<DD>虚拟机在运行时，会不停的分配也释放虚拟机本身管理所需要的内存，分配与释放频率很高的内存块会被缓存一定的数量。例如每当一个Codger方法分调用时，虚拟机会创建一个栈帧，当Codger方法返回时，栈帧会被释放，如果分次栈帧创建都从QuickMem中分配，释放时在返回给QuickMem，这样一来一回，会耗掉很多时间。
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

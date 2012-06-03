@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>标记位</TITLE>
+<META NAME="description" CONTENT="标记位">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="previous" HREF="node100.html">
+<LINK REL="up" HREF="node97.html">
+<LINK REL="next" HREF="node102.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html1211"
+  HREF="node102.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html1209"
+  HREF="node97.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html1205"
+  HREF="node100.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html1212"
+  HREF="node102.html">About this document ...</A>
+<B> Up:</B> <A NAME="tex2html1210"
+  HREF="node97.html">垃圾回收算法</A>
+<B> Previous:</B> <A NAME="tex2html1206"
+  HREF="node100.html">拦截器</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H3><A NAME="SECTION00094400000000000000">
+标记位</A>
+</H3>
+Codger中的对象总共需要2个标记位，一个为标记该对象是否需要在下次垃圾回收时提升到年老分代，一个用于标记对象是否引用了低级别的对象。这两个位如果单独给它们分配一个long型域用于保存它们，显得太浪费，这会让每个对象占用的空间多上4字节。即使在定义时，使用char型，编译器在编译时，会考虑在32位平台上4字节对齐，最后每个对象还是会多占用4字节的空间。
+
+<P>
+在Codger中，每个对象都有一个指针域用于指向该对象类型的信息，如果类型信息是从QuickMem中动态分配,QuickMem能保证得到的指针是8字节对齐，如果类型信息是在程序中使用静态数据，也可通过编译器的扩展语法保证所得到的地址为4字节对齐。保证对象类型信息至少4字节对齐后，它的低2位就可用于对象的标记位，当需要获得对象类型信息时，只需要将低两位屏蔽掉即可。Codger在实现的代码如下，该结构体只适用于CPU为小端字节:<PRE> 
+struct  gr_object 
+{
+    union{
+        struct gr_type_info* g_type;    #类型信息
+        struct 
+        {
+            long g_ref_low:1;    #引用低级别对象的标记位
+            long g_upgrade:1;    #提升标记位
+            long g_reverse:30;
+        };
+    };
+};
+</PRE>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

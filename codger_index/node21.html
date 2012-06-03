@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>变量</TITLE>
+<META NAME="description" CONTENT="变量">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node22.html">
+<LINK REL="previous" HREF="node20.html">
+<LINK REL="up" HREF="node19.html">
+<LINK REL="next" HREF="node22.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html353"
+  HREF="node22.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html351"
+  HREF="node19.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html345"
+  HREF="node20.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html354"
+  HREF="node22.html">基本数据类型</A>
+<B> Up:</B> <A NAME="tex2html352"
+  HREF="node19.html">数据类型</A>
+<B> Previous:</B> <A NAME="tex2html346"
+  HREF="node20.html">对象</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00042000000000000000">
+变量</A>
+</H2>
+Codger是一门动态类型语言，所有对象的类型都是在运行时才能确定，变量在使用时不需要预先申明，也不需要申明变量的类型，可以不同的时刻给变量赋值不同类型的对象，例如下面的语句：<PRE>
+a=2          #把整数对象2赋值给变量a
+a="Codger"   #把字符串对象"Codger"赋值变量a
+</PRE>
+当对一个变量赋值时，变量中会保存到该对象的引用，如果访问一个未引用对象的变量时，虚拟机会抛出变量未定义的异常。当把一个变量赋值给另一个变量，两个变量所引用的对象为同一个，例如：<PRE>
+a=[3,4]       #变量a引用一个数组对象
+b=a           #把变量a赋值给变量b
+a.push(5)     #调用a引用数组对象的push方法
+print b       #输出b，结果为 [3,4,5]
+</PRE>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

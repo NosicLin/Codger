@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>解析器简介</TITLE>
+<META NAME="description" CONTENT="解析器简介">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="previous" HREF="node2.html">
+<LINK REL="up" HREF="node1.html">
+<LINK REL="next" HREF="node4.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html152"
+  HREF="node4.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html150"
+  HREF="node1.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html146"
+  HREF="node2.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html153"
+  HREF="node4.html">词法</A>
+<B> Up:</B> <A NAME="tex2html151"
+  HREF="node1.html">简介</A>
+<B> Previous:</B> <A NAME="tex2html147"
+  HREF="node2.html">Codger简介</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00012000000000000000">
+解析器简介</A>
+</H2>
+解析器用于解析并运行Codger源程序，当Codger源文件被解析时，它的处理过程如图<A HREF="#fig:fileprocess"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>。解析器分成两部分：解析器前端和解析器后端。解析器前端负责检查源程序中的词法、语法错误，生成与源程序等价的抽象语法树，并根据抽象语法树生成模块对象，模块对象是源程序的一种等价表示，它包含了源程中出现的所有常量和标识符以及源程序被转换后的字节码等信息。解析器后端也被称作为虚拟机，它负责字节码的运行，异常处理以及内存管理等。
+
+<P>
+
+<DIV ALIGN="CENTER"><A NAME="fig:fileprocess"></A><A NAME="18"></A>
+<TABLE>
+<CAPTION ALIGN="BOTTOM"><STRONG>Figure:</STRONG>
+解析器工作流程</CAPTION>
+<TR><TD>
+<DIV ALIGN="CENTER">
+
+</DIV>[scale=0.8]file_process.png</TD></TR>
+</TABLE>
+</DIV>
+
+<P>
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>
