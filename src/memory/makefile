@@ -26,7 +26,7 @@ BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
 #FLAGS=-g -Wall  -Werror -include sys/types.h
-FLAGS=-g -Wall  -include sys/types.h
+FLAGS=-O3 -Wall  -include sys/types.h
 INCLUDE=-I. -I./debug   -I../  
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug  -L../lib \
 	-llexical -lobject -lutility_c -lsyntax -lextends -lm \

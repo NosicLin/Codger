@@ -42,7 +42,7 @@ GrObject* GrFunc_Call(GrFunc* gf,GrObject* host,GrArray* args)
 	return GrFunc_CallWithRetVal(gf,host,args,NULL);
 }
 
-GrObject* GrFunc_CallWithRetVal(GrFunc* gf,GrObject* host,GrArray* args,GrObject* retval)
+inline GrObject* GrFunc_CallWithRetVal(GrFunc* gf,GrObject* host,GrArray* args,GrObject* retval)
 {
 	assert(host);
 	int args_nu=GrArray_Size(args);

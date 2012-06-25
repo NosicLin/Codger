@@ -3,7 +3,7 @@
 
 #include"mem_base.h"
 
-#define GR_MEM_TOOL_DEBUG
+//#define GR_MEM_TOOL_DEBUG
 #ifdef  GR_MEM_TOOL_DEBUG
 
 #define GrMem_Alloc Gr_Alloc

@@ -14,7 +14,7 @@ list: list start '\n'
 	| start '\n'
 	;
 
-start: expr {printf("result: %d\n\n",$1);}
+start: expr {printf("\t%d\n\n",$1);}
 	| assign
 	;
 

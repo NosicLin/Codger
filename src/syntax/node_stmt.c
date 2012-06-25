@@ -220,7 +220,7 @@ static int expr_to_opcode(AstObject* ab,GrModule* m,
 
 	ret=GrOpcode_NeedMore(op,1);
 	if(ret<0) return -1;
-	GrOpcode_Push(op,OP_DISCARD);
+	GrOpcode_Push(op,OP_EXPR_DISCARD);
 	return 0;
 }
 

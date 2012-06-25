@@ -27,7 +27,8 @@ BIN_OBJ_NAME=$(BIN:%.c=%.o)
 BIN_OBJ_NAME_WITH_PATH=$(addprefix obj/,$(BIN_OBJ_NAME))
 
 CC=gcc
-FLAGS=-g -Wall  -Werror
+#FLAGS=-g -Wall  -Werror
+FLAGS=-O3 -Wall  -Werror
 INCLUDE=-I. -I./debug   -I../
 LIB=-Llib -l$(PROJECT) -l$(PROJECT)debug -L../../lib -lutility_c  \
 	-L../lib/ 

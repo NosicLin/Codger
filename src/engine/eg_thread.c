@@ -193,7 +193,7 @@ void EgThread_SFrameReturn(EgThread* eg)
 
 int  EgThread_Run(EgThread* e)
 {
-	int exit_code;
+	int exit_code=0;
 	eg_thread_cur=e;
 	if(e->t_fstack==NULL)
 	{
@@ -206,13 +206,13 @@ int  EgThread_Run(EgThread* e)
 
 
 	/* used for temp compute */
-	register u_int8_t cur_code;	/* instruction register*/
-	register u_int32_t rd; 		/* data register */
-	u_int32_t rs; 				/* status register */
-	register GrObject* acc;		
-	register GrObject* r0;
-	register GrObject* r1;
-	register GrObject* r2;
+	register u_int8_t cur_code=0;	/* instruction register*/
+	register u_int32_t rd=0; 		/* data register */
+	u_int32_t rs=0; 				/* status register */
+	register GrObject* acc=NULL;		
+	register GrObject* r0=NULL;
+	register GrObject* r1=NULL;
+	register GrObject* r2=NULL;
 
 
 
@@ -490,6 +490,18 @@ next_instruct:
 		case OP_DISCARD:
 			sp--;
 			goto next_instruct;
+#ifdef CODGER_INTERACTIVE
+		case OP_EXPR_DISCARD:
+			UNPACK_ONE_OP;
+			GrObject_Print(r0,stderr,GR_PRINT_SPACE);
+			printf(stderr,"\n");
+			goto next_instruct;
+#else 
+		case OP_EXPR_DISCARD:
+			sp--;
+			goto next_instruct;
+#endif 
+
 		case OP_DUP_DATA1:
 			REF_ONE_OP;
 			R0_PUSH;
