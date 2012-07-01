@@ -1,0 +1,716 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>字节码的内部执行过程</TITLE>
+<META NAME="description" CONTENT="字节码的内部执行过程">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="index.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html328"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html326"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html320"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html329"
+  HREF="node12.html">解析器源码</A>
+<B> Up:</B> <A NAME="tex2html327"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html321"
+  HREF="node10.html">Codger文法</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html330"
+  HREF="node11.html#SECTION000111000000000000000">不带参数的字节码</A>
+<LI><A NAME="tex2html331"
+  HREF="node11.html#SECTION000112000000000000000">带参数的字节码</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION000110000000000000000">
+字节码的内部执行过程</A>
+</H1>
+
+<H2><A NAME="SECTION000111000000000000000">
+不带参数的字节码</A>
+</H2>
+
+<OL>
+<LI>OP_CALL: 方法调用，需要操作数2个，例如: cos(3) 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.call(Nil,r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_CALL_WITH_HOST: 调用对象的方法，需要操作数3个，例如:a.add(3)
+<BR>执行过程为：<PRE>
+r2=dstack.pop()
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r1.op_call(r1,r2)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_SET_ITEM: 给集合指定的元素赋值，需要3个操用数。例如: a[3]=4  
+<BR>执行过程为: <PRE>
+r2=dstack.pop()
+r1=dstack.pop()
+r0=dstack.pop()
+r1.set_item(r2,r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_GET_ITEM: 访问集合中指定的元素，需要2个操作数，例如: a[3] 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.get_item(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_POSITIVE: 一元运算符 + ，需要1个操作数，例如: +a 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=r0.positive()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_NEGATIVE: 一元运算符 - ，需要1个操作数，例如:-a 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=r0.negative()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_NEGATED: 一元运算符 <code>~</code> ，需要1个操作数，例如：<code>~</code>a 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=r0.negated()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_MUL: 二元运算符 * ，需要2个操作数，例如：1*2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.mul(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DIV：二元运算符 <code>/</code> ，需要2个操作数，例如：1<code>/</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.div(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_MOD：二元运算符 <code>%</code> ，需要2个操作数，例如：1<code>%</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.mod(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_PLUS：二元运算符 <code>+</code> ，需要2个操作数，例如：1<code>+</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.plus(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_MINUS：二元运算符 <code>-</code> ，需要2个操作数，例如：1<code>-</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.minus(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LSHIFT：二元运算符 <code>&lt;&lt;</code> ，需要2个操作数，例如：1<code>&lt;&lt;</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.lshift(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_RSHIFT：二元运算符 <code>&gt;&gt;</code> ，需要2个操作数，例如：1<code>&gt;&gt;</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.rshift(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_AND：二元运算符 <code>&amp;</code> ，需要2个操作数，例如：1<code>&amp;</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.and(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_XOR：二元运算符 <code>^</code> ，需要2个操作数，例如：1<code>^</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.xor(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_OR：二元运算符 <code>|</code> ，需要2个操作数，例如：1<code>|</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.or(r1)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LT：二元运算符 <code>&lt;</code> ，需要2个操作数，例如：1<code>&lt;</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.lt(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LE：二元运算符 <code>&lt;=</code> ，需要2个操作数，例如：1<code>&lt;=</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.le(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_EQ：二元运算符 <code>==</code> ，需要2个操作数，例如：1<code>==</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.eq(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_NE：二元运算符 <code>!=</code> ，需要2个操作数，例如：1<code>!=</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.ne(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_GE：二元运算符 <code>&gt;=</code> ，需要2个操作数，例如：1<code>&gt;=</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.ge(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_GT：二元运算符 <code>&gt;</code> ，需要2个操作数，例如：1<code>&gt;</code>2 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+acc=r0.gt(r1)?true:false
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_BOOL：布尔类型转换，需要1个操作数
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=r0.bool()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_BOOL_NOTAKE：布尔类型转换，需要1个操作数，但操作数不会被弹出数据栈
+<BR>执行过程为：<PRE>
+r0=dstack.top()
+acc=r0.bool()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LOGIC_NOT：逻辑运算符not，需要1个操作数，例如：not 1 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=not r0.bool()
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_PRINT：输出指令，需要1个操作数，例如： print ``Codger'' 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r0.print()
+</PRE>
+
+<P>
+</LI>
+<LI>OP_PRINT_LN：输出换行符指令，不需操作数，例如：print 
+<BR>执行过程为：<PRE>
+print("\n")
+</PRE>
+
+<P>
+</LI>
+<LI>OP_ITER：获取对象的迭代器，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+acc=r0.iter()
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_ITER_NEXT：获取迭代器的下一个元素，需要1个操作数，但操作数不会被弹出数据栈 
+<BR>执行过程为：<PRE>
+r0=dstack.top()
+acc=r0.iter_next()
+if acc != iter_stop
+    pc+=3
+    dstack.push(acc)
+end
+</PRE>
+
+<P>
+</LI>
+<LI>OP_ARRAY_BEGIN：创建一个数组对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=Array()       #创建函数对象
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_ARRAY_PUSH：向数组对象的尾部增加元素，需要2个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=dstack.pop()
+r0.push_back(r1)
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_ARRAY_END：保留指令
+</LI>
+<LI>OP_FUNC_BEGIN：创建一个函数对象,需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=Func()                 #创建函数对象
+acc.set_scope(cur_scope)   #引用当前作用域
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_FUNC_DEFAULT_ARGS：设置函数对象的默认参数的值，如果函数有多个默认参数，该指令会把值赋给第一个还未设置的默认参数，需要2个操作数 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_defalut_arg(r1)
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_CLASS_INHERIT：类对象继承另一个类对象，需要操作数2个 
+<BR>执行过程为：<PRE>
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_inherit(r1)
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LOAD_NIL：把空对象Nil压入数据栈，需要0个操作数  
+<BR>执行过程为：<PRE>
+acc=Nil
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DISCARD：从数据栈中弹出一个对象，并抛弃，需要0个操作数 
+<BR>执行过程为：<PRE>
+dstack.pop()
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DUP_DATA1：复制数据栈栈顶的对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.top()
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DUP_DATA2：复制数据栈栈顶的2个对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+r2=dstack[sp-1]
+r1=dstack[sp-2]
+dstack.push(r0)
+dstack.push(r1)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DUP_DATA3：复制数据栈栈顶的3个对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+r2=dstack[sp-1]
+r1=dstack[sp-2]
+r0=dstack[sp-3]
+dstack.push(r0)
+dstack.push(r1)
+dstack.push(r2)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DATA_SWAP0_1：交换数据栈栈顶第0个对象与第1个对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-2]
+dstack[sp-2]=acc
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DATA_SWAP0_2：交换数据栈栈顶第0个对象与第2个对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-3]
+dstack[sp-3]=acc
+</PRE>
+
+<P>
+</LI>
+<LI>OP_DATA_SWAP0_3：交换数据栈栈顶第0个对象与第3个对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=dstack[sp-1]
+dstack[sp-1]=dstack[sp-4]
+dstack[sp-4]=acc
+</PRE>
+
+<P>
+</LI>
+<LI>OP_EXIT：退出指令，需要0个操作数 
+<BR>执行过程为：<PRE>
+EgThread.exit()
+</PRE>
+
+<P>
+</LI>
+<LI>OP_RETURN：栈帧返回指令，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+EgThread.return(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_RETURN_NIL：栈帧返回指令，需要0个操作数 
+<BR>执行过程为：<PRE>
+r0=Nil
+EgThread.return(r0)
+</PRE>
+</LI>
+</OL>
+
+<P>
+
+<H2><A NAME="SECTION000112000000000000000">
+带参数的字节码</A>
+</H2>
+
+<OL>
+<LI>OP_GET_ATTR：访问对象成员，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=symbols_pool[rd]
+acc=r0.get_attr(r1,r0==sframe.host)
+dstack.push(acc)
+</PRE>
+其中sframe表示当前的栈帧，host为sframe的属主对象，rd是指令的参数。
+
+<P>
+</LI>
+<LI>OP_SET_ATTR：给对象的成员赋值，需要2个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=dstack.pop()
+r2=symbols_pool[rd]
+r1.set_attr(r2,r0,r1==sframe.host)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_CLASS_BEGIN：创建一个类对象，需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=Class()
+r0=symbols_pool[rd]
+acc.set_name(r0)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_CLASS_TEMPLATE：向类的模板中增加元素，需要2个操作数 
+<BR>执行过程为：<PRE>
+r2=perm_symbols_pool[rd]
+r1=dstack.pop()
+r0=dstack.pop()
+r0.add_template(r2,r1)
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_CLASS_ATTR：设置类对象的属性或方法，需要2个操作数 
+<BR>执行过程为：<PRE>
+r2=perm_symbols_pool[rd]
+r1=dstack.pop()
+r0=dstack.pop()
+r0.set_attr(r2,r1)
+dstack.push(r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_FUNC_OPCODE：设置函数对象的字节码，需要1个操作数,但不会弹出数据栈 
+<BR>执行过程为：<PRE>
+r0=dstack.top()
+r1=opcodes_pool[rd]
+r0.set_opcode(r1)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LOAD_CONST：加载常量到数据栈,需要0个操作数 
+<BR>执行过程为：<PRE>
+acc=consts_pool[rd]
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LOAD_SYMBOL：从当前作用域中查找符号的值到数据栈,需要0个操作数 
+<BR>执行过程为：<PRE>
+r0=symbols_pool[rd]
+acc=scope.lookup(r0)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_LOAD_U_SYMBOL：从上层作用域到顶层作用域中查找符号的值到数据栈,需要0个操作数 
+<BR>执行过程为：<PRE>
+r0=symbols_pool[rd]
+acc=scope.lookup_upper(r0)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_STORE_SYMBOL：把符号的值到存入到当前作用域,需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=symbols_pool[rd]
+scope.map(r1,r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_STORE_U_SYMBOL：把符号的值到存入到上层作用域,需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=symbols_pool[rd]
+scope.map_upper(r1,r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_IMPORT：模块导入指令,需要0个操作数 
+<BR>执行过程为：<PRE>
+r0=symbols_pool[rd]
+acc=EgThread.import(r0)
+dstack.push(acc)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_EXPORT：导出指令,需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+r1=symbols_pool[rd]
+cur_module.set_attr(r1,r0)
+</PRE>
+
+<P>
+</LI>
+<LI>OP_BREAK：保留指令，用于辅助字节码生成，最终会被 OP_JUMPR* 指令代替。
+</LI>
+<LI>OP_CONTINUE：保留指令，用于辅助字节码生成，最终会被 OP_JUMPR* 指令代替。
+
+<P>
+</LI>
+<LI>OP_JUMPR_FORWARD：向前跳转指令，需要0个操作数 
+<BR>执行过程为：<PRE>
+pc+=rd-3
+</PRE>
+
+<P>
+</LI>
+<LI>OP_JUMPR_BACK：向后跳转指令，需要0个操作数 
+<BR>执行过程为：<PRE>
+pc-=rd+3
+</PRE>
+
+<P>
+</LI>
+<LI>OP_JUMPR_FALSE_FORWARD：向前跳转指令，只有假时执行，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+rs=r0.bool()
+if(not rs) pc+=rd-3
+</PRE>
+
+<P>
+</LI>
+<LI>OP_JUMPR_TRUE_FORWARD：向前跳转指令，只有真时执行，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+rs=r0.bool()
+if(rs) pc+=rd-3
+</PRE>
+
+<P>
+</LI>
+<LI>OP_JUMPR_FALSE_BACK：向后跳转指令，只有假时执行，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+rs=r0.bool()
+if(not rs) pc-=rd+3
+</PRE>
+
+<P>
+</LI>
+<LI>OP_JUMPR_TRUE_BACK：向后跳转指令，只有真时执行，需要1个操作数 
+<BR>执行过程为：<PRE>
+r0=dstack.pop()
+rs=r0.bool()
+if(rs) pc-=rd+3
+</PRE>
+</LI>
+</OL>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html328"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html326"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html320"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html329"
+  HREF="node12.html">解析器源码</A>
+<B> Up:</B> <A NAME="tex2html327"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html321"
+  HREF="node10.html">Codger文法</A></DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>

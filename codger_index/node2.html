@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2008 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>词法</TITLE>
+<META NAME="description" CONTENT="词法">
+<META NAME="keywords" CONTENT="index">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2008">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="index.css">
+
+<LINK REL="next" HREF="node3.html">
+<LINK REL="previous" HREF="node1.html">
+<LINK REL="up" HREF="index.html">
+<LINK REL="next" HREF="node3.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html148"
+  HREF="node3.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html146"
+  HREF="index.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html140"
+  HREF="node1.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A>   
+<BR>
+<B> Next:</B> <A NAME="tex2html149"
+  HREF="node3.html">词法识别算法</A>
+<B> Up:</B> <A NAME="tex2html147"
+  HREF="index.html">index</A>
+<B> Previous:</B> <A NAME="tex2html141"
+  HREF="node1.html">简介</A>
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html150"
+  HREF="node2.html#SECTION00021000000000000000">关键字</A>
+<LI><A NAME="tex2html151"
+  HREF="node2.html#SECTION00022000000000000000">标识符</A>
+<LI><A NAME="tex2html152"
+  HREF="node2.html#SECTION00023000000000000000">特殊符号与运算符</A>
+<LI><A NAME="tex2html153"
+  HREF="node2.html#SECTION00024000000000000000">整数</A>
+<LI><A NAME="tex2html154"
+  HREF="node2.html#SECTION00025000000000000000">长整数</A>
+<LI><A NAME="tex2html155"
+  HREF="node2.html#SECTION00026000000000000000">浮点数</A>
+<LI><A NAME="tex2html156"
+  HREF="node2.html#SECTION00027000000000000000">字符串</A>
+<LI><A NAME="tex2html157"
+  HREF="node2.html#SECTION00028000000000000000">注释</A>
+<LI><A NAME="tex2html158"
+  HREF="node2.html#SECTION00029000000000000000">空白符</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00020000000000000000">
+词法</A>
+</H1>
+codger源程序由一系列具有独立意义的基本语法单位-单词组成，单词是最小的词法单位，它们不能分割。单词分为8类：关键字，运算符，特殊符号，整数，长整数，浮点数，字符串，标识符，空白符，注释，其中空白符与注释属于无用单词，当被扫描器识别到时，会立刻被弃。
+
+<P>
+解析器中的语法识别模块用于对codger源程序进行词法分析，从输入字符流中扫描出由字符序列组成的单词。并把识别出的单词交给后面的语法分析模块进一步处理，并在识别过程中检测是否存在非法的单词。
+
+<H2><A NAME="SECTION00021000000000000000">
+关键字</A>
+</H2>
+codger中关键字具有专门的意义与用途，它们不能被当作一般的标识符来使用，这些关键字有：<PRE>
+and, as, attr, break, catch, class, continue, export,
+do, elif, else, end, false, finally, for, from, func, 
+if, import, in, inherit, new, not, or, print, private, 
+protected, public, return, static, then, to, true,
+try, while。
+</PRE>
+<H2><A NAME="SECTION00022000000000000000">
+标识符</A>
+</H2>
+标识符用于定义变量，函数，类，方法等所使用的名称，解析器没有限定标识符的长度，但在定义标识符时，需要遵守一定的规则：以字母或者下画线开头，后面可以接零个或多个字母、数字、下画线，并且区会字母的大写与小写。用文法表示为：<PRE>
+identifier =(letter|"_"|)(letter|digit|"_")*
+digit ="0".."9"
+letter =lowercase|uppercase
+lowercase ="a".."z"
+uppercase ="A".."Z"
+</PRE>
+<H2><A NAME="SECTION00023000000000000000">
+特殊符号与运算符</A>
+</H2>
+在codger中，运算符用于指定一种运算方式，特殊符号用于分隔不同的语句或者用于指定某些特定意义的用途。它们有：<PRE>
+ (   )   [   ]   .   ,  +   -   ~   *  ；
+ /   %  &lt;&lt;   &gt;&gt;   &lt;   &gt;   &lt;=   &gt;=  ==  {  }
+ !=   &amp;   ^   | =   +=   -=   *=   /=  -&gt;
+ %=   &amp;=   ^=   |=   &gt;&gt;=   &lt;&lt;=  换行符
+</PRE>
+<H2><A NAME="SECTION00024000000000000000">
+整数</A>
+</H2>
+整数是一种与机器平台相关的数据类型，在32位机上，其表示范围为 <SPAN CLASS="MATH"><IMG
+ WIDTH="43" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img1.png"
+ ALT="$-2^{31}$"></SPAN> 到 <SPAN CLASS="MATH"><IMG
+ WIDTH="61" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$2^{31}-1$"></SPAN>。而在64位机上，其表示范围为<SPAN CLASS="MATH"><IMG
+ WIDTH="43" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$-2^{63}$"></SPAN> 到 <SPAN CLASS="MATH"><IMG
+ WIDTH="61" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$2^{63}-1$"></SPAN> 。整数的表示范围有限，在设计程序时需要考虑运算结果溢出的情况。整数可以在codger源程序中显示的定义，整数又被分为二进制整数，八进制整数，十进制整数，十六进制整数。二进制整数以0b或者0B开头，后面紧接着一个或多个0或1；八进制整数以0或者0o、0O开头，后面紧接数字一个或多个0－7；十进制整数以1－9开头，后面紧接数字零个或多个0－9，或者是只有一位十进制整数0；十六进制整数以0x或都0X开头，后面紧接一个或者多个数字0－9、a－f、A－F。用文法表示为：<PRE>
+integer =decimalinteger|octinteger|hexinteger|bininteger
+decimalinteger = nonzerodigit digit* | "0"
+octinteger = "0" ("o" | "O") octdigit+ | "0" octdigit+
+hexinteger = "0" ("x" | "X") hexdigit+
+bininteger = "0" ("b" | "B") bindigit+
+nonzerodigit = "1"..."9"
+octdigit = "0"..."7"
+bindigit = "0" | "1"
+hexdigit:= digit | "a"..."f" | "A"..."F"
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION00025000000000000000">
+长整数</A>
+</H2>
+整数表示范围有限，在进行大数据运算时受到限制，Codger 提贡长整数用于解决这种问题。长整数是一种与机器无关的数据类型，可以进行任意大小的数据运算，不用去考虑数据溢出问题，但是前提是你的计算机有中够大的内存空间，来保存这些数据。 长整数可以在源程序中显示的定义，定义方法同整数一样，只有在后面多了一位字符L或者是l。用文法表示为：<PRE>
+  longinteger = integer ("l" | "L")
+</PRE>
+
+<P>
+
+<H2><A NAME="SECTION00026000000000000000">
+浮点数</A>
+</H2>
+在codger中采用的是32位浮点数，其数值范围约为：<SPAN CLASS="MATH"><IMG
+ WIDTH="105" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img5.png"
+ ALT="$-3.4*10^{-38}$"></SPAN> 到 <SPAN CLASS="MATH"><IMG
+ WIDTH="94" HEIGHT="39" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-3.4*10^{38}$"></SPAN> 。浮点数由三个部分组成：整数部分，浮点部分，指数部分。浮点数可以在源程序中显示定义，定义时整数部分与指数部分可以省去。用文法表示浮点数为：<PRE>
+floatnumber = pointfloat | exponentfloat
+pointfloat = [intpart] "." digit+
+exponentfloat = (intpart | pointfloat) exponent
+intpart = digit+
+exponent = ("e" | "E") ["+" | "-"] digit+
+</PRE>
+<H2><A NAME="SECTION00027000000000000000">
+字符串</A>
+</H2>
+字符串可以在源程序中显示定义，使用规则为：以双引号开头和双引号结尾，中间可以是除  和换行符以处的任意字符，其中 用于转义其它特殊字符，如果想要以多行的形式书写字符串，需要在每一行的未尾加上 。用文法表示为：<PRE>
+string =`"'stringitem*`"'
+stringitem = &lt;any source character except "\" 
+				or newline or the quote&gt; ｜"\"esc_item
+esc_item =&lt;any source character &gt;
+</PRE>
+<H2><A NAME="SECTION00028000000000000000">
+注释</A>
+</H2>
+在Codger注释以#号开头,直到这一行结果，解析器解析源程序，注释中的所有内容都分被忽略掉。用文法表示为：<PRE>
+comment ="#" cm_item* newline
+cm_item =&lt;any source character except newline&gt;
+</PRE>
+<H2><A NAME="SECTION00029000000000000000">
+空白符</A>
+</H2>
+Codger中的空白符由一个或都多个空格或者是制表符组成，程序中的空白符用于区分开不同的单词，或者使源程序的可读性更强。当解析器识别到空白符时，不会对它做任何的处理，只是简单的将它抛弃。用文法表示为：<PRE>
+white_space =ws_item+
+ws_item = space | tab
+</PRE>
+
+<P>
+
+<BR><HR>
+<ADDRESS>
+NosicLin
+2012-06-03
+</ADDRESS>
+</BODY>
+</HTML>
